@@ -69,19 +69,19 @@ commantaire %.*;
 \n {
   nb_ligne++;
 }
-{DIMENSIONTAB}   printf("  DIMENSION TAB reconnu\n");
-{DIMENSIONMAT}   printf("  DIMENSION MAT recconu\n");
-{identificateur} printf("  identificateur reconnu\n"); 
-{INTEGER} 		 printf(" num integer \n");
-{INTEGERPOSITIF} printf(" num integer positive \n");
-{INTEGERNEGATIF} printf(" num integer negative \n");
-{REAL} 			 printf(" num real \n");
-{caracter}	 	 printf(" CHARACTER reconnu\n");
-{chaine} 		 printf(" Chaine CHARACTER reconnu \n");
-{commantaire}	 printf(" %s commantaire ignore \n", yytext);
-{REALNEGATIF}	 printf(" REAL NEGATIF reconnu \n");
-{REALPOSITIF}	 printf(" REAL POSITIF reconnu \n");
-. 				 printf(" \"%s\" erreur lexicale a la ligne %d \n",yytext,nb_ligne);
+{DIMENSIONTAB}   { return DIMENSIONTAB; }
+{DIMENSIONMAT}   { return DIMENSIONMAT; }
+{identificateur} { return identificateur; } 
+{INTEGER}        { return INTEGER; }
+{INTEGERPOSITIF} { return INTEGERPOSITIF; }
+{INTEGERNEGATIF} { return INTEGERNEGATIF; }
+{REAL}           { return REAL; }
+{caracter}       { return caracter; }
+{chaine}         { return chaine; }
+{commantaire}    { /* Ignore les commentaires */ }
+{REALNEGATIF}    { return REALNEGATIF; }
+{REALPOSITIF}    { return REALPOSITIF; }
+.               printf(" \"%s\" erreur lexicale a la ligne %d \n",yytext,nb_ligne);
 
 %%
 
