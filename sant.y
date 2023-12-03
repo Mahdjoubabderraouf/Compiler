@@ -57,7 +57,6 @@
 %token REALPOSITIF
 %%
 programe : desFonctions prog_princ;
-
 desFonctions : fonnction desFonctions;
 fonnction : fonnction_signature declarations instructions ENDR
 
