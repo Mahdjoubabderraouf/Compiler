@@ -4,7 +4,6 @@
 #include "Syntaxique.tab.h"
 int nb_ligne = 0;
 %}
-
 lettre         [a-zA-Z]
 chiffre        [0-9]
 NATUREL        {chiffre}+
