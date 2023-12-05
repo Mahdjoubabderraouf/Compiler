@@ -4,12 +4,12 @@
 #include <stdlib.h>
 typedef struct   
 {
-  int state; 
-  char name[20];
-  char code[20];
-  char type[20];
-  float val;
-  int globale; /* si la variable est globale --> globle = 1 
+     int state; 
+   char name[20];
+   char code[20];
+   char type[20];
+   float val;
+   int globale; /* si la variable est globale --> globle = 1 
                                  sinon (local --> globale = 0)*/
   variable* suiv;
  }variable;// les variables        
@@ -32,8 +32,11 @@ typedef struct
    elt* suiv;
 } elt;// séparateurs & des mots clés 
 
+// element tab[1000];
+variable *tabVar;
+constant *tabConst;
 void addVariable(variable **tabVar, char *name, char *type, int state, float val, int globale)
-{   
+{
     variable *newVar = (variable*)malloc(sizeof(variable));
     newVar->state = state;
     strcpy(newVar->name, name);
