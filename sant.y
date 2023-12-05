@@ -57,7 +57,6 @@
 %token commantaire
 %token REALNEGATIF
 %token REALPOSITIF
-
 %left plus mpins
 %left etoile division
 %nonassoc EQ NE LT LE GT GE
@@ -66,13 +65,13 @@
 %right UNARY_OPERATOR
 
 %%
-Fonction : type mcROUTINE identificateur paraO Liste DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction | Programme_pr;
+Fonction : type mcROUTINE identificateur paraO Liste  DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction|Programme_pr;
 Programme_pr : mcPROGRAM DECLARATIONS INSTR mcEND;
 DECLARATIONS : type identificateur DECLARATIONS1;
 DECLARATIONS1 : point_virgule | virgule identificateur DECLARATIONS1 | TABLEAU | MATRICE | ;
 TABLEAU : DIMENSIONTAB DIMENSION_REST;
 MATRICE : DIMENSIONMAT DIMENSION_REST;
-DIMENSION_REST : virgule identificateur DECLARATIONS1 | ;
+DIMENSION_REST : virgule identificateur DECLARATIONS1|;
 type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
 INSTR : Affectation | ES | Condition | Boucle | Appel | Equivalence;
 Affectation : identificateur eq EXPR;
@@ -95,15 +94,13 @@ EXPR_CONDI : EXPR_CONDI_TYPE EXPR_CONDI_SUITE;
 EXPR_CONDI_TYPE : identificateur | LOGICAL_WORD_TRUE | LOGICAL_WORD_FALSE | INTEGER | REAL | paraO EXPR_CONDI paraF;
 EXPR_CONDI_SUITE : EXPR_CONDI_OP EXPR_CONDI_TYPE EXPR_CONDI_SUITE | point_virgule | ;
 EXPR_CONDI_OP : OR | AND | GT | GE | EQ | NE | LE | LT | paraO EXPR_CONDI paraF | OPER;
-Liste : identificateur  Liste1;
+Liste : identificateur Liste1;
 Liste1 : virgule identificateur Liste1 | ;
 OPER : plus | mpins | etoile | division;
 %%
-
 main()
 {
   yyparse();
 }
-
 yywrap()
 {}
