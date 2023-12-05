@@ -51,7 +51,6 @@ commantaire %.*;
 "LE"                { return LE; }
 "LT"                { return LT; }
 "Fonction_i"        { return Mot_cle_Fonction_i_reconnu; }
-
 "="                 { return eq; }
 ";"                 { return point_virgule; }
 "+"                 { return plus; }
@@ -63,9 +62,7 @@ commantaire %.*;
 ","                 { return virgule; }
 "("                 { return paraO; }
 ")"                 { return paraF; }
-
 [ \t]
-
 \n {
   nb_ligne++;
 }
@@ -82,9 +79,7 @@ commantaire %.*;
 {REALNEGATIF}    { return REALNEGATIF; }
 {REALPOSITIF}    { return REALPOSITIF; }
 .               printf(" \"%s\" erreur lexicale a la ligne %d \n",yytext,nb_ligne);
-
 %%
-
 int main( )
 {
   yylex();
