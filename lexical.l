@@ -1,9 +1,10 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "Syntaxique.tab.h"
+#include "test.tab.h"
 int nb_ligne = 0;
 %}
+
 lettre         [a-zA-Z]
 chiffre        [0-9]
 NATUREL        {chiffre}+
@@ -35,12 +36,12 @@ commantaire %.*;
 "ROUTINE"           { return mcROUTINE; }
 "ENDR"              { return mcENDR; }
 "CALL"              { return mcCALL; }
-"IF"                { return IF; }
-"THEN"              { return THEN; }
-"ELSE"              { return ELSE; }
-"ENDIF"             { return ENDIF; }
-"DOWHILE"           { return DOWHILE; }
-"ENDO"              { return ENDO; }
+"IF"                { return mcIF; }
+"THEN"              { return mcTHEN; }
+"ELSE"              { return mcELSE; }
+"ENDIF"             { return mcENDIF; }
+"DOWHILE"           { return mcDOWHILE; }
+"ENDO"              { return mcENDO; }
 "PartageMemoire"    { return PartageMemoire; }
 "OR"                { return OR; }
 "AND"               { return AND; }
@@ -62,7 +63,9 @@ commantaire %.*;
 ","                 { return virgule; }
 "("                 { return paraO; }
 ")"                 { return paraF; }
+
 [ \t]
+
 \n {
   nb_ligne++;
 }
@@ -79,7 +82,9 @@ commantaire %.*;
 {REALNEGATIF}    { return REALNEGATIF; }
 {REALPOSITIF}    { return REALPOSITIF; }
 .               printf(" \"%s\" erreur lexicale a la ligne %d \n",yytext,nb_ligne);
+
 %%
+
 int main( )
 {
   yylex();
