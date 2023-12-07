@@ -22,8 +22,8 @@ chaine 	\".+\"
 commantaire %.*;
 
 %%
-"TRUE"              { return LOGICAL_WORD_TRUE; }
-"FALSE"             { return LOGICAL_WORD_FALSE; }
+"TRUE"              { return mcTRUE; }
+"FALSE"             { return mcFALSE; }
 "INTEGER"           { return mcINTEGER; }
 "REAL"              { return mcREAL; }
 "CHARACTER"         { return mcCHARACTER; }
