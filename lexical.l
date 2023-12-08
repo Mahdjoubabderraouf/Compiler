@@ -61,7 +61,7 @@ commantaire %.*;
 "("                 { col = col + yyleng; return paraO; }
 ")"                 { col = col + yyleng; return paraF; }
 [ \t]               {col = col + strlen(yytext);}
-\n {col =1; nb_ligne++;}
+\n {col =1; nbligne++;}
 
 {DIMENSIONTAB}   { col = col + yyleng; return DIMENSIONTAB; }
 {DIMENSIONMAT}   { col = col + yyleng; return DIMENSIONMAT; }
