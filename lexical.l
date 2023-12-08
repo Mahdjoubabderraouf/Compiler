@@ -4,7 +4,6 @@
 #include "syntaxical_file.tab.h"
 int nb_ligne = 0;
 %}
-
 lettre         [a-zA-Z]
 chiffre        [0-9]
 NATUREL        {chiffre}+
@@ -20,7 +19,6 @@ identificateur {lettre}({lettre}|{chiffre}|\_){0,9}
 caracter \'.\'
 chaine 	\".+\"
 commantaire %.*;
-
 %%
 "TRUE"              { return mcTRUE; }
 "FALSE"             { return mcFALSE; }
@@ -62,9 +60,7 @@ commantaire %.*;
 ","                 { return virgule; }
 "("                 { return paraO; }
 ")"                 { return paraF; }
-
 [ \t]
-
 \n {
   nb_ligne++;
 }
