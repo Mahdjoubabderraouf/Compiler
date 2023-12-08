@@ -32,7 +32,6 @@
 %token NE
 %token LE
 %token LT
-%token Fonction_i
 %token eq
 %token point_virgule
 %token plus
