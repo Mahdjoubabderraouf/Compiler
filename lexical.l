@@ -60,7 +60,7 @@ commantaire %.*;
 ","                 { col = col + yyleng; return virgule; }
 "("                 { col = col + yyleng; return paraO; }
 ")"                 { col = col + yyleng; return paraF; }
-[ \t]
+[ \t]               {col = col + strlen(yytext);}
 \n {col =1; nb_ligne++;}
 
 {DIMENSIONTAB}   { col = col + yyleng; return DIMENSIONTAB; }
