@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "syntaxical_file.tab.h"
-int nb_ligne = 0;
+extern nb_ligne;
+extern col;
 %}
 lettre         [a-zA-Z]
 chiffre        [0-9]
@@ -14,71 +15,64 @@ DIMENSIONTAB   DIMENSION[\(]{NATUREL}[\)]
 DIMENSIONMAT   DIMENSION[\(]{NATUREL}[\,]{NATUREL}[\)]
 REALNEGATIF    \-{INTEGER}\.{NATUREL}
 REALPOSITIF    \+{INTEGER}\.{NATUREL}
-REAL		   {INTEGER}\.{NATUREL}
+REAL           {INTEGER}\.{NATUREL}
 identificateur {lettre}({lettre}|{chiffre}|\_){0,9}
 caracter \'.\'
 chaine 	\".+\"
 commantaire %.*;
 %%
-"TRUE"              { return mcTRUE; }
-"FALSE"             { return mcFALSE; }
-"INTEGER"           { return mcINTEGER; }
-"REAL"              { return mcREAL; }
-"CHARACTER"         { return mcCHARACTER; }
-"LOGICAL"           { return mcLOGICAL; }
-"READ"              { return mcREAD; }
-"WRITE"             { return mcWRITE; }
-"DIMENSION"         { return mcDIMENSION; }
-"PROGRAM"           { return mcPROGRAM; }
-"END"               { return mcEND; }
-"ROUTINE"           { return mcROUTINE; }
-"ENDR"              { return mcENDR; }
-"CALL"              { return mcCALL; }
-"IF"                { return mcIF; }
-"THEN"              { return mcTHEN; }
-"ELSE"              { return mcELSE; }
-"ENDIF"             { return mcENDIF; }
-"DOWHILE"           { return mcDOWHILE; }
-"ENDO"              { return mcENDO; }
-"PartageMemoire"    { return PartageMemoire; }
-"OR"                { return OR; }
-"AND"               { return AND; }
-"GT"                { return GT; }
-"EQ"                { return EQ; }
-"GE"                { return GE; }
-"NE"                { return NE; }
-"LE"                { return LE; }
-"LT"                { return LT; }
-"="                 { return eq; }
-";"                 { return point_virgule; }
-"+"                 { return plus; }
-"-"                 { return mpins; }
-"/"                 { return division; }
-"|"                 { return or ; }
-"@"                 { return aro; }
-"*"                 { return etoile; }
-","                 { return virgule; }
-"("                 { return paraO; }
-")"                 { return paraF; }
+"FALSE"             { col = col + yyleng; return mcFALSE; }
+"INTEGER"           { col = col + yyleng; return mcINTEGER; }
+"REAL"              { col = col + yyleng; return mcREAL; }
+"CHARACTER"         { col = col + yyleng; return mcCHARACTER; }
+"LOGICAL"           { col = col + yyleng; return mcLOGICAL; }
+"READ"              { col = col + yyleng; return mcREAD; }
+"WRITE"             { col = col + yyleng; return mcWRITE; }
+"DIMENSION"         { col = col + yyleng; return mcDIMENSION; }
+"PROGRAM"           { col = col + yyleng; return mcPROGRAM; }
+"END"               { col = col + yyleng; return mcEND; }
+"ROUTINE"           { col = col + yyleng; return mcROUTINE; }
+"ENDR"              { col = col + yyleng; return mcENDR; }
+"CALL"              { col = col + yyleng; return mcCALL; }
+"IF"                { col = col + yyleng; return mcIF; }
+"THEN"              { col = col + yyleng; return mcTHEN; }
+"ELSE"              { col = col + yyleng; return mcELSE; }
+"ENDIF"             { col = col + yyleng; return mcENDIF; }
+"DOWHILE"           { col = col + yyleng; return mcDOWHILE; }
+"ENDO"              { col = col + yyleng; return mcENDO; }
+"PartageMemoire"    { col = col + yyleng; return PartageMemoire; }
+"OR"                { col = col + yyleng; return OR; }
+"AND"               { col = col + yyleng; return AND; }
+"GT"                { col = col + yyleng; return GT; }
+"EQ"                { col = col + yyleng; return EQ; }
+"GE"                { col = col + yyleng; return GE; }
+"NE"                { col = col + yyleng; return NE; }
+"LE"                { col = col + yyleng; return LE; }
+"LT"                { col = col + yyleng; return LT; }
+"="                 { col = col + yyleng; return eq; }
+";"                 { col = col + yyleng; return point_virgule; }
+"+"                 { col = col + yyleng; return plus; }
+"-"                 { col = col + yyleng; return mpins; }
+"/"                 { col = col + yyleng; return division; }
+"|"                 { col = col + yyleng; return or ; }
+"@"                 { col = col + yyleng; return aro; }
+"*"                 { col = col + yyleng; return etoile; }
+","                 { col = col + yyleng; return virgule; }
+"("                 { col = col + yyleng; return paraO; }
+")"                 { col = col + yyleng; return paraF; }
 [ \t]
-\n {
-  nb_ligne++;
-}
-{DIMENSIONTAB}   { return DIMENSIONTAB; }
-{DIMENSIONMAT}   { return DIMENSIONMAT; }
-{identificateur} { return identificateur; } 
-{INTEGER}        { return INTEGER; }
-{INTEGERPOSITIF} { return INTEGERPOSITIF; }
-{INTEGERNEGATIF} { return INTEGERNEGATIF; }
-{REAL}           { return REAL; }
-{caracter}       { return caracter; }
-{chaine}         { return chaine; }
+\n {col =1; nb_ligne++;}
+
+{DIMENSIONTAB}   { col = col + yyleng; return DIMENSIONTAB; }
+{DIMENSIONMAT}   { col = col + yyleng; return DIMENSIONMAT; }
+{identificateur} { col = col + yyleng; return identificateur; } 
+{INTEGER}        { col = col + yyleng; return INTEGER; }
+{INTEGERPOSITIF} { col = col + yyleng; return INTEGERPOSITIF; }
+{INTEGERNEGATIF} { col = col + yyleng; return INTEGERNEGATIF; }
+{REAL}           { col = col + yyleng; return REAL; }
+{caracter}       { col = col + yyleng; return caracter; }
+{chaine}         { col = col + yyleng; return chaine; }
 {commantaire}    { /* Ignore les commentaires */ }
-{REALNEGATIF}    { return REALNEGATIF; }
-{REALPOSITIF}    { return REALPOSITIF; }
-.               printf(" \"%s\" erreur lexicale a la ligne %d \n",yytext,nb_ligne);
-%%
-int main( )
-{
-  yylex();
-}
+{REALNEGATIF}    { col = col + yyleng; return REALNEGATIF; }
+{REALPOSITIF}    { col = col + yyleng; return REALPOSITIF; }
+. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nb_ligne,col, yytext);}

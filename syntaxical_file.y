@@ -1,6 +1,5 @@
 %{
-#include<stdio.h>
-#include<stdlib.h>
+int nb_ligne=1; col=1;	
 %}
 %start Fonction
 %token mcTRUE
@@ -63,7 +62,7 @@
 %left paraO paraF
 %right UNARY_OPERATOR
 %%
-Fonction : type mcROUTINE identificateur paraO Liste  DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction|Programme_pr;
+Fonction : type mcROUTINE identificateur paraO Liste  DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction|Programme_pr{printf("prog syntaxiquement correct");YYACCEPT;}
 Programme_pr : mcPROGRAM DECLARATIONS INSTR mcEND;
 DECLARATIONS : type identificateur DECLARATIONS1;
 DECLARATIONS1 : point_virgule|virgule identificateur DECLARATIONS1|TABLEAU|MATRICE|;
@@ -98,7 +97,11 @@ OPER : plus|mpins|etoile|division;
 %%
 main()
 {
-  yyparse();
+yyparse();
 }
 yywrap()
 {}
+int yyerror(char *msg)
+{ printf(" Erreur syntaxique a ligne : %d a la colonne %d ", nb_ligne,col);
+   return 1;  
+}
