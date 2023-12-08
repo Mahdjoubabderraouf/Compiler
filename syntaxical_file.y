@@ -1,7 +1,6 @@
 %{
 #include<stdio.h>
 #include<stdlib.h>
-#include "sant.tab.h"
 %}
 %start Fonction
 %token mcTRUE
@@ -94,8 +93,8 @@ EXPR_CONDI : EXPR_CONDI_TYPE EXPR_CONDI_SUITE;
 EXPR_CONDI_TYPE : identificateur|mcTRUE|mcFALSE|INTEGER|REAL|paraO EXPR_CONDI paraF;
 EXPR_CONDI_SUITE : EXPR_CONDI_OP EXPR_CONDI_TYPE EXPR_CONDI_SUITE|point_virgule|;
 EXPR_CONDI_OP : OR|AND|GT|GE|EQ|NE|LE|LT|paraO EXPR_CONDI paraF|OPER;
-Liste : identificateur ListeRest;
-ListeRest : virgule identificateur ListeRest | ;
+Liste : identificateur 
+      | Liste virgule identificateur ;
 OPER : plus|mpins|etoile|division;
 %%
 main()

@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "test.tab.h"
+#include "syntaxical_file.tab.h"
 int nb_ligne = 0;
 %}
 
@@ -51,7 +51,6 @@ commantaire %.*;
 "NE"                { return NE; }
 "LE"                { return LE; }
 "LT"                { return LT; }
-"Fonction_i"        { return Mot_cle_Fonction_i_reconnu; }
 "="                 { return eq; }
 ";"                 { return point_virgule; }
 "+"                 { return plus; }
@@ -82,9 +81,7 @@ commantaire %.*;
 {REALNEGATIF}    { return REALNEGATIF; }
 {REALPOSITIF}    { return REALPOSITIF; }
 .               printf(" \"%s\" erreur lexicale a la ligne %d \n",yytext,nb_ligne);
-
 %%
-
 int main( )
 {
   yylex();
