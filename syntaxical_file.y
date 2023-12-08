@@ -1,5 +1,6 @@
 %{
-int nb_ligne=1; col=1;	
+int nbligne=1; 
+int col=1;	
 %}
 %start Fonction
 %token mcTRUE
@@ -102,6 +103,6 @@ yyparse();
 yywrap()
 {}
 int yyerror(char *msg)
-{ printf(" Erreur syntaxique a ligne : %d a la colonne %d ", nb_ligne,col);
+{ printf(" Erreur syntaxique a ligne : %d a la colonne %d ", nbligne,col);
    return 1;  
 }
