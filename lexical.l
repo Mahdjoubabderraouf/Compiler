@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "syntaxical_file.tab.h"
-extern nb_ligne;
+extern nbligne;
 extern col;
 %}
 lettre         [a-zA-Z]
@@ -75,4 +75,4 @@ commantaire %.*;
 {commantaire}    { /* Ignore les commentaires */ }
 {REALNEGATIF}    { col = col + yyleng; return REALNEGATIF; }
 {REALPOSITIF}    { col = col + yyleng; return REALPOSITIF; }
-. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nb_ligne,col, yytext);}
+. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nbligne,col, yytext);}
