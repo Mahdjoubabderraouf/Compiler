@@ -363,22 +363,22 @@ struct yy_trans_info
 static const flex_int16_t yy_accept[168] =
     {   0,
         0,    0,   56,   54,   40,   41,   54,   54,   54,   38,
-       39,   36,   31,   37,   32,   33,   45,   30,   29,   35,
-       44,   44,   44,   44,   44,   44,   44,   44,   44,   44,
-       44,   44,   44,   44,   44,   34,    0,    0,   51,    0,
-        0,   46,    0,   47,    0,   45,   44,   44,   44,   44,
-       44,   44,   44,   44,   24,   44,   25,   23,   14,   44,
-       27,   44,   28,   26,   21,   44,   44,   44,   44,   44,
-       44,   50,   49,   46,    0,   47,    0,   48,   44,   22,
-       44,   44,   44,   44,   44,   10,   44,   44,   44,   44,
-       44,   44,   44,   44,   44,   53,   52,   44,   13,   44,
+       39,   36,   31,   37,   32,   33,   44,   30,   29,   35,
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   46,
+       46,   46,   46,   46,   46,   34,    0,    0,   51,    0,
+        0,   47,    0,   48,    0,   44,   46,   46,   46,   46,
+       46,   46,   46,   46,   24,   46,   25,   23,   14,   46,
+       27,   46,   28,   26,   21,   46,   46,   46,   46,   46,
+       46,   50,   49,   47,    0,   48,    0,   45,   46,   22,
+       46,   46,   46,   46,   46,   10,   46,   46,   46,   46,
+       46,   46,   46,   46,   46,   53,   52,   46,   13,   46,
 
-       44,   44,   16,   44,   19,   12,   44,   44,   44,   44,
-       44,    6,    3,   44,   15,   44,   44,   44,   44,   44,
-       17,    1,   44,   44,   44,   44,   44,    7,   44,   44,
-       44,   44,   44,   44,   44,   44,   44,   44,   44,   44,
-       18,    2,    5,    9,   44,   11,   44,   44,   44,   44,
-       44,    4,    8,   44,   44,    0,   44,    0,    0,   42,
+       46,   46,   16,   46,   19,   12,   46,   46,   46,   46,
+       46,    6,    3,   46,   15,   46,   46,   46,   46,   46,
+       17,    1,   46,   46,   46,   46,   46,    7,   46,   46,
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   46,
+       18,    2,    5,    9,   46,   11,   46,   46,   46,   46,
+       46,    4,    8,   46,   46,    0,   46,    0,    0,   42,
         0,    0,    0,    0,   43,   20,    0
     } ;
 
@@ -550,8 +550,8 @@ char *yytext;
 #include <stdio.h>
 #include <stdlib.h>
 #include "syntaxical_file.tab.h"
-extern nbligne;
-extern col;
+int nbligne;
+int col;
 #include "symbolsTable.h"
 extern YYSTYPE yylval;
 #line 558 "lex.yy.c"
@@ -834,277 +834,277 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 26 "lexical.l"
-{addMotCle("FALSE" , "mcFALSE" ,1); col = col + yyleng; return mcFALSE; }
+{ addMotCle(yytext, "mcFALSE" ,1); col = col + yyleng; return mcFALSE; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 27 "lexical.l"
-{ afficher(); col = col + yyleng; return mcINTEGER; }
+{ addMotCle(yytext, "mcINTEGER",1); col = col + yyleng; return mcINTEGER; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 28 "lexical.l"
-{ col = col + yyleng; return mcREAL; }
+{ addMotCle(yytext, "mcREAL", 1); col = col + yyleng; return mcREAL; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 29 "lexical.l"
-{ col = col + yyleng; return mcCHARACTER; }
+{ addMotCle(yytext, "mcCHARACTER", 1); col = col + yyleng; return mcCHARACTER; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 30 "lexical.l"
-{ col = col + yyleng; return mcLOGICAL; }
+{ addMotCle(yytext, "mcLOGICAL", 1); col = col + yyleng; return mcLOGICAL; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 31 "lexical.l"
-{ col = col + yyleng; return mcREAD; }
+{ addMotCle(yytext, "mcREAD", 1); col = col + yyleng; return mcREAD; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 32 "lexical.l"
-{ col = col + yyleng; return mcWRITE; }
+{ addMotCle(yytext, "mcWRITE", 1); col = col + yyleng; return mcWRITE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 33 "lexical.l"
-{ col = col + yyleng; return mcDIMENSION; }
+{ addMotCle(yytext, "mcDIMENSION", 1); col = col + yyleng; return mcDIMENSION; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 34 "lexical.l"
-{ col = col + yyleng; return mcPROGRAM; }
+{ addMotCle(yytext, "mcPROGRAM", 1); col = col + yyleng; return mcPROGRAM; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 35 "lexical.l"
-{ col = col + yyleng; return mcEND; }
+{ addMotCle(yytext, "mcEND", 1); col = col + yyleng; return mcEND; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 36 "lexical.l"
-{ col = col + yyleng; return mcROUTINE; }
+{ addMotCle(yytext, "mcROUTINE", 1); col = col + yyleng; return mcROUTINE; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 37 "lexical.l"
-{ col = col + yyleng; return mcENDR; }
+{ addMotCle(yytext, "mcENDR", 1); col = col + yyleng; return mcENDR; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 38 "lexical.l"
-{ col = col + yyleng; return mcCALL; }
+{ addMotCle(yytext, "mcCALL", 1); col = col + yyleng; return mcCALL; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 39 "lexical.l"
-{ col = col + yyleng; return mcIF; }
+{ addMotCle(yytext, "mcIF", 1); col = col + yyleng; return mcIF; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 40 "lexical.l"
-{ col = col + yyleng; return mcTHEN; }
+{ addMotCle(yytext, "mcTHEN", 1); col = col + yyleng; return mcTHEN; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 41 "lexical.l"
-{ col = col + yyleng; return mcELSE; }
+{ addMotCle(yytext, "mcELSE", 1); col = col + yyleng; return mcELSE; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 42 "lexical.l"
-{ col = col + yyleng; return mcENDIF; }
+{ addMotCle(yytext, "mcENDIF", 1); col = col + yyleng; return mcENDIF; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 43 "lexical.l"
-{ col = col + yyleng; return mcDOWHILE; }
+{ addMotCle(yytext, "mcDOWHILE", 1); col = col + yyleng; return mcDOWHILE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 44 "lexical.l"
-{ col = col + yyleng; return mcENDO; }
+{ addMotCle(yytext, "mcENDO", 1); col = col + yyleng; return mcENDO; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 45 "lexical.l"
-{ col = col + yyleng; return PartageMemoire; }
+{ addMotCle(yytext, "PartageMemoire", 1); col = col + yyleng; return PartageMemoire; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 46 "lexical.l"
-{ col = col + yyleng; return OR; }
+{ addMotCle(yytext, "OR", 1); col = col + yyleng; return OR; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 47 "lexical.l"
-{ col = col + yyleng; return AND; }
+{ addMotCle(yytext, "AND", 1); col = col + yyleng; return AND; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 48 "lexical.l"
-{ col = col + yyleng; return GT; }
+{ addMotCle(yytext, "GT", 1); col = col + yyleng; return GT; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 49 "lexical.l"
-{ col = col + yyleng; return EQ; }
+{ addMotCle(yytext, "EQ", 1); col = col + yyleng; return EQ; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 50 "lexical.l"
-{ col = col + yyleng; return GE; }
+{ addMotCle(yytext, "GE", 1); col = col + yyleng; return GE; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 51 "lexical.l"
-{ col = col + yyleng; return NE; }
+{ addMotCle(yytext, "NE", 1); col = col + yyleng; return NE; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 52 "lexical.l"
-{ col = col + yyleng; return LE; }
+{ addMotCle(yytext, "LE", 1); col = col + yyleng; return LE; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 53 "lexical.l"
-{ col = col + yyleng; return LT; }
+{ addMotCle(yytext, "LT", 1); col = col + yyleng; return LT; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 54 "lexical.l"
-{ col = col + yyleng; return eq; }
+{ addSep(yytext, "eq", 1);col = col + yyleng; return eq; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 55 "lexical.l"
-{ col = col + yyleng; return point_virgule; }
+{ addSep(yytext, "point_virgule", 1); col = col + yyleng; return point_virgule; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 56 "lexical.l"
-{ col = col + yyleng; return plus; }
+{ addSep(yytext, "plus", 1); col = col + yyleng; return plus; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 57 "lexical.l"
-{ col = col + yyleng; return mpins; }
+{ addSep(yytext, "mpins", 1); col = col + yyleng; return mpins; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 58 "lexical.l"
-{ col = col + yyleng; return division; }
+{ addSep(yytext, "division", 1); col = col + yyleng; return division; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 59 "lexical.l"
-{ col = col + yyleng; return or ; }
+{ addSep(yytext, "or", 1); col = col + yyleng; return or ; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 60 "lexical.l"
-{ col = col + yyleng; return aro; }
+{ addSep(yytext, "aro", 1); col = col + yyleng; return aro; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 61 "lexical.l"
-{ col = col + yyleng; return etoile; }
+{ addSep(yytext, "etoile", 1); col = col + yyleng; return etoile; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 62 "lexical.l"
-{ col = col + yyleng; return virgule; }
+{ addSep(yytext, "virgule", 1); col = col + yyleng; return virgule; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 63 "lexical.l"
-{ col = col + yyleng; return paraO; }
+{ addSep(yytext, "paraO", 1); col = col + yyleng; return paraO; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 64 "lexical.l"
-{ col = col + yyleng; return paraF; }
+{ addSep(yytext, "paraF", 1); col = col + yyleng; return paraF; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 65 "lexical.l"
+#line 66 "lexical.l"
 {col = col + strlen(yytext);}
 	YY_BREAK
 case 41:
 /* rule 41 can match eol */
 YY_RULE_SETUP
-#line 66 "lexical.l"
+#line 67 "lexical.l"
 {col =1; nbligne++;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 68 "lexical.l"
-{ col = col + yyleng; return DIMENSIONTAB; }
+#line 69 "lexical.l"
+{ addConstant(yytext, "DIMENSIONTAB", 1, 0.0); col = col + yyleng; return DIMENSIONTAB; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 69 "lexical.l"
-{ col = col + yyleng; return DIMENSIONMAT; }
+#line 70 "lexical.l"
+{ addConstant(yytext, "DIMENSIONMAT", 1, 0.0); col = col + yyleng; return DIMENSIONMAT; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 70 "lexical.l"
-{ col = col + yyleng; return identificateur; } 
+#line 71 "lexical.l"
+{ addConstant(yytext, "mcINTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGER; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 71 "lexical.l"
-{ col = col + yyleng; return INTEGER; }
+#line 72 "lexical.l"
+{ addConstant(yytext, "mcREAL", 1, atof(yytext)); col = col + yyleng; return REAL; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 72 "lexical.l"
-{ col = col + yyleng; return INTEGERPOSITIF; }
+#line 73 "lexical.l"
+{ addVariable(yytext, "TypeVariable", 1, 0.0, ""); col = col + yyleng; return identificateur; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 73 "lexical.l"
-{ col = col + yyleng; return INTEGERNEGATIF; }
+#line 74 "lexical.l"
+{ addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGERPOSITIF; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 74 "lexical.l"
-{ col = col + yyleng; return REAL; }
+#line 75 "lexical.l"
+{ addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGERNEGATIF; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 75 "lexical.l"
-{ col = col + yyleng; return caracter; }
+#line 76 "lexical.l"
+{ addConstant(yytext, "CHARACTER", 1, (float)yytext[1]); col = col + yyleng; return caracter; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 76 "lexical.l"
-{ col = col + yyleng; return chaine; }
+#line 77 "lexical.l"
+{ addConstant(yytext, "STRING", 1, 0.0); col = col + yyleng; return chaine; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 77 "lexical.l"
+#line 78 "lexical.l"
 { /* Ignore les commentaires */ }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 78 "lexical.l"
-{ col = col + yyleng; return REALNEGATIF; }
+#line 79 "lexical.l"
+{ addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALNEGATIF; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 79 "lexical.l"
-{ col = col + yyleng; return REALPOSITIF; }
+#line 80 "lexical.l"
+{ addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALPOSITIF; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 80 "lexical.l"
+#line 82 "lexical.l"
 {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nbligne,col, yytext);}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 81 "lexical.l"
+#line 83 "lexical.l"
 ECHO;
 	YY_BREAK
 #line 1111 "lex.yy.c"
@@ -2112,6 +2112,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 81 "lexical.l"
+#line 83 "lexical.l"
 
 
