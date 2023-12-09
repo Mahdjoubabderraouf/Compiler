@@ -1,5 +1,4 @@
 %{
-	
 int nbligne=1; 
 int col=1;	
 %}
@@ -64,21 +63,19 @@ int col=1;
 %left paraO paraF
 %right UNARY_OPERATOR
 %%
-Fonction : type mcROUTINE identificateur paraO Liste  DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction|Programme_pr{printf("prog syntaxiquement correct");YYACCEPT;}
-Programme_pr : mcPROGRAM identificateur DECLARATIONS INSTR mcEND;
+Fonction : type mcROUTINE identificateur paraO Liste  DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction|mcPROGRAM identificateur DECLARATIONS INSTR mcEND {printf("prog syntaxiquement correct");YYACCEPT;}
 DECLARATIONS : type identificateur DECLARATIONS1;
 DECLARATIONS1 : point_virgule|virgule identificateur DECLARATIONS1|TABLEAU|MATRICE|;
 TABLEAU : mcDIMENSION DIMENSIONTAB DIMENSION_REST;
 MATRICE : mcDIMENSION DIMENSIONMAT DIMENSION_REST;
 DIMENSION_REST : virgule identificateur DECLARATIONS1|;
 type : mcINTEGER|mcLOGICAL|mcREAL|mcCHARACTER;
-INSTR : Affectation|ES|Condition|Boucle|Appel|Equivalence;
-Affectation : identificateur eq EXPR;  
+INSTR :INSTR Affectation |INSTR ES|INSTR Condition|INSTR Boucle|INSTR Appel|INSTR Equivalence|/*vide*/;
+Affectation : identificateur eq EXPR;
 EXPR : CHAINE_STRING|MATH_VAR|APPEL_FONC|LOGIQUE point_virgule;
 APPEL_FONC : mcCALL identificateur paraO Liste point_virgule;
-MATH_VAR : IDFI MATH_VAR1;
-IDFI : identificateur |identificateur paraO INTEGER paraF |identificateur paraO INTEGER virgule INTEGER paraF|INTEGER|REAL;
-MATH_VAR1 : OPER IDFI MATH_VAR1|point_virgule;
+MATH_VAR : identificateur MATH_VAR1|INTEGER MATH_VAR1|REAL MATH_VAR1;
+MATH_VAR1 : OPER MATH_VAR|point_virgule;
 CHAINE_STRING : IDFI_CHAR CHAINE_STRING1;
 CHAINE_STRING1 : OPER IDFI_CHAR CHAINE_STRING1|point_virgule;
 IDFI_CHAR : chaine|caracter;
@@ -90,19 +87,18 @@ Appel : identificateur mcROUTINE paraO Liste paraF point_virgule;
 Equivalence : PartageMemoire paraO Liste paraF virgule paraO Liste paraF point_virgule;
 EXPR_CONDI : EXPR_CONDI_TYPE EXPR_CONDI_SUITE;
 EXPR_CONDI_TYPE : identificateur|mcTRUE|mcFALSE|INTEGER|REAL|paraO EXPR_CONDI paraF;
-EXPR_CONDI_SUITE : EXPR_CONDI_OP EXPR_CONDI_TYPE EXPR_CONDI_SUITE|point_virgule|;
-EXPR_CONDI_OP : OR|AND|GT|GE|EQ|NE|LE|LT|paraO EXPR_CONDI paraF|OPER;
+EXPR_CONDI_SUITE : EXPR_CONDI_OP EXPR_CONDI_TYPE EXPR_CONDI_SUITE|point_virgule|;EXPR_CONDI_OP : OR|AND|GT|GE|EQ|NE|LE|LT|paraO EXPR_CONDI paraF|OPER;
 Liste : identificateur 
       | Liste virgule identificateur ;
 OPER : plus|mpins|etoile|division;
 %%
-
-main() {
-	yyparse();
+int main() {
+		yyparse();
+		return 0;
 }
 yywrap()
 {}
 int yyerror(char *msg)
-{ printf(" Erreur syntaxique a ligne : %d a la colonne %d ", nbligne,col);
+{ printf("Erreur syntaxique a ligne : %d a la colonne %d ", nbligne,col);
    return 1;  
 }
