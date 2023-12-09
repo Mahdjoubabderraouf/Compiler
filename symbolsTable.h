@@ -6,14 +6,15 @@
 typedef struct variable variable; // Forward declaration
 
 typedef struct variable {  
- 
+
     int state;
     char name[20];
     char code[20];
     char type[20];
     float val;
-    char *varPlace; /* la place de la variable  */
+    char varPlace[20]; /* la place de la variable  */
     struct variable* suiv;
+    
 }variable;
       
 
@@ -23,6 +24,7 @@ typedef struct constant {
     char code[20];
     char type[20];
     float val;
+    char constPlace[20];
     struct constant* suiv;
 } constant;
 
@@ -110,7 +112,7 @@ void addVariable(char *name, char *type, int state, float val, char varPlace[])
         strcpy(listVar->name, name);
         strcpy(listVar->type, type);
         listVar->val = val;
-        listVar->varPlace = varPlace;
+        strcpy(listVar->varPlace , varPlace);
         listVar->suiv = NULL;
         dernierVar = listVar;
     }
@@ -121,7 +123,7 @@ void addVariable(char *name, char *type, int state, float val, char varPlace[])
         strcpy(newVar->name, name);
         strcpy(newVar->type, type);
         newVar->val = val;
-        newVar->varPlace = varPlace;  
+        strcpy(newVar->varPlace , varPlace); 
         newVar->suiv = NULL;
         dernierVar->suiv = newVar;
         dernierVar = newVar;
@@ -237,7 +239,7 @@ void afficher()
     {
         if(tempVar->state == 1)
         {
-            printf("\t|%10s |%15s | %12s | %12lf | %10s\n", tempVar->name, tempVar->type, tempVar->val, tempVar->varPlace);
+            printf("\t|%10s |%15s | %12f | %10s\n", tempVar->name, tempVar->type, tempVar->val, tempVar->varPlace);
         }
         tempVar = tempVar->suiv;
     }
@@ -251,7 +253,7 @@ void afficher()
     {
         if(tempConst->state == 1)
         {
-            printf("\t|%10s |%15s | %12s | %12f | %10s\n", tempConst->name, tempConst->type, tempConst->val, tempConst->constPlace);
+            printf("\t|%10s |%15s | %12f \n", tempConst->name, tempConst->type, tempConst->val);
         }
         tempConst = tempConst->suiv;
     }

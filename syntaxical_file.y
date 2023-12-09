@@ -1,5 +1,12 @@
 %{
+#include <stdio.h>
+#include <stdlib.h>
+
+extern int yylex();
+extern int yyparse();
+extern FILE* yyin;
 int nb_ligne=1; col=1;	
+void yyerror(const char* s);
 %}
 %start Fonction
 %token mcTRUE
@@ -96,8 +103,14 @@ Liste : identificateur
 OPER : plus|mpins|etoile|division;
 %%
 main()
-{
-yyparse();
+int main() {
+	yyin = stdin;
+
+	do {
+		yyparse();
+	} while(!feof(yyin));
+
+	return 0;
 }
 yywrap()
 {}
