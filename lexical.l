@@ -4,6 +4,8 @@
 #include "syntaxical_file.tab.h"
 extern nb_ligne;
 extern col;
+#include "symbolsTable.h"
+extern YYSTYPE yylval;
 %}
 lettre         [a-zA-Z]
 chiffre        [0-9]
@@ -21,8 +23,8 @@ caracter \'.\'
 chaine 	\".+\"
 commantaire %.*;
 %%
-"FALSE"             { col = col + yyleng; return mcFALSE; }
-"INTEGER"           { col = col + yyleng; return mcINTEGER; }
+"FALSE"             {addMotCle("FALSE" , "mcFALSE" ,1); col = col + yyleng; return mcFALSE; }
+"INTEGER"           { afficher(); col = col + yyleng; return mcINTEGER; }
 "REAL"              { col = col + yyleng; return mcREAL; }
 "CHARACTER"         { col = col + yyleng; return mcCHARACTER; }
 "LOGICAL"           { col = col + yyleng; return mcLOGICAL; }
@@ -66,7 +68,6 @@ commantaire %.*;
 \n {
   col =1; nb_ligne++;
 }
-. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nb_ligne,col, yytext);}
 
 {DIMENSIONTAB}   { col = col + yyleng; return DIMENSIONTAB; }
 {DIMENSIONMAT}   { col = col + yyleng; return DIMENSIONMAT; }
@@ -80,3 +81,5 @@ commantaire %.*;
 {commantaire}    { /* Ignore les commentaires */ }
 {REALNEGATIF}    { col = col + yyleng; return REALNEGATIF; }
 {REALPOSITIF}    { col = col + yyleng; return REALPOSITIF; }
+. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nb_ligne,col, yytext);}
+%%
