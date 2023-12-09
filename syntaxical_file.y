@@ -73,7 +73,7 @@ MATRICE : mcDIMENSION DIMENSIONMAT DIMENSION_REST;
 DIMENSION_REST : virgule identificateur DECLARATIONS1|;
 type : mcINTEGER|mcLOGICAL|mcREAL|mcCHARACTER;
 INSTR : Affectation|ES|Condition|Boucle|Appel|Equivalence;
-Affectation : identificateur eq EXPR; // idf = identificateur  MATH_VAR1; 
+Affectation : identificateur eq EXPR;  
 EXPR : CHAINE_STRING|MATH_VAR|APPEL_FONC|LOGIQUE point_virgule;
 APPEL_FONC : mcCALL identificateur paraO Liste point_virgule;
 MATH_VAR : IDFI MATH_VAR1;
@@ -96,15 +96,9 @@ Liste : identificateur
       | Liste virgule identificateur ;
 OPER : plus|mpins|etoile|division;
 %%
-main()
-int main() {
-	yyin = stdin;
 
-	do {
-		yyparse();
-	} while(!feof(yyin));
-
-	return 0;
+main() {
+	yyparse();
 }
 yywrap()
 {}
