@@ -65,7 +65,7 @@ int col=1;
 %right UNARY_OPERATOR
 %%
 Fonction : type mcROUTINE identificateur paraO Liste  DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction|Programme_pr{printf("prog syntaxiquement correct");YYACCEPT;}
-Programme_pr : mcPROGRAM DECLARATIONS INSTR mcEND;
+Programme_pr : mcPROGRAM identificateur DECLARATIONS INSTR mcEND;
 DECLARATIONS : type identificateur DECLARATIONS1;
 DECLARATIONS1 : point_virgule|virgule identificateur DECLARATIONS1|TABLEAU|MATRICE|;
 TABLEAU : mcDIMENSION DIMENSIONTAB DIMENSION_REST;
@@ -96,15 +96,8 @@ Liste : identificateur
       | Liste virgule identificateur ;
 OPER : plus|mpins|etoile|division;
 %%
-main()
-int main() {
-	yyin = stdin;
-
-	do {
+main() {
 		yyparse();
-	} while(!feof(yyin));
-
-	return 0;
 }
 yywrap()
 {}
