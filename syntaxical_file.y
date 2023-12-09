@@ -1,12 +1,7 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
-
-extern int yylex();
-extern int yyparse();
-extern FILE* yyin;
-int nb_ligne=1; col=1;	
-void yyerror(const char* s);
+	
+int nbligne=1; 
+int col=1;	
 %}
 %start Fonction
 %token mcTRUE
@@ -115,6 +110,6 @@ int main() {
 yywrap()
 {}
 int yyerror(char *msg)
-{ printf(" Erreur syntaxique a ligne : %d a la colonne %d ", nb_ligne,col);
+{ printf(" Erreur syntaxique a ligne : %d a la colonne %d ", nbligne,col);
    return 1;  
 }

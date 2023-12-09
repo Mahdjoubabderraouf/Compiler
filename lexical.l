@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "syntaxical_file.tab.h"
-extern nb_ligne;
+extern nbligne;
 extern col;
 #include "symbolsTable.h"
 extern YYSTYPE yylval;
@@ -62,12 +62,8 @@ commantaire %.*;
 ","                 { col = col + yyleng; return virgule; }
 "("                 { col = col + yyleng; return paraO; }
 ")"                 { col = col + yyleng; return paraF; }
-
-[ \t]               {//col = col + strlen(yytext);}
-
-\n {
-  col =1; nb_ligne++;
-}
+[ \t]               {col = col + strlen(yytext);}
+\n {col =1; nbligne++;}
 
 {DIMENSIONTAB}   { col = col + yyleng; return DIMENSIONTAB; }
 {DIMENSIONMAT}   { col = col + yyleng; return DIMENSIONMAT; }
@@ -81,5 +77,5 @@ commantaire %.*;
 {commantaire}    { /* Ignore les commentaires */ }
 {REALNEGATIF}    { col = col + yyleng; return REALNEGATIF; }
 {REALPOSITIF}    { col = col + yyleng; return REALPOSITIF; }
-. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nb_ligne,col, yytext);}
+. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nbligne,col, yytext);}
 %%
