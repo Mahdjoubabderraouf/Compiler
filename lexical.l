@@ -60,8 +60,13 @@ commantaire %.*;
 ","                 { col = col + yyleng; return virgule; }
 "("                 { col = col + yyleng; return paraO; }
 ")"                 { col = col + yyleng; return paraF; }
-[ \t]               {col = col + strlen(yytext);}
-\n {col =1; nb_ligne++;}
+
+[ \t]               {//col = col + strlen(yytext);}
+
+\n {
+  col =1; nb_ligne++;
+}
+. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nb_ligne,col, yytext);}
 
 {DIMENSIONTAB}   { col = col + yyleng; return DIMENSIONTAB; }
 {DIMENSIONMAT}   { col = col + yyleng; return DIMENSIONMAT; }
@@ -75,4 +80,3 @@ commantaire %.*;
 {commantaire}    { /* Ignore les commentaires */ }
 {REALNEGATIF}    { col = col + yyleng; return REALNEGATIF; }
 {REALPOSITIF}    { col = col + yyleng; return REALPOSITIF; }
-. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nb_ligne,col, yytext);}
