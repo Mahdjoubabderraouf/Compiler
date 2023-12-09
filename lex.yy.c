@@ -550,10 +550,10 @@ char *yytext;
 #include <stdio.h>
 #include <stdlib.h>
 #include "syntaxical_file.tab.h"
-int nb_ligne;
-int col;
+extern nbligne;
+extern col;
 #include "symbolsTable.h"
-//extern YYSTYPE yylval;
+extern YYSTYPE yylval;
 #line 558 "lex.yy.c"
 #line 559 "lex.yy.c"
 
@@ -1028,88 +1028,86 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 66 "lexical.l"
-{//col = col + strlen(yytext);}
+#line 65 "lexical.l"
+{col = col + strlen(yytext);}
 	YY_BREAK
 case 41:
 /* rule 41 can match eol */
 YY_RULE_SETUP
-#line 68 "lexical.l"
-{
-  col =1; nb_ligne++;
-}
+#line 66 "lexical.l"
+{col =1; nbligne++;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 72 "lexical.l"
+#line 68 "lexical.l"
 { col = col + yyleng; return DIMENSIONTAB; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 73 "lexical.l"
+#line 69 "lexical.l"
 { col = col + yyleng; return DIMENSIONMAT; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 74 "lexical.l"
+#line 70 "lexical.l"
 { col = col + yyleng; return identificateur; } 
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 75 "lexical.l"
+#line 71 "lexical.l"
 { col = col + yyleng; return INTEGER; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 76 "lexical.l"
+#line 72 "lexical.l"
 { col = col + yyleng; return INTEGERPOSITIF; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 77 "lexical.l"
+#line 73 "lexical.l"
 { col = col + yyleng; return INTEGERNEGATIF; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 78 "lexical.l"
+#line 74 "lexical.l"
 { col = col + yyleng; return REAL; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 79 "lexical.l"
+#line 75 "lexical.l"
 { col = col + yyleng; return caracter; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 80 "lexical.l"
+#line 76 "lexical.l"
 { col = col + yyleng; return chaine; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 81 "lexical.l"
+#line 77 "lexical.l"
 { /* Ignore les commentaires */ }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 82 "lexical.l"
+#line 78 "lexical.l"
 { col = col + yyleng; return REALNEGATIF; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 83 "lexical.l"
+#line 79 "lexical.l"
 { col = col + yyleng; return REALPOSITIF; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 84 "lexical.l"
-{printf("erreur lexical a la ligne %d  la col %d entite %s \n",nb_ligne,col, yytext);}
+#line 80 "lexical.l"
+{printf("erreur lexical a la ligne %d  la col %d entite %s \n",nbligne,col, yytext);}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 85 "lexical.l"
+#line 81 "lexical.l"
 ECHO;
 	YY_BREAK
-#line 1113 "lex.yy.c"
+#line 1111 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2114,9 +2112,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 85 "lexical.l"
+#line 81 "lexical.l"
 
-int main( )
-{
-  yylex();
-}
+
