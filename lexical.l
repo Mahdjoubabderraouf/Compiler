@@ -76,3 +76,4 @@ commantaire %.*;
 {REALNEGATIF}    { col = col + yyleng; return REALNEGATIF; }
 {REALPOSITIF}    { col = col + yyleng; return REALPOSITIF; }
 . {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nbligne,col, yytext);}
+%%
