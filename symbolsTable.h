@@ -56,10 +56,6 @@ elt *listSep = NULL;
 elt *dernierSep = NULL;
 elt *listMotCle = NULL;
 elt *dernierMotCle = NULL;
-// extern char sav[20];
-// char chaine [] = "";
-
-// element tab[1000];
 
 /***Step 3: Définition des fonctions ***/
 
@@ -120,6 +116,7 @@ void addVariable(char *name, char *type, int state, float val, char varPlace[])
             listVar->state = state;
             strcpy(listVar->name, name);
             strcpy(listVar->type, type);
+            strcpy(listVar->code, "identificateur");
             listVar->val = val;
             strcpy(listVar->varPlace, varPlace);
             listVar->suiv = NULL;
@@ -131,6 +128,7 @@ void addVariable(char *name, char *type, int state, float val, char varPlace[])
             newVar->state = state;
             strcpy(newVar->name, name);
             strcpy(newVar->type, type);
+            strcpy(newVar->code, "identificateur");
             newVar->val = val;
             strcpy(newVar->varPlace, varPlace);
             newVar->suiv = NULL;
@@ -165,6 +163,7 @@ void addConstant(char *name, char *type, int state, float val)
                 newConst->state = state;
                 strcpy(newConst->name, name);
                 strcpy(newConst->type, type);
+                strcpy(newConst->code, "CONSTANT");
                 newConst->val = val;
                 newConst->suiv = NULL;
                 dernierConst->suiv = newConst;
@@ -249,7 +248,7 @@ void afficher()
     {
         if (tempVar->state == 1)
         {
-            printf("\t|%10s |%15s | %12f | %10s\n", tempVar->name, tempVar->type, tempVar->val, tempVar->varPlace);
+            printf("\t|%s |%s |%s | %f | %s\n", tempVar->name, tempVar->code, tempVar->type, tempVar->val,tempVar->varPlace);
         }
         tempVar = tempVar->suiv;
     }
@@ -262,7 +261,7 @@ void afficher()
 
     while (tempConst != NULL)
     {
-        printf("\t|%10s |%15d | %12s | %12f\n", tempConst->name, tempConst->state, tempConst->type, tempConst->val);
+        printf("\t|%s |%s | %s | %f\n", tempConst->name, tempConst->code, tempConst->type, tempConst->val);
         tempConst = tempConst->suiv;
     }
     printf("\n");
