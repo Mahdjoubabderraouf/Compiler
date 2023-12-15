@@ -1,9 +1,7 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
 #include "syntaxical_file.tab.h"
-extern nbligne;
-extern col;
+extern int nbligne;
+extern int col;
 #include "symbolsTable.h"
 extern YYSTYPE yylval;
 %}
