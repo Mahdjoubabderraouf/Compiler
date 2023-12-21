@@ -60,8 +60,8 @@ commantaire %.*;
 ","                 { addSep(yytext, "virgule", 1); col = col + yyleng; return virgule; }
 "("                 { addSep(yytext, "paraO", 1); col = col + yyleng; return paraO; }
 ")"                 { addSep(yytext, "paraF", 1); col = col + yyleng; return paraF; }
-"afficherTS"               { afficher();}
-[ \t]               {col = col + strlen(yytext);}
+"."                 { addSep(yytext, "point", 1); col = col + yyleng; return point; }
+[ \t]               { col = col + strlen(yytext); }
 \n {col =1; nbligne++;}
 
 {DIMENSIONTAB}   { addConstant(yytext, "DIMENSIONTAB", 1, 0.0); col = col + yyleng; return DIMENSIONTAB; }
