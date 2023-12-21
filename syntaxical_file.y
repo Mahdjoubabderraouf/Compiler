@@ -39,6 +39,7 @@ void yyerror(const char *s);
 %token LT
 %token eq
 %token point_virgule
+%token point
 %token plus
 %token mpins
 %token division
