@@ -195,7 +195,7 @@ OPER : plus
 
 void yyerror(const char *s) {
     fprintf(stderr, "Syntax error at line %d, column %d: %s\n", nbligne, col, s);
-    
+    yyparse ();
 }
 
 int main() {
