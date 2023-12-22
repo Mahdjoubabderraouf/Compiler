@@ -21,31 +21,23 @@ void yyerror(const char *s);
 %left paraO paraF
 %right UNARY_OPERATOR
 %%
-
-Fonction : type mcROUTINE identificateur paraO Liste DECLARATIONS INSTR identificateur eq VALEURS_RETURN mcENDR Fonction
+Fonction : type mcROUTINE identificateur paraO Liste DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction
          | mcPROGRAM identificateur DECLARATIONS INSTR mcEND { printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
-
 DECLARATIONS : type identificateur DECLARATIONS1;
 
-DECLARATIONS1 : point_virgule DECLARATIONS
-			  | point_virgule
+DECLARATIONS1 : point_virgule
               | virgule identificateur DECLARATIONS1
               | TABLEAU
-              | MATRICE DECLARATIONS1
-			  | OPERS VALEURS DECLARATIONS1	 
-			  ;
-			  
-OPERS : eq | OPER;
+              | MATRICE
+              ;
 
-VALEURS : REAL | INTEGER | caracter | chaine;
- 
-VALEURS_RETURN : REAL | INTEGER | identificateur;
- 
-TABLEAU : mcDIMENSION paraO INTEGER paraF DECLARATIONS1;
+TABLEAU : mcDIMENSION DIMENSIONTAB DIMENSION_REST;
 
-MATRICE : mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS1;
+MATRICE : mcDIMENSION DIMENSIONMAT DIMENSION_REST;
+
+DIMENSION_REST : virgule identificateur DECLARATIONS1;
 
 type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
 
@@ -55,7 +47,7 @@ INSTR : INSTR Affectation
       | INSTR Boucle
       | INSTR Appel
       | INSTR Equivalence
-      | 
+      | /*vide*/
       ;
 
 Affectation : identificateur eq EXPR point_virgule;
@@ -103,11 +95,8 @@ LOGIQUE : mcTRUE
         ;
 
 ES : mcREAD paraO identificateur paraF point_virgule
-   | mcWRITE paraO chaine ES_WRITE_OPTIONAL paraF point_virgule
+   | mcWRITE paraO chaine virgule Liste virgule chaine paraF point_virgule
    ;
-
-ES_WRITE_OPTIONAL :  virgule identificateur | virgule identificateur chaine | ;
-
 
 Condition : mcIF paraO EXPR_CONDI paraF mcTHEN INSTR mcENDIF;
 
@@ -143,7 +132,7 @@ EXPR_CONDI_OP : OR
               | OPER
               ;
 
-Liste : identificateur paraF
+Liste : identificateur
       | Liste virgule identificateur
       ;
 
@@ -165,4 +154,6 @@ void yyerror(const char *s) {
 int main() {
     yyparse();
     return 0;
+
+
 }
