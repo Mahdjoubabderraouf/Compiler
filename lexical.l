@@ -28,7 +28,7 @@ commantaire %.*;
 "WRITE"             { addMotCle(yytext, "mcWRITE", 1); col = col + yyleng; return mcWRITE; }
 "DIMENSION"         { addMotCle(yytext, "mcDIMENSION", 1); col = col + yyleng; return mcDIMENSION; }
 "PROGRAM"           { addMotCle(yytext, "mcPROGRAM", 1); col = col + yyleng; return mcPROGRAM; }
-"END"               { addMotCle(yytext, "mcEND", 1); col = col + yyleng; return mcEND; }
+"END"               { addMotCle(yytext, "mcEND", 1); col = col + yyleng; afficher();  return mcEND;}
 "ROUTINE"           { addMotCle(yytext, "mcROUTINE", 1); col = col + yyleng; return mcROUTINE; }
 "ENDR"              { addMotCle(yytext, "mcENDR", 1); col = col + yyleng; return mcENDR; }
 "CALL"              { addMotCle(yytext, "mcCALL", 1); col = col + yyleng; return mcCALL; }
@@ -73,4 +73,5 @@ commantaire %.*;
 {REALNEGATIF}    { addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALNEGATIF; }
 {REALPOSITIF}    { addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALPOSITIF; }
 . {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nbligne,col, yytext);}
+
 %%

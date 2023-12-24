@@ -21,8 +21,8 @@ void yyerror(const char *s);
 %left paraO paraF
 %right UNARY_OPERATOR
 %%
-Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq INTEGER mcENDR Fonction
-         | mcPROGRAM identificateur DECLARATIONS INSTR1 mcEND { printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
+Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
+         | mcPROGRAM identificateur DECLARATIONS INSTR1 mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
 DECLARATIONS : type identificateur caractere1 DECLARATIONS1;
@@ -62,7 +62,8 @@ INSTR : Affectation
       | /*vide*/
       ;
 
-Affectation : identificateur eq EXPR  ;
+Affectation : identificateur eq EXPR;
+
 
 EXPR : CHAINE_STRING
      | MATH_VAR
@@ -71,11 +72,11 @@ EXPR : CHAINE_STRING
      | mcTRUE
      ;
 
-
 APPEL_FONC : mcCALL identificateur paraO Liste paraF ;
 
 MATH_VAR : identificateur MATH_VAR1
-
+         | identificateur paraO INTEGER paraF MATH_VAR1
+         | identificateur paraO INTEGER virgule INTEGER paraF MATH_VAR1
          | INTEGER  MATH_VAR1
          | INTEGERPOSITIF  MATH_VAR1
          | INTEGERNEGATIF  MATH_VAR1
@@ -83,11 +84,17 @@ MATH_VAR : identificateur MATH_VAR1
          | REAL MATH_VAR1
          | REALPOSITIF MATH_VAR1
          | REALNEGATIF MATH_VAR1
-         | paraO MATH_VAR paraF
+         | paraO MATH_VAR paraF MATH_VAR1
          ;
 
+          /* paraO int OPER int paraF */
+
 MATH_VAR1 : OPER MATH_VAR
-          | INTEGERNEGATIF 
+          | INTEGERNEGATIF OPER MATH_VAR
+          | INTEGERPOSITIF OPER MATH_VAR
+          | REALNEGATIF OPER MATH_VAR
+          | REALPOSITIF OPER MATH_VAR
+          | INTEGERNEGATIF
           | INTEGERPOSITIF
           | REALNEGATIF
           | REALPOSITIF
@@ -105,17 +112,21 @@ IDFI_CHAR : chaine
           | caracter
           ;
 
-ES : mcREAD paraO identificateur paraF point_virgule
-   | mcWRITE paraO chaine virgule Liste virgule chaine paraF point_virgule
+ES : mcREAD paraO identificateur paraF 
+   | mcWRITE paraO chaine paraF 
+   | mcWRITE paraO chaine ES_WRITE_OPTIONAL paraF 
    ;
+
+ES_WRITE_OPTIONAL :  virgule identificateur | virgule identificateur chaine ;
+
 
 Condition : mcIF paraO EXPR_CONDI paraF mcTHEN INSTR mcENDIF;
 
 Boucle : mcDOWHILE paraO EXPR_CONDI paraF INSTR mcENDO;
 
-Appel : identificateur mcROUTINE paraO Liste paraF point_virgule;
+Appel : identificateur paraO Liste paraF ;
 
-Equivalence : PartageMemoire paraO Liste paraF virgule paraO Liste paraF point_virgule;
+Equivalence : PartageMemoire paraO Liste paraF virgule paraO Liste paraF ;
 
 EXPR_CONDI : EXPR_CONDI_TYPE EXPR_CONDI_SUITE;
 
