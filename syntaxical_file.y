@@ -29,6 +29,7 @@ Fonction : type mcROUTINE identificateur paraO Liste DECLARATIONS INSTR identifi
 
 DECLARATIONS : type identificateur DECLARATIONS1;
 
+
 DECLARATIONS1 : point_virgule DECLARATIONS
 			  | point_virgule
               | virgule identificateur DECLARATIONS1
@@ -43,7 +44,7 @@ VALEURS : REAL | INTEGER | caracter | chaine;
  
 VALEURS_RETURN : REAL | INTEGER | identificateur;
  
-TABLEAU : mcDIMENSION paraO INTEGER paraF DECLARATIONS1;
+TABLEAU : mcDIMENSION paraO INTEGER paraF point_virgule DECLARATIONS1;
 
 MATRICE : mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS1;
 
@@ -66,14 +67,10 @@ EXPR : CHAINE_STRING
      | LOGIQUE point_virgule
      ;
 
-APPEL_FONC : mcCALL identificateur paraO Liste paraF point_virgule;
-
 MATH_VAR : identificateur MATH_VAR1
-
-         | INTEGER  MATH_VAR1
+         | INTEGER MATH_VAR1
          | INTEGERPOSITIF  MATH_VAR1
          | INTEGERNEGATIF  MATH_VAR1
-
          | REAL MATH_VAR1
          | REALPOSITIF MATH_VAR1
          | REALNEGATIF MATH_VAR1
@@ -85,8 +82,10 @@ MATH_VAR1 : OPER MATH_VAR
           | INTEGERPOSITIF
           | REALNEGATIF
           | REALPOSITIF
-          | /*vide*/
+          | point_virgule
           ;
+
+APPEL_FONC : mcCALL identificateur paraO Liste paraF point_virgule;
 
 CHAINE_STRING : IDFI_CHAR CHAINE_STRING1;
 
