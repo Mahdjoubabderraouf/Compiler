@@ -11,7 +11,7 @@ void yyerror(const char *s);
 
 %token mcTRUE mcFALSE mcINTEGER mcREAL mcCHARACTER mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDO PartageMemoire
 %token OR AND GT EQ GE NE LE LT eq point_virgule point plus mpins division or aro etoile virgule gui
-%token paraO paraF DIMENSIONTAB DIMENSIONMAT identificateur INTEGER INTEGERPOSITIF INTEGERNEGATIF REAL caracter chaine commantaire REALNEGATIF REALPOSITIF
+%token paraO paraF identificateur INTEGER INTEGERPOSITIF INTEGERNEGATIF REAL caracter chaine commantaire REALNEGATIF REALPOSITIF
 
 %left virgule
 %left plus mpins
@@ -25,20 +25,28 @@ Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR id
          | mcPROGRAM identificateur DECLARATIONS INSTR mcEND { printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
-DECLARATIONS : type identificateur  DECLARATIONS1 DECLARATIONS| type identificateur  DECLARATIONS1;
+DECLARATIONS : type identificateur caractere1 DECLARATIONS1;
 
-DECLARATIONS1 : eq EXPR  
+caractere1: etoile INTEGER
+          | /*epsilon*/
+          ;
+
+DECLARATIONS1 : point_virgule DECLARATIONS
+			  | point_virgule
+              | virgule identificateur caractere1 DECLARATIONS1
+              | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
+              | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
+			  | eq VALEURS DECLARATIONS1
+			  ;/* TABLEAU tab (50),X = 847,ahmed (64); */
+
+DECLARATIONS2 : point_virgule DECLARATIONS
               | point_virgule
-              | virgule identificateur DECLARATIONS1
-              | TABLEAU
-              | MATRICE
+              | virgule identificateur caractere1 DECLARATIONS1
+              | mcDIMENSION paraO INTEGER paraF DECLARATIONS1
+              | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS1
               ;
 
-TABLEAU : mcDIMENSION DIMENSIONTAB DIMENSION_REST;
-
-MATRICE : mcDIMENSION DIMENSIONMAT DIMENSION_REST;
-
-DIMENSION_REST : virgule identificateur DECLARATIONS1;
+VALEURS : REAL | INTEGER | caracter | chaine;
 
 type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
 
@@ -51,12 +59,12 @@ INSTR : INSTR Affectation
       | /*vide*/
       ;
 
-Affectation : identificateur eq EXPR point_virgule;
+Affectation : identificateur eq EXPR point_virgule | identificateur eq mcTRUE point_virgule;
 
 EXPR : CHAINE_STRING
      | MATH_VAR
      | APPEL_FONC
-     | LOGIQUE point_virgule
+     | mcFALSE
      ;
 
 APPEL_FONC : mcCALL identificateur paraO Liste paraF point_virgule;
@@ -90,10 +98,6 @@ CHAINE_STRING1 : OPER IDFI_CHAR CHAINE_STRING1
 IDFI_CHAR : chaine
           | caracter
           ;
-
-LOGIQUE : mcTRUE
-        | mcFALSE
-        ;
 
 ES : mcREAD paraO identificateur paraF point_virgule
    | mcWRITE paraO chaine virgule Liste virgule chaine paraF point_virgule
