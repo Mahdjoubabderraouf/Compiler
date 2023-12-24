@@ -21,8 +21,8 @@ void yyerror(const char *s);
 %left paraO paraF
 %right UNARY_OPERATOR
 %%
-Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction
-         | mcPROGRAM identificateur DECLARATIONS INSTR mcEND { printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
+Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq INTEGER mcENDR Fonction
+         | mcPROGRAM identificateur DECLARATIONS INSTR1 mcEND { printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
 DECLARATIONS : type identificateur caractere1 DECLARATIONS1;
@@ -50,24 +50,29 @@ VALEURS : REAL | INTEGER | caracter | chaine;
 
 type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
 
-INSTR : INSTR Affectation
-      | INSTR ES
-      | INSTR Condition
-      | INSTR Boucle
-      | INSTR Appel
-      | INSTR Equivalence
+INSTR1: INSTR1 INSTR point_virgule
+      | ;
+
+INSTR : Affectation
+      | ES
+      | Condition
+      | Boucle
+      | Appel
+      | Equivalence
       | /*vide*/
       ;
 
-Affectation : identificateur eq EXPR point_virgule | identificateur eq mcTRUE point_virgule;
+Affectation : identificateur eq EXPR  ;
 
 EXPR : CHAINE_STRING
      | MATH_VAR
      | APPEL_FONC
      | mcFALSE
+     | mcTRUE
      ;
 
-APPEL_FONC : mcCALL identificateur paraO Liste paraF point_virgule;
+
+APPEL_FONC : mcCALL identificateur paraO Liste paraF ;
 
 MATH_VAR : identificateur MATH_VAR1
 
@@ -91,8 +96,9 @@ MATH_VAR1 : OPER MATH_VAR
 
 CHAINE_STRING : IDFI_CHAR CHAINE_STRING1;
 
-CHAINE_STRING1 : OPER IDFI_CHAR CHAINE_STRING1
-               | point_virgule
+CHAINE_STRING1 : plus IDFI_CHAR CHAINE_STRING1
+               | mpins IDFI_CHAR CHAINE_STRING1
+               | /*vide*/
                ;
 
 IDFI_CHAR : chaine

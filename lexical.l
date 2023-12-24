@@ -11,13 +11,11 @@ NATUREL        {chiffre}+
 INTEGERPOSITIF (\+)[ ]*{NATUREL}
 INTEGERNEGATIF (\-)[ ]*{NATUREL}
 INTEGER        {NATUREL}
-DIMENSIONTAB   [\(]{NATUREL}[\)]
-DIMENSIONMAT   [\(]{NATUREL}[\,]{NATUREL}[\)]
 REALNEGATIF    \-{INTEGER}\.{NATUREL}
 REALPOSITIF    \+{INTEGER}\.{NATUREL}
 REAL           {INTEGER}\.{NATUREL}
 identificateur {lettre}({lettre}|{chiffre}|\_){0,9}
-caracter \'.\'
+caracter \".\"
 chaine 	\".+\"
 commantaire %.*;
 %%
@@ -64,8 +62,6 @@ commantaire %.*;
 "\""                 { addSep(yytext, "point", 1); col = col + yyleng; return gui; }
 [ \t]               { col = col + strlen(yytext); }
 \n {col =1; nbligne++;}
-{DIMENSIONTAB}   { addConstant(yytext, "DIMENSIONTAB", 1, 0.0); col = col + yyleng; return DIMENSIONTAB; }
-{DIMENSIONMAT}   { addConstant(yytext, "DIMENSIONMAT", 1, 0.0); col = col + yyleng; return DIMENSIONMAT; }
 {INTEGER}        { addConstant(yytext, "mcINTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGER; }
 {REAL}           { addConstant(yytext, "mcREAL", 1, atof(yytext)); col = col + yyleng; return REAL; }
 {identificateur} { addVariable(yytext,"TypeVariable", 1, 0.0, ""); col = col + yyleng; return identificateur; }
