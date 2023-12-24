@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 /******les siganatures des fonctions *********/
-int RechercherVar(char *name);
+int RechercherVar(char *name,char *place);
 int RechercherConst(char *name);
 int RechercherSep(char *name);
 int RechercherMotCle(char *name);
@@ -59,12 +59,12 @@ elt *dernierMotCle = NULL;
 
 /***Step 3: Définition des fonctions ***/
 
-int RechercherVar(char *name)
+int RechercherVar(char *name,char *place)
 {
     variable *tempVar = listVar;
     while (tempVar != NULL)
     {
-        if (strcmp(tempVar->name, name) == 0)
+        if (strcmp(tempVar->name, name) == 0 && strcmp(tempVar->varPlace,place)== 0)
             return 1; // Element found in listVar
         tempVar = tempVar->suiv;
     }
@@ -108,7 +108,7 @@ int RechercherMotCle(char *name)
 }
 void addVariable(char *name, char *type, int state, float val, char varPlace[])
 {
-    if (RechercherVar(name) == 0)
+    if (RechercherVar(name,varPlace) == 0)
     {
         if (listVar == NULL)
         {
@@ -135,10 +135,6 @@ void addVariable(char *name, char *type, int state, float val, char varPlace[])
             dernierVar->suiv = newVar;
             dernierVar = newVar;
         }
-    }
-    else
-    {
-        printf("La variable %s existe déjà\n", name);
     }
 }
 
@@ -170,10 +166,6 @@ void addConstant(char *name, char *type, int state, float val)
                 dernierConst = newConst;
             }
         }
-        else
-        {
-            printf("The constant %s already exists\n", name);
-        }
     }
 
 void addMotCle(char *name, char *type, int state)
@@ -200,10 +192,6 @@ void addMotCle(char *name, char *type, int state)
             dernierMotCle = newMotCle;
         }
     }
-    else
-    {
-        printf("Le MotCle %s existe déjà\n", name);
-    }
 }
 
 void addSep(char *name, char *type, int state)
@@ -229,10 +217,6 @@ void addSep(char *name, char *type, int state)
             dernierSep->suiv = newSep;
             dernierSep = newSep;
         }
-    }
-    else
-    {
-        printf("Le séparateur %s existe déjà\n", name);
     }
 }
 

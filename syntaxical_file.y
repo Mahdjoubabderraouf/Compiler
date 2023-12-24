@@ -21,13 +21,14 @@ void yyerror(const char *s);
 %left paraO paraF
 %right UNARY_OPERATOR
 %%
-Fonction : type mcROUTINE identificateur paraO Liste DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction
+Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR identificateur eq INTEGER mcENDR Fonction
          | mcPROGRAM identificateur DECLARATIONS INSTR mcEND { printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
-DECLARATIONS : type identificateur DECLARATIONS1;
+DECLARATIONS : type identificateur  DECLARATIONS1 DECLARATIONS| type identificateur  DECLARATIONS1;
 
-DECLARATIONS1 : point_virgule
+DECLARATIONS1 : eq EXPR  
+              | point_virgule
               | virgule identificateur DECLARATIONS1
               | TABLEAU
               | MATRICE
