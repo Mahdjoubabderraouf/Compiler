@@ -119,14 +119,23 @@ ES : mcREAD paraO identificateur paraF
 
 ES_WRITE_OPTIONAL :  virgule identificateur | virgule identificateur chaine ;
 
+Appel : identificateur paraO Liste paraF ;
+
+Equivalence : PartageMemoire paraO Liste paraF virgule paraO Liste paraF ;
+
+Liste : identificateur
+      | Liste virgule identificateur
+      | Liste virgule identificateur paraO INTEGER paraF
+      | Liste virgule identificateur paraO INTEGER virgule INTEGER paraF
+      | identificateur paraO INTEGER virgule INTEGER paraF
+      | identificateur paraO INTEGER paraF
+      ;
+
 
 Condition : mcIF paraO EXPR_CONDI paraF mcTHEN INSTR mcENDIF;
 
 Boucle : mcDOWHILE paraO EXPR_CONDI paraF INSTR mcENDO;
 
-Appel : identificateur paraO Liste paraF ;
-
-Equivalence : PartageMemoire paraO Liste paraF virgule paraO Liste paraF ;
 
 EXPR_CONDI : EXPR_CONDI_TYPE EXPR_CONDI_SUITE;
 
@@ -153,10 +162,6 @@ EXPR_CONDI_OP : OR
               | paraO EXPR_CONDI paraF
               | OPER
               ;
-
-Liste : identificateur
-      | Liste virgule identificateur
-      ;
 
 OPER : plus
      | mpins
