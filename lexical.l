@@ -19,6 +19,7 @@ caracter \".\"
 chaine 	\".+\"
 commantaire %.*;
 %%
+"TRUE"              { addMotCle(yytext, "mcTRUE" ,1); col = col + yyleng; return mcTRUE; }
 "FALSE"             { addMotCle(yytext, "mcFALSE" ,1); col = col + yyleng; return mcFALSE; }
 "INTEGER"           { addMotCle(yytext, "mcINTEGER",1); col = col + yyleng; return mcINTEGER; }
 "REAL"              { addMotCle(yytext, "mcREAL", 1); col = col + yyleng; return mcREAL; }
@@ -38,7 +39,7 @@ commantaire %.*;
 "ENDIF"             { addMotCle(yytext, "mcENDIF", 1); col = col + yyleng; return mcENDIF; }
 "DOWHILE"           { addMotCle(yytext, "mcDOWHILE", 1); col = col + yyleng; return mcDOWHILE; }
 "ENDO"              { addMotCle(yytext, "mcENDO", 1); col = col + yyleng; return mcENDO; }
-"PartageMemoire"    { addMotCle(yytext, "PartageMemoire", 1); col = col + yyleng; return PartageMemoire; }
+"EQUIVALENCE"       { addMotCle(yytext, "PartageMemoire", 1); col = col + yyleng; return PartageMemoire; }
 "OR"                { addMotCle(yytext, "OR", 1); col = col + yyleng; return OR; }
 "AND"               { addMotCle(yytext, "AND", 1); col = col + yyleng; return AND; }
 "GT"                { addMotCle(yytext, "GT", 1); col = col + yyleng; return GT; }
