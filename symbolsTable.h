@@ -59,20 +59,12 @@ elt *dernierMotCle = NULL;
 
 /***Step 3: Définition des fonctions ***/
 
-<<<<<<< HEAD
-int RechercherVar(char *name, char *place)
-=======
 int RechercherVar(char *name,char *place)
->>>>>>> origin/master
 {
     variable *tempVar = listVar;
     while (tempVar != NULL)
     {
-<<<<<<< HEAD
-        if (strcmp(tempVar->name, name) == 0 && strcmp (tempVar->varPlace, place) == 0 )
-=======
         if (strcmp(tempVar->name, name) == 0 && strcmp(tempVar->varPlace,place)== 0)
->>>>>>> origin/master
             return 1; // Element found in listVar
         tempVar = tempVar->suiv;
     }
