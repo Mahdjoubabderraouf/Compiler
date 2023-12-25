@@ -301,3 +301,46 @@ void afficher()
         tempSep = tempSep->suiv;
     }
 }
+// the function addType for the variables 
+void addType(char *name, char *type)
+{
+    variable *tempVar = listVar;
+    while (tempVar != NULL)
+    {
+        if (strcmp(tempVar->name, name) == 0)
+        {
+            strcpy(tempVar->type, type);
+            break;
+        }
+        tempVar = tempVar->suiv;
+    }
+}
+// the function addVal for the variables
+void addVal(char *name, float val)
+{
+    variable *tempVar = listVar;
+    while (tempVar != NULL)
+    {
+        if (strcmp(tempVar->name, name) == 0)
+        {
+            tempVar->val = val;
+            break;
+        }
+        tempVar = tempVar->suiv;
+    }
+}
+// the function addVarplace for the constants
+void addVarPlace(char *name, char *varPlace)
+{
+    variable *tempVar = listVar;
+    while (tempVar != NULL)
+    {
+        if (strcmp(tempVar->name, name) == 0)
+        {
+            strcpy(tempVar->varPlace, varPlace);
+            break;
+        }
+        tempVar = tempVar->suiv;
+    }
+}
+
