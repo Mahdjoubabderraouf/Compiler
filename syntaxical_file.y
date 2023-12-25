@@ -50,12 +50,11 @@ VALEURS : REAL | INTEGER | caracter | chaine;
 
 type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
 
-INSTR1: INSTR1 INSTR point_virgule
+INSTR1: INSTR1 INSTR point_virgule | INSTR1 Condition
       | ;
 
 INSTR : Affectation
       | ES
-      | Condition
       | Boucle
       | Appel
       | Equivalence
@@ -131,37 +130,34 @@ Liste : identificateur
       | identificateur paraO INTEGER paraF
       ;
 
+Boucle : mcDOWHILE paraO expression paraF INSTR mcENDO;
+Condition : mcIF paraO expression paraF;
 
-Condition : mcIF paraO EXPR_CONDI paraF mcTHEN INSTR mcENDIF;
-
-Boucle : mcDOWHILE paraO EXPR_CONDI paraF INSTR mcENDO;
-
-
-EXPR_CONDI : EXPR_CONDI_TYPE EXPR_CONDI_SUITE;
-
-EXPR_CONDI_TYPE : identificateur
-               | mcTRUE
-               | mcFALSE
-               | INTEGER
-               | REAL
-               | paraO EXPR_CONDI paraF
-               ;
-
-EXPR_CONDI_SUITE : EXPR_CONDI_OP EXPR_CONDI_TYPE EXPR_CONDI_SUITE
-                | point_virgule
-                | ;
-
-EXPR_CONDI_OP : OR
-              | AND
-              | GT
-              | GE
-              | EQ
-              | NE
-              | LE
-              | LT
-              | paraO EXPR_CONDI paraF
-              | OPER
-              ;
+expression : logical_expression
+           | paraO expression paraF
+           | expression AND expression
+           | expression OR expression
+           | comparison
+            ;
+logical_expression : mcTRUE
+                  |mcFALSE
+                    ;
+comparison : operand EQ operand
+           | operand GT operand
+           | operand GE operand
+           | operand NE operand
+           | operand LE operand
+           | operand LT operand
+           | 
+            ;
+operand : identificateur INTEGERPOSITIF
+        | identificateur INTEGERNEGATIF
+        | identificateur division operand
+        | identificateur etoile operand
+        | paraO operand paraF
+        | identificateur
+        | logical_expression operand
+        ;
 
 OPER : plus
      | mpins
