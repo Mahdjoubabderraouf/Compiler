@@ -73,7 +73,7 @@ extern int yydebug;
     mcELSE = 274,                  /* mcELSE  */
     mcENDIF = 275,                 /* mcENDIF  */
     mcDOWHILE = 276,               /* mcDOWHILE  */
-    mcENDO = 277,                  /* mcENDO  */
+    mcENDDO = 277,                 /* mcENDDO  */
     PartageMemoire = 278,          /* PartageMemoire  */
     OR = 279,                      /* OR  */
     AND = 280,                     /* AND  */

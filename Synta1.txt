@@ -41,4 +41,10 @@ THEN A = A - B ; ELSE
 A = A + B;  
 ENDIF 
 
+DOWHILE (A.LT.10) 
+
+A = A + 1;
+
+ENDDO ;
+
 END.

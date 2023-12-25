@@ -9,7 +9,7 @@ void yyerror(const char *s);
 %}
 %start Fonction
 
-%token mcTRUE mcFALSE mcINTEGER mcREAL mcCHARACTER mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDO PartageMemoire
+%token mcTRUE mcFALSE mcINTEGER mcREAL mcCHARACTER mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
 %token OR AND GT EQ GE NE LE LT eq point_virgule point plus mpins division or aro etoile virgule gui
 %token paraO paraF identificateur INTEGER INTEGERPOSITIF INTEGERNEGATIF REAL caracter chaine commantaire REALNEGATIF REALPOSITIF
 
@@ -38,8 +38,7 @@ DECLARATIONS1 : point_virgule DECLARATIONS
               | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
               | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
 			  | eq VALEURS DECLARATIONS1
-			  ;/* TABLEAU tab (50),X = 847,ahmed (64); */
-
+			  ;
 DECLARATIONS2 : point_virgule DECLARATIONS
               | point_virgule
               | virgule identificateur caractere1 DECLARATIONS1
@@ -87,7 +86,7 @@ MATH_VAR : identificateur MATH_VAR1
          | paraO MATH_VAR paraF MATH_VAR1
          ;
 
-          /* paraO int OPER int paraF */
+          
 
 MATH_VAR1 : OPER MATH_VAR
           | INTEGERNEGATIF OPER MATH_VAR
@@ -131,7 +130,8 @@ Liste : identificateur
       | identificateur paraO INTEGER paraF
       ;
 
-Boucle : mcDOWHILE paraO expression paraF INSTR mcENDO;
+Boucle : mcDOWHILE paraO expression paraF INST_S mcENDDO ;
+
 
 Condition : mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
           | mcIF paraO expression paraF mcTHEN INST_S mcENDIF
@@ -158,6 +158,12 @@ operand : identificateur INTEGERPOSITIF
         | identificateur etoile operand
         | paraO operand paraF
         | identificateur
+        | INTEGER
+        | INTEGERPOSITIF
+        | INTEGERNEGATIF
+        | REAL
+        | REALPOSITIF
+        | REALNEGATIF
         | mcTRUE
         | mcFALSE
         ;
