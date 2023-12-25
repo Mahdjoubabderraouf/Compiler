@@ -1,0 +1,38 @@
+INTEGER ROUTINE Comp (X,Y,Z)
+
+% Déclarations ;
+
+INTEGER A,B; 
+REAL Z=10.0, T= 55555.87; 
+CHARACTER C*20; 
+INTEGER var4 DIMENSION (20);
+REAL MAT DIMENSION (20, 200);
+LOGICAL D;
+
+% Instructions;
+C = 22+10*B;
+B = 30;
+C = "L3";
+D = TRUE;
+A = MAT(5,4) + (B * 5);
+
+
+WRITE ("La Valeur de A est ", A, ".");
+WRITE ("Donner la valeur de A :"); 
+
+Comp = A
+
+ENDR
+PROGRAM HelloAcad
+% Déclarations;
+INTEGER A,B,C ; 
+REAL Y ; 
+INTEGER TAB DIMENSION (10) ; 
+
+% Instructions;
+A = TAB(11) + (B * 7);
+B = 30;
+C = 22+10*B;
+
+A = CALL abdou (A,B,C);
+END.
