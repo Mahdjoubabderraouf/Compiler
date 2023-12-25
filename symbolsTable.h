@@ -59,12 +59,12 @@ elt *dernierMotCle = NULL;
 
 /***Step 3: Définition des fonctions ***/
 
-int RechercherVar(char *name)
+int RechercherVar(char *name, char *place)
 {
     variable *tempVar = listVar;
     while (tempVar != NULL)
     {
-        if (strcmp(tempVar->name, name) == 0)
+        if (strcmp(tempVar->name, name) == 0 && strcmp (tempVar->varPlace, place) == 0 )
             return 1; // Element found in listVar
         tempVar = tempVar->suiv;
     }
@@ -76,7 +76,7 @@ int RechercherConst(char *name)
     constant *tempConst = listConst;
     while (tempConst != NULL)
     {
-        if (strcmp(tempConst->name, name) == 0)
+        if (strcmp(tempConst->name, name) == 0 )
             return 1; // Element found in listConst
         tempConst = tempConst->suiv;
     }
@@ -108,7 +108,7 @@ int RechercherMotCle(char *name)
 }
 void addVariable(char *name, char *type, int state, float val, char varPlace[])
 {
-    if (RechercherVar(name) == 0)
+    if (RechercherVar(name,varPlace) == 0)
     {
         if (listVar == NULL)
         {
