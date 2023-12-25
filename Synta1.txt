@@ -35,4 +35,10 @@ B = 30;
 C = 22+10*B;
 
 A = CALL abdou (A,B,C);
+
+IF (((A.EQ.(B+1)).OR.(C.EQ.TRUE))) 
+THEN A = A - B ; ELSE 
+A = A + B;  
+ENDIF 
+
 END.

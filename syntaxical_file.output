@@ -1,7 +1,5 @@
 Terminals unused in grammar
 
-    mcELSE
-    point
     or
     aro
     gui
@@ -13,8 +11,8 @@ Grammar
 
     0 $accept: Fonction $end
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
-    2         | mcPROGRAM identificateur DECLARATIONS INSTR1 mcEND
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
+    2         | mcPROGRAM identificateur DECLARATIONS INST_S mcEND
 
     3 DECLARATIONS: type identificateur caractere1 DECLARATIONS1
 
@@ -44,12 +42,12 @@ Grammar
    23     | mcREAL
    24     | mcCHARACTER
 
-   25 INSTR1: INSTR1 INSTR point_virgule
-   26       | ε
+   25 INST_S: INST_S INSTR point_virgule
+   26       | INST_S Condition
+   27       | ε
 
-   27 INSTR: Affectation
-   28      | ES
-   29      | Condition
+   28 INSTR: Affectation
+   29      | ES
    30      | Boucle
    31      | Appel
    32      | Equivalence
@@ -103,53 +101,56 @@ Grammar
    70 ES_WRITE_OPTIONAL: virgule identificateur
    71                  | virgule identificateur chaine
 
-   72 Condition: mcIF paraO EXPR_CONDI paraF mcTHEN INSTR mcENDIF
+   72 Appel: identificateur paraO Liste paraF
 
-   73 Boucle: mcDOWHILE paraO EXPR_CONDI paraF INSTR mcENDO
+   73 Equivalence: PartageMemoire paraO Liste paraF virgule paraO Liste paraF
 
-   74 Appel: identificateur paraO Liste paraF
+   74 Liste: identificateur
+   75      | Liste virgule identificateur
+   76      | Liste virgule identificateur paraO INTEGER paraF
+   77      | Liste virgule identificateur paraO INTEGER virgule INTEGER paraF
+   78      | identificateur paraO INTEGER virgule INTEGER paraF
+   79      | identificateur paraO INTEGER paraF
 
-   75 Equivalence: PartageMemoire paraO Liste paraF virgule paraO Liste paraF
+   80 Boucle: mcDOWHILE paraO expression paraF INSTR mcENDO
 
-   76 EXPR_CONDI: EXPR_CONDI_TYPE EXPR_CONDI_SUITE
+   81 Condition: mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+   82          | mcIF paraO expression paraF mcTHEN INST_S mcENDIF
 
-   77 EXPR_CONDI_TYPE: identificateur
-   78                | mcTRUE
-   79                | mcFALSE
-   80                | INTEGER
-   81                | REAL
-   82                | paraO EXPR_CONDI paraF
+   83 expression: paraO expression paraF
+   84           | expression point AND point expression
+   85           | expression point OR point expression
+   86           | comparison
 
-   83 EXPR_CONDI_SUITE: EXPR_CONDI_OP EXPR_CONDI_TYPE EXPR_CONDI_SUITE
-   84                 | point_virgule
-   85                 | ε
+   87 comparison: operand point EQ point operand
+   88           | operand point GT point operand
+   89           | operand point GE point operand
+   90           | operand point NE point operand
+   91           | operand point LE point operand
+   92           | operand point LT point operand
+   93           | ε
 
-   86 EXPR_CONDI_OP: OR
-   87              | AND
-   88              | GT
-   89              | GE
-   90              | EQ
-   91              | NE
-   92              | LE
-   93              | LT
-   94              | paraO EXPR_CONDI paraF
-   95              | OPER
+   94 operand: identificateur INTEGERPOSITIF
+   95        | identificateur INTEGERNEGATIF
+   96        | identificateur division operand
+   97        | identificateur etoile operand
+   98        | paraO operand paraF
+   99        | identificateur
+  100        | mcTRUE
+  101        | mcFALSE
 
-   96 Liste: identificateur
-   97      | Liste virgule identificateur
-
-   98 OPER: plus
-   99     | mpins
-  100     | etoile
-  101     | division
+  102 OPER: plus
+  103     | mpins
+  104     | etoile
+  105     | division
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256)
-    mcTRUE (258) 39 78
-    mcFALSE (259) 38 79
+    mcTRUE (258) 39 100
+    mcFALSE (259) 38 101
     mcINTEGER (260) 21
     mcREAL (261) 23
     mcCHARACTER (262) 24
@@ -162,39 +163,39 @@ Terminals, with rules where they appear
     mcROUTINE (269) 1
     mcENDR (270) 1
     mcCALL (271) 40
-    mcIF (272) 72
-    mcTHEN (273) 72
-    mcELSE (274)
-    mcENDIF (275) 72
-    mcDOWHILE (276) 73
-    mcENDO (277) 73
-    PartageMemoire (278) 75
-    OR (279) 86
-    AND (280) 87
+    mcIF (272) 81 82
+    mcTHEN (273) 81 82
+    mcELSE (274) 81
+    mcENDIF (275) 81 82
+    mcDOWHILE (276) 80
+    mcENDO (277) 80
+    PartageMemoire (278) 73
+    OR (279) 85
+    AND (280) 84
     GT (281) 88
-    EQ (282) 90
+    EQ (282) 87
     GE (283) 89
-    NE (284) 91
-    LE (285) 92
-    LT (286) 93
+    NE (284) 90
+    LE (285) 91
+    LT (286) 92
     eq (287) 1 11 34
-    point_virgule (288) 6 7 12 13 25 84
-    point (289)
-    plus (290) 62 98
-    mpins (291) 63 99
-    division (292) 101
+    point_virgule (288) 6 7 12 13 25
+    point (289) 84 85 87 88 89 90 91 92
+    plus (290) 62 102
+    mpins (291) 63 103
+    division (292) 96 105
     or (293)
     aro (294)
-    etoile (295) 4 100
-    virgule (296) 8 10 14 16 43 70 71 75 97
+    etoile (295) 4 97 104
+    virgule (296) 8 10 14 16 43 70 71 73 75 76 77 78
     gui (297)
-    paraO (298) 1 9 10 15 16 40 42 43 50 67 68 69 72 73 74 75 82 94
-    paraF (299) 1 9 10 15 16 40 42 43 50 67 68 69 72 73 74 75 82 94
-    identificateur (300) 1 2 3 8 14 34 40 41 42 43 67 70 71 74 77 96 97
-    INTEGER (301) 4 9 10 15 16 18 42 43 44 80
-    INTEGERPOSITIF (302) 45 53 57
-    INTEGERNEGATIF (303) 46 52 56
-    REAL (304) 17 47 81
+    paraO (298) 1 9 10 15 16 40 42 43 50 67 68 69 72 73 76 77 78 79 80 81 82 83 98
+    paraF (299) 1 9 10 15 16 40 42 43 50 67 68 69 72 73 76 77 78 79 80 81 82 83 98
+    identificateur (300) 1 2 3 8 14 34 40 41 42 43 67 70 71 72 74 75 76 77 78 79 94 95 96 97 99
+    INTEGER (301) 4 9 10 15 16 18 42 43 44 76 77 78 79
+    INTEGERPOSITIF (302) 45 53 57 94
+    INTEGERNEGATIF (303) 46 52 56 95
+    REAL (304) 17 47
     caracter (305) 19 66
     chaine (306) 20 65 68 69 71
     commantaire (307)
@@ -228,15 +229,15 @@ Nonterminals, with rules where they appear
     type (63)
         on left: 21 22 23 24
         on right: 1 3
-    INSTR1 (64)
-        on left: 25 26
-        on right: 1 2 25
+    INST_S (64)
+        on left: 25 26 27
+        on right: 1 2 25 26 81 82
     INSTR (65)
-        on left: 27 28 29 30 31 32 33
-        on right: 25 72 73
+        on left: 28 29 30 31 32 33
+        on right: 25 80
     Affectation (66)
         on left: 34
-        on right: 27
+        on right: 28
     EXPR (67)
         on left: 35 36 37 38 39
         on right: 1 34
@@ -260,40 +261,37 @@ Nonterminals, with rules where they appear
         on right: 61 62 63
     ES (74)
         on left: 67 68 69
-        on right: 28
+        on right: 29
     ES_WRITE_OPTIONAL (75)
         on left: 70 71
         on right: 69
-    Condition (76)
+    Appel (76)
         on left: 72
-        on right: 29
-    Boucle (77)
-        on left: 73
-        on right: 30
-    Appel (78)
-        on left: 74
         on right: 31
-    Equivalence (79)
-        on left: 75
+    Equivalence (77)
+        on left: 73
         on right: 32
-    EXPR_CONDI (80)
-        on left: 76
-        on right: 72 73 82 94
-    EXPR_CONDI_TYPE (81)
-        on left: 77 78 79 80 81 82
-        on right: 76 83
-    EXPR_CONDI_SUITE (82)
-        on left: 83 84 85
-        on right: 76 83
-    EXPR_CONDI_OP (83)
-        on left: 86 87 88 89 90 91 92 93 94 95
-        on right: 83
-    Liste (84)
-        on left: 96 97
-        on right: 1 40 74 75 97
-    OPER (85)
-        on left: 98 99 100 101
-        on right: 51 52 53 54 55 95
+    Liste (78)
+        on left: 74 75 76 77 78 79
+        on right: 1 40 72 73 75 76 77
+    Boucle (79)
+        on left: 80
+        on right: 30
+    Condition (80)
+        on left: 81 82
+        on right: 26
+    expression (81)
+        on left: 83 84 85 86
+        on right: 80 81 82 83 84 85
+    comparison (82)
+        on left: 87 88 89 90 91 92 93
+        on right: 86
+    operand (83)
+        on left: 94 95 96 97 98 99 100 101
+        on right: 87 88 89 90 91 92 96 97 98
+    OPER (84)
+        on left: 102 103 104 105
+        on right: 51 52 53 54 55
 
 
 State 0
@@ -340,7 +338,7 @@ State 4
 
 State 5
 
-    2 Fonction: mcPROGRAM • identificateur DECLARATIONS INSTR1 mcEND
+    2 Fonction: mcPROGRAM • identificateur DECLARATIONS INST_S mcEND
 
     identificateur  shift, and go to state 8
 
@@ -354,14 +352,14 @@ State 6
 
 State 7
 
-    1 Fonction: type • mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
+    1 Fonction: type • mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
 
     mcROUTINE  shift, and go to state 10
 
 
 State 8
 
-    2 Fonction: mcPROGRAM identificateur • DECLARATIONS INSTR1 mcEND
+    2 Fonction: mcPROGRAM identificateur • DECLARATIONS INST_S mcEND
 
     mcINTEGER    shift, and go to state 1
     mcREAL       shift, and go to state 2
@@ -381,18 +379,18 @@ State 9
 
 State 10
 
-    1 Fonction: type mcROUTINE • identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
+    1 Fonction: type mcROUTINE • identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
 
     identificateur  shift, and go to state 13
 
 
 State 11
 
-    2 Fonction: mcPROGRAM identificateur DECLARATIONS • INSTR1 mcEND
+    2 Fonction: mcPROGRAM identificateur DECLARATIONS • INST_S mcEND
 
-    $default  reduce using rule 26 (INSTR1)
+    $default  reduce using rule 27 (INST_S)
 
-    INSTR1  go to state 14
+    INST_S  go to state 14
 
 
 State 12
@@ -404,15 +402,16 @@ State 12
 
 State 13
 
-    1 Fonction: type mcROUTINE identificateur • paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
+    1 Fonction: type mcROUTINE identificateur • paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
 
     paraO  shift, and go to state 16
 
 
 State 14
 
-    2 Fonction: mcPROGRAM identificateur DECLARATIONS INSTR1 • mcEND
-   25 INSTR1: INSTR1 • INSTR point_virgule
+    2 Fonction: mcPROGRAM identificateur DECLARATIONS INST_S • mcEND
+   25 INST_S: INST_S • INSTR point_virgule
+   26       | INST_S • Condition
 
     mcREAD          shift, and go to state 17
     mcWRITE         shift, and go to state 18
@@ -427,10 +426,10 @@ State 14
     INSTR        go to state 24
     Affectation  go to state 25
     ES           go to state 26
-    Condition    go to state 27
-    Boucle       go to state 28
-    Appel        go to state 29
-    Equivalence  go to state 30
+    Appel        go to state 27
+    Equivalence  go to state 28
+    Boucle       go to state 29
+    Condition    go to state 30
 
 
 State 15
@@ -446,7 +445,7 @@ State 15
 
 State 16
 
-    1 Fonction: type mcROUTINE identificateur paraO • Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
+    1 Fonction: type mcROUTINE identificateur paraO • Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
 
     identificateur  shift, and go to state 33
 
@@ -470,28 +469,29 @@ State 18
 
 State 19
 
-    2 Fonction: mcPROGRAM identificateur DECLARATIONS INSTR1 mcEND •
+    2 Fonction: mcPROGRAM identificateur DECLARATIONS INST_S mcEND •
 
     $default  reduce using rule 2 (Fonction)
 
 
 State 20
 
-   72 Condition: mcIF • paraO EXPR_CONDI paraF mcTHEN INSTR mcENDIF
+   81 Condition: mcIF • paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+   82          | mcIF • paraO expression paraF mcTHEN INST_S mcENDIF
 
     paraO  shift, and go to state 37
 
 
 State 21
 
-   73 Boucle: mcDOWHILE • paraO EXPR_CONDI paraF INSTR mcENDO
+   80 Boucle: mcDOWHILE • paraO expression paraF INSTR mcENDO
 
     paraO  shift, and go to state 38
 
 
 State 22
 
-   75 Equivalence: PartageMemoire • paraO Liste paraF virgule paraO Liste paraF
+   73 Equivalence: PartageMemoire • paraO Liste paraF virgule paraO Liste paraF
 
     paraO  shift, and go to state 39
 
@@ -499,7 +499,7 @@ State 22
 State 23
 
    34 Affectation: identificateur • eq EXPR
-   74 Appel: identificateur • paraO Liste paraF
+   72 Appel: identificateur • paraO Liste paraF
 
     eq     shift, and go to state 40
     paraO  shift, and go to state 41
@@ -507,51 +507,51 @@ State 23
 
 State 24
 
-   25 INSTR1: INSTR1 INSTR • point_virgule
+   25 INST_S: INST_S INSTR • point_virgule
 
     point_virgule  shift, and go to state 42
 
 
 State 25
 
-   27 INSTR: Affectation •
-
-    $default  reduce using rule 27 (INSTR)
-
-
-State 26
-
-   28 INSTR: ES •
+   28 INSTR: Affectation •
 
     $default  reduce using rule 28 (INSTR)
 
 
-State 27
+State 26
 
-   29 INSTR: Condition •
+   29 INSTR: ES •
 
     $default  reduce using rule 29 (INSTR)
 
 
-State 28
-
-   30 INSTR: Boucle •
-
-    $default  reduce using rule 30 (INSTR)
-
-
-State 29
+State 27
 
    31 INSTR: Appel •
 
     $default  reduce using rule 31 (INSTR)
 
 
-State 30
+State 28
 
    32 INSTR: Equivalence •
 
     $default  reduce using rule 32 (INSTR)
+
+
+State 29
+
+   30 INSTR: Boucle •
+
+    $default  reduce using rule 30 (INSTR)
+
+
+State 30
+
+   26 INST_S: INST_S Condition •
+
+    $default  reduce using rule 26 (INST_S)
 
 
 State 31
@@ -575,25 +575,31 @@ State 32
 
 State 33
 
-   96 Liste: identificateur •
+   74 Liste: identificateur •
+   78      | identificateur • paraO INTEGER virgule INTEGER paraF
+   79      | identificateur • paraO INTEGER paraF
 
-    $default  reduce using rule 96 (Liste)
+    paraO  shift, and go to state 49
+
+    $default  reduce using rule 74 (Liste)
 
 
 State 34
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste • paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
-   97 Liste: Liste • virgule identificateur
+    1 Fonction: type mcROUTINE identificateur paraO Liste • paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
+   75 Liste: Liste • virgule identificateur
+   76      | Liste • virgule identificateur paraO INTEGER paraF
+   77      | Liste • virgule identificateur paraO INTEGER virgule INTEGER paraF
 
-    virgule  shift, and go to state 49
-    paraF    shift, and go to state 50
+    virgule  shift, and go to state 50
+    paraF    shift, and go to state 51
 
 
 State 35
 
    67 ES: mcREAD paraO • identificateur paraF
 
-    identificateur  shift, and go to state 51
+    identificateur  shift, and go to state 52
 
 
 State 36
@@ -601,42 +607,45 @@ State 36
    68 ES: mcWRITE paraO • chaine paraF
    69   | mcWRITE paraO • chaine ES_WRITE_OPTIONAL paraF
 
-    chaine  shift, and go to state 52
+    chaine  shift, and go to state 53
 
 
 State 37
 
-   72 Condition: mcIF paraO • EXPR_CONDI paraF mcTHEN INSTR mcENDIF
+   81 Condition: mcIF paraO • expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+   82          | mcIF paraO • expression paraF mcTHEN INST_S mcENDIF
 
-    mcTRUE          shift, and go to state 53
-    mcFALSE         shift, and go to state 54
-    paraO           shift, and go to state 55
-    identificateur  shift, and go to state 56
-    INTEGER         shift, and go to state 57
-    REAL            shift, and go to state 58
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 56
+    identificateur  shift, and go to state 57
 
-    EXPR_CONDI       go to state 59
-    EXPR_CONDI_TYPE  go to state 60
+    $default  reduce using rule 93 (comparison)
+
+    expression  go to state 58
+    comparison  go to state 59
+    operand     go to state 60
 
 
 State 38
 
-   73 Boucle: mcDOWHILE paraO • EXPR_CONDI paraF INSTR mcENDO
+   80 Boucle: mcDOWHILE paraO • expression paraF INSTR mcENDO
 
-    mcTRUE          shift, and go to state 53
-    mcFALSE         shift, and go to state 54
-    paraO           shift, and go to state 55
-    identificateur  shift, and go to state 56
-    INTEGER         shift, and go to state 57
-    REAL            shift, and go to state 58
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 56
+    identificateur  shift, and go to state 57
 
-    EXPR_CONDI       go to state 61
-    EXPR_CONDI_TYPE  go to state 60
+    $default  reduce using rule 93 (comparison)
+
+    expression  go to state 61
+    comparison  go to state 59
+    operand     go to state 60
 
 
 State 39
 
-   75 Equivalence: PartageMemoire paraO • Liste paraF virgule paraO Liste paraF
+   73 Equivalence: PartageMemoire paraO • Liste paraF virgule paraO Liste paraF
 
     identificateur  shift, and go to state 33
 
@@ -670,7 +679,7 @@ State 40
 
 State 41
 
-   74 Appel: identificateur paraO • Liste paraF
+   72 Appel: identificateur paraO • Liste paraF
 
     identificateur  shift, and go to state 33
 
@@ -679,9 +688,9 @@ State 41
 
 State 42
 
-   25 INSTR1: INSTR1 INSTR point_virgule •
+   25 INST_S: INST_S INSTR point_virgule •
 
-    $default  reduce using rule 25 (INSTR1)
+    $default  reduce using rule 25 (INST_S)
 
 
 State 43
@@ -743,139 +752,148 @@ State 48
 
 State 49
 
-   97 Liste: Liste virgule • identificateur
+   78 Liste: identificateur paraO • INTEGER virgule INTEGER paraF
+   79      | identificateur paraO • INTEGER paraF
 
-    identificateur  shift, and go to state 90
+    INTEGER  shift, and go to state 90
 
 
 State 50
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF • DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
+   75 Liste: Liste virgule • identificateur
+   76      | Liste virgule • identificateur paraO INTEGER paraF
+   77      | Liste virgule • identificateur paraO INTEGER virgule INTEGER paraF
+
+    identificateur  shift, and go to state 91
+
+
+State 51
+
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF • DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
 
     mcINTEGER    shift, and go to state 1
     mcREAL       shift, and go to state 2
     mcCHARACTER  shift, and go to state 3
     mcLOGICAL    shift, and go to state 4
 
-    DECLARATIONS  go to state 91
+    DECLARATIONS  go to state 92
     type          go to state 12
-
-
-State 51
-
-   67 ES: mcREAD paraO identificateur • paraF
-
-    paraF  shift, and go to state 92
 
 
 State 52
 
-   68 ES: mcWRITE paraO chaine • paraF
-   69   | mcWRITE paraO chaine • ES_WRITE_OPTIONAL paraF
+   67 ES: mcREAD paraO identificateur • paraF
 
-    virgule  shift, and go to state 93
-    paraF    shift, and go to state 94
-
-    ES_WRITE_OPTIONAL  go to state 95
+    paraF  shift, and go to state 93
 
 
 State 53
 
-   78 EXPR_CONDI_TYPE: mcTRUE •
+   68 ES: mcWRITE paraO chaine • paraF
+   69   | mcWRITE paraO chaine • ES_WRITE_OPTIONAL paraF
 
-    $default  reduce using rule 78 (EXPR_CONDI_TYPE)
+    virgule  shift, and go to state 94
+    paraF    shift, and go to state 95
+
+    ES_WRITE_OPTIONAL  go to state 96
 
 
 State 54
 
-   79 EXPR_CONDI_TYPE: mcFALSE •
+  100 operand: mcTRUE •
 
-    $default  reduce using rule 79 (EXPR_CONDI_TYPE)
+    $default  reduce using rule 100 (operand)
 
 
 State 55
 
-   82 EXPR_CONDI_TYPE: paraO • EXPR_CONDI paraF
+  101 operand: mcFALSE •
 
-    mcTRUE          shift, and go to state 53
-    mcFALSE         shift, and go to state 54
-    paraO           shift, and go to state 55
-    identificateur  shift, and go to state 56
-    INTEGER         shift, and go to state 57
-    REAL            shift, and go to state 58
-
-    EXPR_CONDI       go to state 96
-    EXPR_CONDI_TYPE  go to state 60
+    $default  reduce using rule 101 (operand)
 
 
 State 56
 
-   77 EXPR_CONDI_TYPE: identificateur •
+   83 expression: paraO • expression paraF
+   98 operand: paraO • operand paraF
 
-    $default  reduce using rule 77 (EXPR_CONDI_TYPE)
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 56
+    identificateur  shift, and go to state 57
+
+    $default  reduce using rule 93 (comparison)
+
+    expression  go to state 97
+    comparison  go to state 59
+    operand     go to state 98
 
 
 State 57
 
-   80 EXPR_CONDI_TYPE: INTEGER •
+   94 operand: identificateur • INTEGERPOSITIF
+   95        | identificateur • INTEGERNEGATIF
+   96        | identificateur • division operand
+   97        | identificateur • etoile operand
+   99        | identificateur •
 
-    $default  reduce using rule 80 (EXPR_CONDI_TYPE)
+    division        shift, and go to state 99
+    etoile          shift, and go to state 100
+    INTEGERPOSITIF  shift, and go to state 101
+    INTEGERNEGATIF  shift, and go to state 102
+
+    $default  reduce using rule 99 (operand)
 
 
 State 58
 
-   81 EXPR_CONDI_TYPE: REAL •
+   81 Condition: mcIF paraO expression • paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+   82          | mcIF paraO expression • paraF mcTHEN INST_S mcENDIF
+   84 expression: expression • point AND point expression
+   85           | expression • point OR point expression
 
-    $default  reduce using rule 81 (EXPR_CONDI_TYPE)
+    point  shift, and go to state 103
+    paraF  shift, and go to state 104
 
 
 State 59
 
-   72 Condition: mcIF paraO EXPR_CONDI • paraF mcTHEN INSTR mcENDIF
+   86 expression: comparison •
 
-    paraF  shift, and go to state 97
+    $default  reduce using rule 86 (expression)
 
 
 State 60
 
-   76 EXPR_CONDI: EXPR_CONDI_TYPE • EXPR_CONDI_SUITE
+   87 comparison: operand • point EQ point operand
+   88           | operand • point GT point operand
+   89           | operand • point GE point operand
+   90           | operand • point NE point operand
+   91           | operand • point LE point operand
+   92           | operand • point LT point operand
 
-    OR             shift, and go to state 98
-    AND            shift, and go to state 99
-    GT             shift, and go to state 100
-    EQ             shift, and go to state 101
-    GE             shift, and go to state 102
-    NE             shift, and go to state 103
-    LE             shift, and go to state 104
-    LT             shift, and go to state 105
-    point_virgule  shift, and go to state 106
-    plus           shift, and go to state 107
-    mpins          shift, and go to state 108
-    division       shift, and go to state 109
-    etoile         shift, and go to state 110
-    paraO          shift, and go to state 111
-
-    $default  reduce using rule 85 (EXPR_CONDI_SUITE)
-
-    EXPR_CONDI_SUITE  go to state 112
-    EXPR_CONDI_OP     go to state 113
-    OPER              go to state 114
+    point  shift, and go to state 105
 
 
 State 61
 
-   73 Boucle: mcDOWHILE paraO EXPR_CONDI • paraF INSTR mcENDO
+   80 Boucle: mcDOWHILE paraO expression • paraF INSTR mcENDO
+   84 expression: expression • point AND point expression
+   85           | expression • point OR point expression
 
-    paraF  shift, and go to state 115
+    point  shift, and go to state 103
+    paraF  shift, and go to state 106
 
 
 State 62
 
-   75 Equivalence: PartageMemoire paraO Liste • paraF virgule paraO Liste paraF
-   97 Liste: Liste • virgule identificateur
+   73 Equivalence: PartageMemoire paraO Liste • paraF virgule paraO Liste paraF
+   75 Liste: Liste • virgule identificateur
+   76      | Liste • virgule identificateur paraO INTEGER paraF
+   77      | Liste • virgule identificateur paraO INTEGER virgule INTEGER paraF
 
-    virgule  shift, and go to state 49
-    paraF    shift, and go to state 116
+    virgule  shift, and go to state 50
+    paraF    shift, and go to state 107
 
 
 State 63
@@ -896,7 +914,7 @@ State 65
 
    40 APPEL_FONC: mcCALL • identificateur paraO Liste paraF
 
-    identificateur  shift, and go to state 117
+    identificateur  shift, and go to state 108
 
 
 State 66
@@ -912,7 +930,7 @@ State 66
     REALNEGATIF     shift, and go to state 74
     REALPOSITIF     shift, and go to state 75
 
-    MATH_VAR  go to state 118
+    MATH_VAR  go to state 109
 
 
 State 67
@@ -921,96 +939,96 @@ State 67
    42         | identificateur • paraO INTEGER paraF MATH_VAR1
    43         | identificateur • paraO INTEGER virgule INTEGER paraF MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    paraO           shift, and go to state 119
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    paraO           shift, and go to state 114
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 124
-    OPER       go to state 125
+    MATH_VAR1  go to state 119
+    OPER       go to state 120
 
 
 State 68
 
    44 MATH_VAR: INTEGER • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 126
-    OPER       go to state 125
+    MATH_VAR1  go to state 121
+    OPER       go to state 120
 
 
 State 69
 
    45 MATH_VAR: INTEGERPOSITIF • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 127
-    OPER       go to state 125
+    MATH_VAR1  go to state 122
+    OPER       go to state 120
 
 
 State 70
 
    46 MATH_VAR: INTEGERNEGATIF • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 128
-    OPER       go to state 125
+    MATH_VAR1  go to state 123
+    OPER       go to state 120
 
 
 State 71
 
    47 MATH_VAR: REAL • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 129
-    OPER       go to state 125
+    MATH_VAR1  go to state 124
+    OPER       go to state 120
 
 
 State 72
@@ -1031,38 +1049,38 @@ State 74
 
    49 MATH_VAR: REALNEGATIF • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 130
-    OPER       go to state 125
+    MATH_VAR1  go to state 125
+    OPER       go to state 120
 
 
 State 75
 
    48 MATH_VAR: REALPOSITIF • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 131
-    OPER       go to state 125
+    MATH_VAR1  go to state 126
+    OPER       go to state 120
 
 
 State 76
@@ -1097,21 +1115,23 @@ State 80
 
    61 CHAINE_STRING: IDFI_CHAR • CHAINE_STRING1
 
-    plus   shift, and go to state 132
-    mpins  shift, and go to state 133
+    plus   shift, and go to state 127
+    mpins  shift, and go to state 128
 
     $default  reduce using rule 64 (CHAINE_STRING1)
 
-    CHAINE_STRING1  go to state 134
+    CHAINE_STRING1  go to state 129
 
 
 State 81
 
-   74 Appel: identificateur paraO Liste • paraF
-   97 Liste: Liste • virgule identificateur
+   72 Appel: identificateur paraO Liste • paraF
+   75 Liste: Liste • virgule identificateur
+   76      | Liste • virgule identificateur paraO INTEGER paraF
+   77      | Liste • virgule identificateur paraO INTEGER virgule INTEGER paraF
 
-    virgule  shift, and go to state 49
-    paraF    shift, and go to state 135
+    virgule  shift, and go to state 50
+    paraF    shift, and go to state 130
 
 
 State 82
@@ -1119,7 +1139,7 @@ State 82
     9 DECLARATIONS1: mcDIMENSION paraO • INTEGER paraF DECLARATIONS2
    10              | mcDIMENSION paraO • INTEGER virgule INTEGER paraF DECLARATIONS2
 
-    INTEGER  shift, and go to state 136
+    INTEGER  shift, and go to state 131
 
 
 State 83
@@ -1159,7 +1179,7 @@ State 87
     point_virgule  shift, and go to state 46
     virgule        shift, and go to state 47
 
-    DECLARATIONS1  go to state 137
+    DECLARATIONS1  go to state 132
 
 
 State 88
@@ -1177,321 +1197,308 @@ State 89
 
     $default  reduce using rule 5 (caractere1)
 
-    caractere1  go to state 138
+    caractere1  go to state 133
 
 
 State 90
 
-   97 Liste: Liste virgule identificateur •
+   78 Liste: identificateur paraO INTEGER • virgule INTEGER paraF
+   79      | identificateur paraO INTEGER • paraF
 
-    $default  reduce using rule 97 (Liste)
+    virgule  shift, and go to state 134
+    paraF    shift, and go to state 135
 
 
 State 91
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS • INSTR1 identificateur eq EXPR mcENDR Fonction
+   75 Liste: Liste virgule identificateur •
+   76      | Liste virgule identificateur • paraO INTEGER paraF
+   77      | Liste virgule identificateur • paraO INTEGER virgule INTEGER paraF
 
-    $default  reduce using rule 26 (INSTR1)
+    paraO  shift, and go to state 136
 
-    INSTR1  go to state 139
+    $default  reduce using rule 75 (Liste)
 
 
 State 92
+
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS • INST_S identificateur eq EXPR mcENDR Fonction
+
+    $default  reduce using rule 27 (INST_S)
+
+    INST_S  go to state 137
+
+
+State 93
 
    67 ES: mcREAD paraO identificateur paraF •
 
     $default  reduce using rule 67 (ES)
 
 
-State 93
+State 94
 
    70 ES_WRITE_OPTIONAL: virgule • identificateur
    71                  | virgule • identificateur chaine
 
-    identificateur  shift, and go to state 140
+    identificateur  shift, and go to state 138
 
 
-State 94
+State 95
 
    68 ES: mcWRITE paraO chaine paraF •
 
     $default  reduce using rule 68 (ES)
 
 
-State 95
+State 96
 
    69 ES: mcWRITE paraO chaine ES_WRITE_OPTIONAL • paraF
 
-    paraF  shift, and go to state 141
-
-
-State 96
-
-   82 EXPR_CONDI_TYPE: paraO EXPR_CONDI • paraF
-
-    paraF  shift, and go to state 142
+    paraF  shift, and go to state 139
 
 
 State 97
 
-   72 Condition: mcIF paraO EXPR_CONDI paraF • mcTHEN INSTR mcENDIF
+   83 expression: paraO expression • paraF
+   84           | expression • point AND point expression
+   85           | expression • point OR point expression
 
-    mcTHEN  shift, and go to state 143
+    point  shift, and go to state 103
+    paraF  shift, and go to state 140
 
 
 State 98
 
-   86 EXPR_CONDI_OP: OR •
+   87 comparison: operand • point EQ point operand
+   88           | operand • point GT point operand
+   89           | operand • point GE point operand
+   90           | operand • point NE point operand
+   91           | operand • point LE point operand
+   92           | operand • point LT point operand
+   98 operand: paraO operand • paraF
 
-    $default  reduce using rule 86 (EXPR_CONDI_OP)
+    point  shift, and go to state 105
+    paraF  shift, and go to state 141
 
 
 State 99
 
-   87 EXPR_CONDI_OP: AND •
+   96 operand: identificateur division • operand
 
-    $default  reduce using rule 87 (EXPR_CONDI_OP)
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 143
 
 
 State 100
 
-   88 EXPR_CONDI_OP: GT •
+   97 operand: identificateur etoile • operand
 
-    $default  reduce using rule 88 (EXPR_CONDI_OP)
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 144
 
 
 State 101
 
-   90 EXPR_CONDI_OP: EQ •
+   94 operand: identificateur INTEGERPOSITIF •
 
-    $default  reduce using rule 90 (EXPR_CONDI_OP)
+    $default  reduce using rule 94 (operand)
 
 
 State 102
 
-   89 EXPR_CONDI_OP: GE •
+   95 operand: identificateur INTEGERNEGATIF •
 
-    $default  reduce using rule 89 (EXPR_CONDI_OP)
+    $default  reduce using rule 95 (operand)
 
 
 State 103
 
-   91 EXPR_CONDI_OP: NE •
+   84 expression: expression point • AND point expression
+   85           | expression point • OR point expression
 
-    $default  reduce using rule 91 (EXPR_CONDI_OP)
+    OR   shift, and go to state 145
+    AND  shift, and go to state 146
 
 
 State 104
 
-   92 EXPR_CONDI_OP: LE •
+   81 Condition: mcIF paraO expression paraF • mcTHEN INST_S mcELSE INST_S mcENDIF
+   82          | mcIF paraO expression paraF • mcTHEN INST_S mcENDIF
 
-    $default  reduce using rule 92 (EXPR_CONDI_OP)
+    mcTHEN  shift, and go to state 147
 
 
 State 105
 
-   93 EXPR_CONDI_OP: LT •
+   87 comparison: operand point • EQ point operand
+   88           | operand point • GT point operand
+   89           | operand point • GE point operand
+   90           | operand point • NE point operand
+   91           | operand point • LE point operand
+   92           | operand point • LT point operand
 
-    $default  reduce using rule 93 (EXPR_CONDI_OP)
+    GT  shift, and go to state 148
+    EQ  shift, and go to state 149
+    GE  shift, and go to state 150
+    NE  shift, and go to state 151
+    LE  shift, and go to state 152
+    LT  shift, and go to state 153
 
 
 State 106
 
-   84 EXPR_CONDI_SUITE: point_virgule •
-
-    $default  reduce using rule 84 (EXPR_CONDI_SUITE)
-
-
-State 107
-
-   98 OPER: plus •
-
-    $default  reduce using rule 98 (OPER)
-
-
-State 108
-
-   99 OPER: mpins •
-
-    $default  reduce using rule 99 (OPER)
-
-
-State 109
-
-  101 OPER: division •
-
-    $default  reduce using rule 101 (OPER)
-
-
-State 110
-
-  100 OPER: etoile •
-
-    $default  reduce using rule 100 (OPER)
-
-
-State 111
-
-   94 EXPR_CONDI_OP: paraO • EXPR_CONDI paraF
-
-    mcTRUE          shift, and go to state 53
-    mcFALSE         shift, and go to state 54
-    paraO           shift, and go to state 55
-    identificateur  shift, and go to state 56
-    INTEGER         shift, and go to state 57
-    REAL            shift, and go to state 58
-
-    EXPR_CONDI       go to state 144
-    EXPR_CONDI_TYPE  go to state 60
-
-
-State 112
-
-   76 EXPR_CONDI: EXPR_CONDI_TYPE EXPR_CONDI_SUITE •
-
-    $default  reduce using rule 76 (EXPR_CONDI)
-
-
-State 113
-
-   83 EXPR_CONDI_SUITE: EXPR_CONDI_OP • EXPR_CONDI_TYPE EXPR_CONDI_SUITE
-
-    mcTRUE          shift, and go to state 53
-    mcFALSE         shift, and go to state 54
-    paraO           shift, and go to state 55
-    identificateur  shift, and go to state 56
-    INTEGER         shift, and go to state 57
-    REAL            shift, and go to state 58
-
-    EXPR_CONDI_TYPE  go to state 145
-
-
-State 114
-
-   95 EXPR_CONDI_OP: OPER •
-
-    $default  reduce using rule 95 (EXPR_CONDI_OP)
-
-
-State 115
-
-   73 Boucle: mcDOWHILE paraO EXPR_CONDI paraF • INSTR mcENDO
+   80 Boucle: mcDOWHILE paraO expression paraF • INSTR mcENDO
 
     mcREAD          shift, and go to state 17
     mcWRITE         shift, and go to state 18
-    mcIF            shift, and go to state 20
     mcDOWHILE       shift, and go to state 21
     PartageMemoire  shift, and go to state 22
     identificateur  shift, and go to state 23
 
     $default  reduce using rule 33 (INSTR)
 
-    INSTR        go to state 146
+    INSTR        go to state 154
     Affectation  go to state 25
     ES           go to state 26
-    Condition    go to state 27
-    Boucle       go to state 28
-    Appel        go to state 29
-    Equivalence  go to state 30
+    Appel        go to state 27
+    Equivalence  go to state 28
+    Boucle       go to state 29
 
 
-State 116
+State 107
 
-   75 Equivalence: PartageMemoire paraO Liste paraF • virgule paraO Liste paraF
+   73 Equivalence: PartageMemoire paraO Liste paraF • virgule paraO Liste paraF
 
-    virgule  shift, and go to state 147
+    virgule  shift, and go to state 155
 
 
-State 117
+State 108
 
    40 APPEL_FONC: mcCALL identificateur • paraO Liste paraF
 
-    paraO  shift, and go to state 148
+    paraO  shift, and go to state 156
 
 
-State 118
+State 109
 
    50 MATH_VAR: paraO MATH_VAR • paraF MATH_VAR1
 
-    paraF  shift, and go to state 149
+    paraF  shift, and go to state 157
 
 
-State 119
+State 110
+
+  102 OPER: plus •
+
+    $default  reduce using rule 102 (OPER)
+
+
+State 111
+
+  103 OPER: mpins •
+
+    $default  reduce using rule 103 (OPER)
+
+
+State 112
+
+  105 OPER: division •
+
+    $default  reduce using rule 105 (OPER)
+
+
+State 113
+
+  104 OPER: etoile •
+
+    $default  reduce using rule 104 (OPER)
+
+
+State 114
 
    42 MATH_VAR: identificateur paraO • INTEGER paraF MATH_VAR1
    43         | identificateur paraO • INTEGER virgule INTEGER paraF MATH_VAR1
 
-    INTEGER  shift, and go to state 150
+    INTEGER  shift, and go to state 158
 
 
-State 120
+State 115
 
    53 MATH_VAR1: INTEGERPOSITIF • OPER MATH_VAR
    57          | INTEGERPOSITIF •
 
-    plus      shift, and go to state 107
-    mpins     shift, and go to state 108
-    division  shift, and go to state 109
-    etoile    shift, and go to state 110
+    plus      shift, and go to state 110
+    mpins     shift, and go to state 111
+    division  shift, and go to state 112
+    etoile    shift, and go to state 113
 
     $default  reduce using rule 57 (MATH_VAR1)
 
-    OPER  go to state 151
+    OPER  go to state 159
 
 
-State 121
+State 116
 
    52 MATH_VAR1: INTEGERNEGATIF • OPER MATH_VAR
    56          | INTEGERNEGATIF •
 
-    plus      shift, and go to state 107
-    mpins     shift, and go to state 108
-    division  shift, and go to state 109
-    etoile    shift, and go to state 110
+    plus      shift, and go to state 110
+    mpins     shift, and go to state 111
+    division  shift, and go to state 112
+    etoile    shift, and go to state 113
 
     $default  reduce using rule 56 (MATH_VAR1)
 
-    OPER  go to state 152
+    OPER  go to state 160
 
 
-State 122
+State 117
 
    54 MATH_VAR1: REALNEGATIF • OPER MATH_VAR
    58          | REALNEGATIF •
 
-    plus      shift, and go to state 107
-    mpins     shift, and go to state 108
-    division  shift, and go to state 109
-    etoile    shift, and go to state 110
+    plus      shift, and go to state 110
+    mpins     shift, and go to state 111
+    division  shift, and go to state 112
+    etoile    shift, and go to state 113
 
     $default  reduce using rule 58 (MATH_VAR1)
 
-    OPER  go to state 153
+    OPER  go to state 161
 
 
-State 123
+State 118
 
    55 MATH_VAR1: REALPOSITIF • OPER MATH_VAR
    59          | REALPOSITIF •
 
-    plus      shift, and go to state 107
-    mpins     shift, and go to state 108
-    division  shift, and go to state 109
-    etoile    shift, and go to state 110
+    plus      shift, and go to state 110
+    mpins     shift, and go to state 111
+    division  shift, and go to state 112
+    etoile    shift, and go to state 113
 
     $default  reduce using rule 59 (MATH_VAR1)
 
-    OPER  go to state 154
+    OPER  go to state 162
 
 
-State 124
+State 119
 
    41 MATH_VAR: identificateur MATH_VAR1 •
 
     $default  reduce using rule 41 (MATH_VAR)
 
 
-State 125
+State 120
 
    51 MATH_VAR1: OPER • MATH_VAR
 
@@ -1504,102 +1511,102 @@ State 125
     REALNEGATIF     shift, and go to state 74
     REALPOSITIF     shift, and go to state 75
 
-    MATH_VAR  go to state 155
+    MATH_VAR  go to state 163
 
 
-State 126
+State 121
 
    44 MATH_VAR: INTEGER MATH_VAR1 •
 
     $default  reduce using rule 44 (MATH_VAR)
 
 
-State 127
+State 122
 
    45 MATH_VAR: INTEGERPOSITIF MATH_VAR1 •
 
     $default  reduce using rule 45 (MATH_VAR)
 
 
-State 128
+State 123
 
    46 MATH_VAR: INTEGERNEGATIF MATH_VAR1 •
 
     $default  reduce using rule 46 (MATH_VAR)
 
 
-State 129
+State 124
 
    47 MATH_VAR: REAL MATH_VAR1 •
 
     $default  reduce using rule 47 (MATH_VAR)
 
 
-State 130
+State 125
 
    49 MATH_VAR: REALNEGATIF MATH_VAR1 •
 
     $default  reduce using rule 49 (MATH_VAR)
 
 
-State 131
+State 126
 
    48 MATH_VAR: REALPOSITIF MATH_VAR1 •
 
     $default  reduce using rule 48 (MATH_VAR)
 
 
-State 132
+State 127
 
    62 CHAINE_STRING1: plus • IDFI_CHAR CHAINE_STRING1
 
     caracter  shift, and go to state 72
     chaine    shift, and go to state 73
 
-    IDFI_CHAR  go to state 156
+    IDFI_CHAR  go to state 164
 
 
-State 133
+State 128
 
    63 CHAINE_STRING1: mpins • IDFI_CHAR CHAINE_STRING1
 
     caracter  shift, and go to state 72
     chaine    shift, and go to state 73
 
-    IDFI_CHAR  go to state 157
+    IDFI_CHAR  go to state 165
 
 
-State 134
+State 129
 
    61 CHAINE_STRING: IDFI_CHAR CHAINE_STRING1 •
 
     $default  reduce using rule 61 (CHAINE_STRING)
 
 
-State 135
+State 130
 
-   74 Appel: identificateur paraO Liste paraF •
+   72 Appel: identificateur paraO Liste paraF •
 
-    $default  reduce using rule 74 (Appel)
+    $default  reduce using rule 72 (Appel)
 
 
-State 136
+State 131
 
     9 DECLARATIONS1: mcDIMENSION paraO INTEGER • paraF DECLARATIONS2
    10              | mcDIMENSION paraO INTEGER • virgule INTEGER paraF DECLARATIONS2
 
-    virgule  shift, and go to state 158
-    paraF    shift, and go to state 159
+    virgule  shift, and go to state 166
+    paraF    shift, and go to state 167
 
 
-State 137
+State 132
 
    11 DECLARATIONS1: eq VALEURS DECLARATIONS1 •
 
     $default  reduce using rule 11 (DECLARATIONS1)
 
 
-State 138
+State 133
 
     8 DECLARATIONS1: virgule identificateur caractere1 • DECLARATIONS1
 
@@ -1608,163 +1615,230 @@ State 138
     point_virgule  shift, and go to state 46
     virgule        shift, and go to state 47
 
-    DECLARATIONS1  go to state 160
+    DECLARATIONS1  go to state 168
 
 
-State 139
+State 134
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 • identificateur eq EXPR mcENDR Fonction
-   25 INSTR1: INSTR1 • INSTR point_virgule
+   78 Liste: identificateur paraO INTEGER virgule • INTEGER paraF
+
+    INTEGER  shift, and go to state 169
+
+
+State 135
+
+   79 Liste: identificateur paraO INTEGER paraF •
+
+    $default  reduce using rule 79 (Liste)
+
+
+State 136
+
+   76 Liste: Liste virgule identificateur paraO • INTEGER paraF
+   77      | Liste virgule identificateur paraO • INTEGER virgule INTEGER paraF
+
+    INTEGER  shift, and go to state 170
+
+
+State 137
+
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S • identificateur eq EXPR mcENDR Fonction
+   25 INST_S: INST_S • INSTR point_virgule
+   26       | INST_S • Condition
 
     mcREAD          shift, and go to state 17
     mcWRITE         shift, and go to state 18
     mcIF            shift, and go to state 20
     mcDOWHILE       shift, and go to state 21
     PartageMemoire  shift, and go to state 22
-    identificateur  shift, and go to state 161
+    identificateur  shift, and go to state 171
 
     $default  reduce using rule 33 (INSTR)
 
     INSTR        go to state 24
     Affectation  go to state 25
     ES           go to state 26
-    Condition    go to state 27
-    Boucle       go to state 28
-    Appel        go to state 29
-    Equivalence  go to state 30
+    Appel        go to state 27
+    Equivalence  go to state 28
+    Boucle       go to state 29
+    Condition    go to state 30
 
 
-State 140
+State 138
 
    70 ES_WRITE_OPTIONAL: virgule identificateur •
    71                  | virgule identificateur • chaine
 
-    chaine  shift, and go to state 162
+    chaine  shift, and go to state 172
 
     $default  reduce using rule 70 (ES_WRITE_OPTIONAL)
 
 
-State 141
+State 139
 
    69 ES: mcWRITE paraO chaine ES_WRITE_OPTIONAL paraF •
 
     $default  reduce using rule 69 (ES)
 
 
+State 140
+
+   83 expression: paraO expression paraF •
+
+    $default  reduce using rule 83 (expression)
+
+
+State 141
+
+   98 operand: paraO operand paraF •
+
+    $default  reduce using rule 98 (operand)
+
+
 State 142
 
-   82 EXPR_CONDI_TYPE: paraO EXPR_CONDI paraF •
+   98 operand: paraO • operand paraF
 
-    $default  reduce using rule 82 (EXPR_CONDI_TYPE)
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 173
 
 
 State 143
 
-   72 Condition: mcIF paraO EXPR_CONDI paraF mcTHEN • INSTR mcENDIF
+   96 operand: identificateur division operand •
 
-    mcREAD          shift, and go to state 17
-    mcWRITE         shift, and go to state 18
-    mcIF            shift, and go to state 20
-    mcDOWHILE       shift, and go to state 21
-    PartageMemoire  shift, and go to state 22
-    identificateur  shift, and go to state 23
-
-    $default  reduce using rule 33 (INSTR)
-
-    INSTR        go to state 163
-    Affectation  go to state 25
-    ES           go to state 26
-    Condition    go to state 27
-    Boucle       go to state 28
-    Appel        go to state 29
-    Equivalence  go to state 30
+    $default  reduce using rule 96 (operand)
 
 
 State 144
 
-   94 EXPR_CONDI_OP: paraO EXPR_CONDI • paraF
+   97 operand: identificateur etoile operand •
 
-    paraF  shift, and go to state 164
+    $default  reduce using rule 97 (operand)
 
 
 State 145
 
-   83 EXPR_CONDI_SUITE: EXPR_CONDI_OP EXPR_CONDI_TYPE • EXPR_CONDI_SUITE
+   85 expression: expression point OR • point expression
 
-    OR             shift, and go to state 98
-    AND            shift, and go to state 99
-    GT             shift, and go to state 100
-    EQ             shift, and go to state 101
-    GE             shift, and go to state 102
-    NE             shift, and go to state 103
-    LE             shift, and go to state 104
-    LT             shift, and go to state 105
-    point_virgule  shift, and go to state 106
-    plus           shift, and go to state 107
-    mpins          shift, and go to state 108
-    division       shift, and go to state 109
-    etoile         shift, and go to state 110
-    paraO          shift, and go to state 111
-
-    $default  reduce using rule 85 (EXPR_CONDI_SUITE)
-
-    EXPR_CONDI_SUITE  go to state 165
-    EXPR_CONDI_OP     go to state 113
-    OPER              go to state 114
+    point  shift, and go to state 174
 
 
 State 146
 
-   73 Boucle: mcDOWHILE paraO EXPR_CONDI paraF INSTR • mcENDO
+   84 expression: expression point AND • point expression
 
-    mcENDO  shift, and go to state 166
+    point  shift, and go to state 175
 
 
 State 147
 
-   75 Equivalence: PartageMemoire paraO Liste paraF virgule • paraO Liste paraF
+   81 Condition: mcIF paraO expression paraF mcTHEN • INST_S mcELSE INST_S mcENDIF
+   82          | mcIF paraO expression paraF mcTHEN • INST_S mcENDIF
 
-    paraO  shift, and go to state 167
+    $default  reduce using rule 27 (INST_S)
+
+    INST_S  go to state 176
 
 
 State 148
+
+   88 comparison: operand point GT • point operand
+
+    point  shift, and go to state 177
+
+
+State 149
+
+   87 comparison: operand point EQ • point operand
+
+    point  shift, and go to state 178
+
+
+State 150
+
+   89 comparison: operand point GE • point operand
+
+    point  shift, and go to state 179
+
+
+State 151
+
+   90 comparison: operand point NE • point operand
+
+    point  shift, and go to state 180
+
+
+State 152
+
+   91 comparison: operand point LE • point operand
+
+    point  shift, and go to state 181
+
+
+State 153
+
+   92 comparison: operand point LT • point operand
+
+    point  shift, and go to state 182
+
+
+State 154
+
+   80 Boucle: mcDOWHILE paraO expression paraF INSTR • mcENDO
+
+    mcENDO  shift, and go to state 183
+
+
+State 155
+
+   73 Equivalence: PartageMemoire paraO Liste paraF virgule • paraO Liste paraF
+
+    paraO  shift, and go to state 184
+
+
+State 156
 
    40 APPEL_FONC: mcCALL identificateur paraO • Liste paraF
 
     identificateur  shift, and go to state 33
 
-    Liste  go to state 168
+    Liste  go to state 185
 
 
-State 149
+State 157
 
    50 MATH_VAR: paraO MATH_VAR paraF • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 169
-    OPER       go to state 125
+    MATH_VAR1  go to state 186
+    OPER       go to state 120
 
 
-State 150
+State 158
 
    42 MATH_VAR: identificateur paraO INTEGER • paraF MATH_VAR1
    43         | identificateur paraO INTEGER • virgule INTEGER paraF MATH_VAR1
 
-    virgule  shift, and go to state 170
-    paraF    shift, and go to state 171
+    virgule  shift, and go to state 187
+    paraF    shift, and go to state 188
 
 
-State 151
+State 159
 
    53 MATH_VAR1: INTEGERPOSITIF OPER • MATH_VAR
 
@@ -1777,10 +1851,10 @@ State 151
     REALNEGATIF     shift, and go to state 74
     REALPOSITIF     shift, and go to state 75
 
-    MATH_VAR  go to state 172
+    MATH_VAR  go to state 189
 
 
-State 152
+State 160
 
    52 MATH_VAR1: INTEGERNEGATIF OPER • MATH_VAR
 
@@ -1793,10 +1867,10 @@ State 152
     REALNEGATIF     shift, and go to state 74
     REALPOSITIF     shift, and go to state 75
 
-    MATH_VAR  go to state 173
+    MATH_VAR  go to state 190
 
 
-State 153
+State 161
 
    54 MATH_VAR1: REALNEGATIF OPER • MATH_VAR
 
@@ -1809,10 +1883,10 @@ State 153
     REALNEGATIF     shift, and go to state 74
     REALPOSITIF     shift, and go to state 75
 
-    MATH_VAR  go to state 174
+    MATH_VAR  go to state 191
 
 
-State 154
+State 162
 
    55 MATH_VAR1: REALPOSITIF OPER • MATH_VAR
 
@@ -1825,219 +1899,354 @@ State 154
     REALNEGATIF     shift, and go to state 74
     REALPOSITIF     shift, and go to state 75
 
-    MATH_VAR  go to state 175
+    MATH_VAR  go to state 192
 
 
-State 155
+State 163
 
    51 MATH_VAR1: OPER MATH_VAR •
 
     $default  reduce using rule 51 (MATH_VAR1)
 
 
-State 156
+State 164
 
    62 CHAINE_STRING1: plus IDFI_CHAR • CHAINE_STRING1
 
-    plus   shift, and go to state 132
-    mpins  shift, and go to state 133
+    plus   shift, and go to state 127
+    mpins  shift, and go to state 128
 
     $default  reduce using rule 64 (CHAINE_STRING1)
 
-    CHAINE_STRING1  go to state 176
+    CHAINE_STRING1  go to state 193
 
 
-State 157
+State 165
 
    63 CHAINE_STRING1: mpins IDFI_CHAR • CHAINE_STRING1
 
-    plus   shift, and go to state 132
-    mpins  shift, and go to state 133
+    plus   shift, and go to state 127
+    mpins  shift, and go to state 128
 
     $default  reduce using rule 64 (CHAINE_STRING1)
 
-    CHAINE_STRING1  go to state 177
+    CHAINE_STRING1  go to state 194
 
 
-State 158
+State 166
 
    10 DECLARATIONS1: mcDIMENSION paraO INTEGER virgule • INTEGER paraF DECLARATIONS2
 
-    INTEGER  shift, and go to state 178
+    INTEGER  shift, and go to state 195
 
 
-State 159
+State 167
 
     9 DECLARATIONS1: mcDIMENSION paraO INTEGER paraF • DECLARATIONS2
 
-    mcDIMENSION    shift, and go to state 179
-    point_virgule  shift, and go to state 180
-    virgule        shift, and go to state 181
+    mcDIMENSION    shift, and go to state 196
+    point_virgule  shift, and go to state 197
+    virgule        shift, and go to state 198
 
-    DECLARATIONS2  go to state 182
+    DECLARATIONS2  go to state 199
 
 
-State 160
+State 168
 
     8 DECLARATIONS1: virgule identificateur caractere1 DECLARATIONS1 •
 
     $default  reduce using rule 8 (DECLARATIONS1)
 
 
-State 161
+State 169
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur • eq EXPR mcENDR Fonction
+   78 Liste: identificateur paraO INTEGER virgule INTEGER • paraF
+
+    paraF  shift, and go to state 200
+
+
+State 170
+
+   76 Liste: Liste virgule identificateur paraO INTEGER • paraF
+   77      | Liste virgule identificateur paraO INTEGER • virgule INTEGER paraF
+
+    virgule  shift, and go to state 201
+    paraF    shift, and go to state 202
+
+
+State 171
+
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur • eq EXPR mcENDR Fonction
    34 Affectation: identificateur • eq EXPR
-   74 Appel: identificateur • paraO Liste paraF
+   72 Appel: identificateur • paraO Liste paraF
 
-    eq     shift, and go to state 183
+    eq     shift, and go to state 203
     paraO  shift, and go to state 41
 
 
-State 162
+State 172
 
    71 ES_WRITE_OPTIONAL: virgule identificateur chaine •
 
     $default  reduce using rule 71 (ES_WRITE_OPTIONAL)
 
 
-State 163
+State 173
 
-   72 Condition: mcIF paraO EXPR_CONDI paraF mcTHEN INSTR • mcENDIF
+   98 operand: paraO operand • paraF
 
-    mcENDIF  shift, and go to state 184
-
-
-State 164
-
-   94 EXPR_CONDI_OP: paraO EXPR_CONDI paraF •
-
-    $default  reduce using rule 94 (EXPR_CONDI_OP)
+    paraF  shift, and go to state 141
 
 
-State 165
+State 174
 
-   83 EXPR_CONDI_SUITE: EXPR_CONDI_OP EXPR_CONDI_TYPE EXPR_CONDI_SUITE •
+   85 expression: expression point OR point • expression
 
-    $default  reduce using rule 83 (EXPR_CONDI_SUITE)
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 56
+    identificateur  shift, and go to state 57
+
+    $default  reduce using rule 93 (comparison)
+
+    expression  go to state 204
+    comparison  go to state 59
+    operand     go to state 60
 
 
-State 166
+State 175
 
-   73 Boucle: mcDOWHILE paraO EXPR_CONDI paraF INSTR mcENDO •
+   84 expression: expression point AND point • expression
 
-    $default  reduce using rule 73 (Boucle)
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 56
+    identificateur  shift, and go to state 57
+
+    $default  reduce using rule 93 (comparison)
+
+    expression  go to state 205
+    comparison  go to state 59
+    operand     go to state 60
 
 
-State 167
+State 176
 
-   75 Equivalence: PartageMemoire paraO Liste paraF virgule paraO • Liste paraF
+   25 INST_S: INST_S • INSTR point_virgule
+   26       | INST_S • Condition
+   81 Condition: mcIF paraO expression paraF mcTHEN INST_S • mcELSE INST_S mcENDIF
+   82          | mcIF paraO expression paraF mcTHEN INST_S • mcENDIF
+
+    mcREAD          shift, and go to state 17
+    mcWRITE         shift, and go to state 18
+    mcIF            shift, and go to state 20
+    mcELSE          shift, and go to state 206
+    mcENDIF         shift, and go to state 207
+    mcDOWHILE       shift, and go to state 21
+    PartageMemoire  shift, and go to state 22
+    identificateur  shift, and go to state 23
+
+    $default  reduce using rule 33 (INSTR)
+
+    INSTR        go to state 24
+    Affectation  go to state 25
+    ES           go to state 26
+    Appel        go to state 27
+    Equivalence  go to state 28
+    Boucle       go to state 29
+    Condition    go to state 30
+
+
+State 177
+
+   88 comparison: operand point GT point • operand
+
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 208
+
+
+State 178
+
+   87 comparison: operand point EQ point • operand
+
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 209
+
+
+State 179
+
+   89 comparison: operand point GE point • operand
+
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 210
+
+
+State 180
+
+   90 comparison: operand point NE point • operand
+
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 211
+
+
+State 181
+
+   91 comparison: operand point LE point • operand
+
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 212
+
+
+State 182
+
+   92 comparison: operand point LT point • operand
+
+    mcTRUE          shift, and go to state 54
+    mcFALSE         shift, and go to state 55
+    paraO           shift, and go to state 142
+    identificateur  shift, and go to state 57
+
+    operand  go to state 213
+
+
+State 183
+
+   80 Boucle: mcDOWHILE paraO expression paraF INSTR mcENDO •
+
+    $default  reduce using rule 80 (Boucle)
+
+
+State 184
+
+   73 Equivalence: PartageMemoire paraO Liste paraF virgule paraO • Liste paraF
 
     identificateur  shift, and go to state 33
 
-    Liste  go to state 185
+    Liste  go to state 214
 
 
-State 168
+State 185
 
    40 APPEL_FONC: mcCALL identificateur paraO Liste • paraF
-   97 Liste: Liste • virgule identificateur
+   75 Liste: Liste • virgule identificateur
+   76      | Liste • virgule identificateur paraO INTEGER paraF
+   77      | Liste • virgule identificateur paraO INTEGER virgule INTEGER paraF
 
-    virgule  shift, and go to state 49
-    paraF    shift, and go to state 186
+    virgule  shift, and go to state 50
+    paraF    shift, and go to state 215
 
 
-State 169
+State 186
 
    50 MATH_VAR: paraO MATH_VAR paraF MATH_VAR1 •
 
     $default  reduce using rule 50 (MATH_VAR)
 
 
-State 170
+State 187
 
    43 MATH_VAR: identificateur paraO INTEGER virgule • INTEGER paraF MATH_VAR1
 
-    INTEGER  shift, and go to state 187
+    INTEGER  shift, and go to state 216
 
 
-State 171
+State 188
 
    42 MATH_VAR: identificateur paraO INTEGER paraF • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 188
-    OPER       go to state 125
+    MATH_VAR1  go to state 217
+    OPER       go to state 120
 
 
-State 172
+State 189
 
    53 MATH_VAR1: INTEGERPOSITIF OPER MATH_VAR •
 
     $default  reduce using rule 53 (MATH_VAR1)
 
 
-State 173
+State 190
 
    52 MATH_VAR1: INTEGERNEGATIF OPER MATH_VAR •
 
     $default  reduce using rule 52 (MATH_VAR1)
 
 
-State 174
+State 191
 
    54 MATH_VAR1: REALNEGATIF OPER MATH_VAR •
 
     $default  reduce using rule 54 (MATH_VAR1)
 
 
-State 175
+State 192
 
    55 MATH_VAR1: REALPOSITIF OPER MATH_VAR •
 
     $default  reduce using rule 55 (MATH_VAR1)
 
 
-State 176
+State 193
 
    62 CHAINE_STRING1: plus IDFI_CHAR CHAINE_STRING1 •
 
     $default  reduce using rule 62 (CHAINE_STRING1)
 
 
-State 177
+State 194
 
    63 CHAINE_STRING1: mpins IDFI_CHAR CHAINE_STRING1 •
 
     $default  reduce using rule 63 (CHAINE_STRING1)
 
 
-State 178
+State 195
 
    10 DECLARATIONS1: mcDIMENSION paraO INTEGER virgule INTEGER • paraF DECLARATIONS2
 
-    paraF  shift, and go to state 189
+    paraF  shift, and go to state 218
 
 
-State 179
+State 196
 
    15 DECLARATIONS2: mcDIMENSION • paraO INTEGER paraF DECLARATIONS1
    16              | mcDIMENSION • paraO INTEGER virgule INTEGER paraF DECLARATIONS1
 
-    paraO  shift, and go to state 190
+    paraO  shift, and go to state 219
 
 
-State 180
+State 197
 
    12 DECLARATIONS2: point_virgule • DECLARATIONS
    13              | point_virgule •
@@ -2049,27 +2258,48 @@ State 180
 
     $default  reduce using rule 13 (DECLARATIONS2)
 
-    DECLARATIONS  go to state 191
+    DECLARATIONS  go to state 220
     type          go to state 12
 
 
-State 181
+State 198
 
    14 DECLARATIONS2: virgule • identificateur caractere1 DECLARATIONS1
 
-    identificateur  shift, and go to state 192
+    identificateur  shift, and go to state 221
 
 
-State 182
+State 199
 
     9 DECLARATIONS1: mcDIMENSION paraO INTEGER paraF DECLARATIONS2 •
 
     $default  reduce using rule 9 (DECLARATIONS1)
 
 
-State 183
+State 200
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq • EXPR mcENDR Fonction
+   78 Liste: identificateur paraO INTEGER virgule INTEGER paraF •
+
+    $default  reduce using rule 78 (Liste)
+
+
+State 201
+
+   77 Liste: Liste virgule identificateur paraO INTEGER virgule • INTEGER paraF
+
+    INTEGER  shift, and go to state 222
+
+
+State 202
+
+   76 Liste: Liste virgule identificateur paraO INTEGER paraF •
+
+    $default  reduce using rule 76 (Liste)
+
+
+State 203
+
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq • EXPR mcENDR Fonction
    34 Affectation: identificateur eq • EXPR
 
     mcTRUE          shift, and go to state 63
@@ -2086,77 +2316,148 @@ State 183
     REALNEGATIF     shift, and go to state 74
     REALPOSITIF     shift, and go to state 75
 
-    EXPR           go to state 193
+    EXPR           go to state 223
     APPEL_FONC     go to state 77
     MATH_VAR       go to state 78
     CHAINE_STRING  go to state 79
     IDFI_CHAR      go to state 80
 
 
-State 184
+State 204
 
-   72 Condition: mcIF paraO EXPR_CONDI paraF mcTHEN INSTR mcENDIF •
+   84 expression: expression • point AND point expression
+   85           | expression • point OR point expression
+   85           | expression point OR point expression •
 
-    $default  reduce using rule 72 (Condition)
-
-
-State 185
-
-   75 Equivalence: PartageMemoire paraO Liste paraF virgule paraO Liste • paraF
-   97 Liste: Liste • virgule identificateur
-
-    virgule  shift, and go to state 49
-    paraF    shift, and go to state 194
+    $default  reduce using rule 85 (expression)
 
 
-State 186
+State 205
+
+   84 expression: expression • point AND point expression
+   84           | expression point AND point expression •
+   85           | expression • point OR point expression
+
+    $default  reduce using rule 84 (expression)
+
+
+State 206
+
+   81 Condition: mcIF paraO expression paraF mcTHEN INST_S mcELSE • INST_S mcENDIF
+
+    $default  reduce using rule 27 (INST_S)
+
+    INST_S  go to state 224
+
+
+State 207
+
+   82 Condition: mcIF paraO expression paraF mcTHEN INST_S mcENDIF •
+
+    $default  reduce using rule 82 (Condition)
+
+
+State 208
+
+   88 comparison: operand point GT point operand •
+
+    $default  reduce using rule 88 (comparison)
+
+
+State 209
+
+   87 comparison: operand point EQ point operand •
+
+    $default  reduce using rule 87 (comparison)
+
+
+State 210
+
+   89 comparison: operand point GE point operand •
+
+    $default  reduce using rule 89 (comparison)
+
+
+State 211
+
+   90 comparison: operand point NE point operand •
+
+    $default  reduce using rule 90 (comparison)
+
+
+State 212
+
+   91 comparison: operand point LE point operand •
+
+    $default  reduce using rule 91 (comparison)
+
+
+State 213
+
+   92 comparison: operand point LT point operand •
+
+    $default  reduce using rule 92 (comparison)
+
+
+State 214
+
+   73 Equivalence: PartageMemoire paraO Liste paraF virgule paraO Liste • paraF
+   75 Liste: Liste • virgule identificateur
+   76      | Liste • virgule identificateur paraO INTEGER paraF
+   77      | Liste • virgule identificateur paraO INTEGER virgule INTEGER paraF
+
+    virgule  shift, and go to state 50
+    paraF    shift, and go to state 225
+
+
+State 215
 
    40 APPEL_FONC: mcCALL identificateur paraO Liste paraF •
 
     $default  reduce using rule 40 (APPEL_FONC)
 
 
-State 187
+State 216
 
    43 MATH_VAR: identificateur paraO INTEGER virgule INTEGER • paraF MATH_VAR1
 
-    paraF  shift, and go to state 195
+    paraF  shift, and go to state 226
 
 
-State 188
+State 217
 
    42 MATH_VAR: identificateur paraO INTEGER paraF MATH_VAR1 •
 
     $default  reduce using rule 42 (MATH_VAR)
 
 
-State 189
+State 218
 
    10 DECLARATIONS1: mcDIMENSION paraO INTEGER virgule INTEGER paraF • DECLARATIONS2
 
-    mcDIMENSION    shift, and go to state 179
-    point_virgule  shift, and go to state 180
-    virgule        shift, and go to state 181
+    mcDIMENSION    shift, and go to state 196
+    point_virgule  shift, and go to state 197
+    virgule        shift, and go to state 198
 
-    DECLARATIONS2  go to state 196
+    DECLARATIONS2  go to state 227
 
 
-State 190
+State 219
 
    15 DECLARATIONS2: mcDIMENSION paraO • INTEGER paraF DECLARATIONS1
    16              | mcDIMENSION paraO • INTEGER virgule INTEGER paraF DECLARATIONS1
 
-    INTEGER  shift, and go to state 197
+    INTEGER  shift, and go to state 228
 
 
-State 191
+State 220
 
    12 DECLARATIONS2: point_virgule DECLARATIONS •
 
     $default  reduce using rule 12 (DECLARATIONS2)
 
 
-State 192
+State 221
 
    14 DECLARATIONS2: virgule identificateur • caractere1 DECLARATIONS1
 
@@ -2164,62 +2465,94 @@ State 192
 
     $default  reduce using rule 5 (caractere1)
 
-    caractere1  go to state 198
+    caractere1  go to state 229
 
 
-State 193
+State 222
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR • mcENDR Fonction
+   77 Liste: Liste virgule identificateur paraO INTEGER virgule INTEGER • paraF
+
+    paraF  shift, and go to state 230
+
+
+State 223
+
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR • mcENDR Fonction
    34 Affectation: identificateur eq EXPR •
 
-    mcENDR  shift, and go to state 199
+    mcENDR  shift, and go to state 231
 
     $default  reduce using rule 34 (Affectation)
 
 
-State 194
+State 224
 
-   75 Equivalence: PartageMemoire paraO Liste paraF virgule paraO Liste paraF •
+   25 INST_S: INST_S • INSTR point_virgule
+   26       | INST_S • Condition
+   81 Condition: mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S • mcENDIF
 
-    $default  reduce using rule 75 (Equivalence)
+    mcREAD          shift, and go to state 17
+    mcWRITE         shift, and go to state 18
+    mcIF            shift, and go to state 20
+    mcENDIF         shift, and go to state 232
+    mcDOWHILE       shift, and go to state 21
+    PartageMemoire  shift, and go to state 22
+    identificateur  shift, and go to state 23
+
+    $default  reduce using rule 33 (INSTR)
+
+    INSTR        go to state 24
+    Affectation  go to state 25
+    ES           go to state 26
+    Appel        go to state 27
+    Equivalence  go to state 28
+    Boucle       go to state 29
+    Condition    go to state 30
 
 
-State 195
+State 225
+
+   73 Equivalence: PartageMemoire paraO Liste paraF virgule paraO Liste paraF •
+
+    $default  reduce using rule 73 (Equivalence)
+
+
+State 226
 
    43 MATH_VAR: identificateur paraO INTEGER virgule INTEGER paraF • MATH_VAR1
 
-    plus            shift, and go to state 107
-    mpins           shift, and go to state 108
-    division        shift, and go to state 109
-    etoile          shift, and go to state 110
-    INTEGERPOSITIF  shift, and go to state 120
-    INTEGERNEGATIF  shift, and go to state 121
-    REALNEGATIF     shift, and go to state 122
-    REALPOSITIF     shift, and go to state 123
+    plus            shift, and go to state 110
+    mpins           shift, and go to state 111
+    division        shift, and go to state 112
+    etoile          shift, and go to state 113
+    INTEGERPOSITIF  shift, and go to state 115
+    INTEGERNEGATIF  shift, and go to state 116
+    REALNEGATIF     shift, and go to state 117
+    REALPOSITIF     shift, and go to state 118
 
     $default  reduce using rule 60 (MATH_VAR1)
 
-    MATH_VAR1  go to state 200
-    OPER       go to state 125
+    MATH_VAR1  go to state 233
+    OPER       go to state 120
 
 
-State 196
+State 227
 
    10 DECLARATIONS1: mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2 •
 
     $default  reduce using rule 10 (DECLARATIONS1)
 
 
-State 197
+State 228
 
    15 DECLARATIONS2: mcDIMENSION paraO INTEGER • paraF DECLARATIONS1
    16              | mcDIMENSION paraO INTEGER • virgule INTEGER paraF DECLARATIONS1
 
-    virgule  shift, and go to state 201
-    paraF    shift, and go to state 202
+    virgule  shift, and go to state 234
+    paraF    shift, and go to state 235
 
 
-State 198
+State 229
 
    14 DECLARATIONS2: virgule identificateur caractere1 • DECLARATIONS1
 
@@ -2228,12 +2561,19 @@ State 198
     point_virgule  shift, and go to state 46
     virgule        shift, and go to state 47
 
-    DECLARATIONS1  go to state 203
+    DECLARATIONS1  go to state 236
 
 
-State 199
+State 230
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR • Fonction
+   77 Liste: Liste virgule identificateur paraO INTEGER virgule INTEGER paraF •
+
+    $default  reduce using rule 77 (Liste)
+
+
+State 231
+
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR • Fonction
 
     mcINTEGER    shift, and go to state 1
     mcREAL       shift, and go to state 2
@@ -2241,25 +2581,32 @@ State 199
     mcLOGICAL    shift, and go to state 4
     mcPROGRAM    shift, and go to state 5
 
-    Fonction  go to state 204
+    Fonction  go to state 237
     type      go to state 7
 
 
-State 200
+State 232
+
+   81 Condition: mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF •
+
+    $default  reduce using rule 81 (Condition)
+
+
+State 233
 
    43 MATH_VAR: identificateur paraO INTEGER virgule INTEGER paraF MATH_VAR1 •
 
     $default  reduce using rule 43 (MATH_VAR)
 
 
-State 201
+State 234
 
    16 DECLARATIONS2: mcDIMENSION paraO INTEGER virgule • INTEGER paraF DECLARATIONS1
 
-    INTEGER  shift, and go to state 205
+    INTEGER  shift, and go to state 238
 
 
-State 202
+State 235
 
    15 DECLARATIONS2: mcDIMENSION paraO INTEGER paraF • DECLARATIONS1
 
@@ -2268,38 +2615,38 @@ State 202
     point_virgule  shift, and go to state 46
     virgule        shift, and go to state 47
 
-    DECLARATIONS1  go to state 206
+    DECLARATIONS1  go to state 239
 
 
-State 203
+State 236
 
    14 DECLARATIONS2: virgule identificateur caractere1 DECLARATIONS1 •
 
     $default  reduce using rule 14 (DECLARATIONS2)
 
 
-State 204
+State 237
 
-    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction •
+    1 Fonction: type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction •
 
     $default  reduce using rule 1 (Fonction)
 
 
-State 205
+State 238
 
    16 DECLARATIONS2: mcDIMENSION paraO INTEGER virgule INTEGER • paraF DECLARATIONS1
 
-    paraF  shift, and go to state 207
+    paraF  shift, and go to state 240
 
 
-State 206
+State 239
 
    15 DECLARATIONS2: mcDIMENSION paraO INTEGER paraF DECLARATIONS1 •
 
     $default  reduce using rule 15 (DECLARATIONS2)
 
 
-State 207
+State 240
 
    16 DECLARATIONS2: mcDIMENSION paraO INTEGER virgule INTEGER paraF • DECLARATIONS1
 
@@ -2308,10 +2655,10 @@ State 207
     point_virgule  shift, and go to state 46
     virgule        shift, and go to state 47
 
-    DECLARATIONS1  go to state 208
+    DECLARATIONS1  go to state 241
 
 
-State 208
+State 241
 
    16 DECLARATIONS2: mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS1 •
 

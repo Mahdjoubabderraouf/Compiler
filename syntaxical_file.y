@@ -19,10 +19,11 @@ void yyerror(const char *s);
 %nonassoc EQ NE LT LE GT GE
 %left AND OR
 %left paraO paraF
+%left point
 %right UNARY_OPERATOR
 %%
-Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
-         | mcPROGRAM identificateur DECLARATIONS INSTR1 mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
+Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
+         | mcPROGRAM identificateur DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
 DECLARATIONS : type identificateur caractere1 DECLARATIONS1;
@@ -50,7 +51,7 @@ VALEURS : REAL | INTEGER | caracter | chaine;
 
 type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
 
-INSTR1: INSTR1 INSTR point_virgule | INSTR1 Condition
+INST_S: INST_S INSTR point_virgule | INST_S Condition
       | ;
 
 INSTR : Affectation
@@ -131,7 +132,10 @@ Liste : identificateur
       ;
 
 Boucle : mcDOWHILE paraO expression paraF INSTR mcENDO;
-Condition : mcIF paraO expression paraF;
+
+Condition : mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+          | mcIF paraO expression paraF mcTHEN INST_S mcENDIF
+          ;
 
 expression : paraO expression paraF
            | expression point AND point expression
@@ -146,7 +150,8 @@ comparison : operand point EQ point operand
            | operand point LE point operand
            | operand point LT point operand
            | 
-            ;
+           ;
+
 operand : identificateur INTEGERPOSITIF
         | identificateur INTEGERNEGATIF
         | identificateur division operand
