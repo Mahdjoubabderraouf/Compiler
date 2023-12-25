@@ -26,14 +26,14 @@ Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S i
          | mcPROGRAM identificateur DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
-DECLARATIONS : type identificateur caractere1 DECLARATIONS1;
+DECLARATIONS : type identificateur caractere1 DECLARATIONS1 ;
 
 caractere1: etoile INTEGER
           | /*epsilon*/
           ;
 
 DECLARATIONS1 : point_virgule DECLARATIONS
-			  | point_virgule
+		  | point_virgule
               | virgule identificateur caractere1 DECLARATIONS1
               | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
               | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
@@ -133,15 +133,19 @@ Liste : identificateur
 Boucle : mcDOWHILE paraO expression paraF INST_S mcENDDO ;
 
 
-Condition : mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
-          | mcIF paraO expression paraF mcTHEN INST_S mcENDIF
+Condition : mcIF  paraO operand paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+          | mcIF  paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+          | mcIF  paraO expression paraF mcTHEN INST_S mcENDIF
           ;
 
+
+
 expression : paraO expression paraF
+           | operand point OR point operand
+           | operand point AND point operand
            | expression point AND point expression
            | expression point OR point expression
            | comparison
-
             ;
 comparison : operand point EQ point operand
            | operand point GT point operand
@@ -149,7 +153,6 @@ comparison : operand point EQ point operand
            | operand point NE point operand
            | operand point LE point operand
            | operand point LT point operand
-           | 
            ;
 
 operand : identificateur INTEGERPOSITIF
