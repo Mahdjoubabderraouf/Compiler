@@ -838,22 +838,22 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 24 "lexical.l"
-{ addMotCle(yytext, "mcINTEGER",1); col = col + yyleng; return mcINTEGER; }
+{ yylval.string=strdup(yytext); addMotCle(yytext, "mcINTEGER",1); col = col + yyleng; return mcINTEGER; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 25 "lexical.l"
-{ addMotCle(yytext, "mcREAL", 1); col = col + yyleng; return mcREAL; }
+{ yylval.string=strdup(yytext); addMotCle(yytext, "mcREAL", 1); col = col + yyleng; return mcREAL; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 26 "lexical.l"
-{ addMotCle(yytext, "mcCHARACTER", 1); col = col + yyleng; return mcCHARACTER; }
+{ yylval.string=strdup(yytext); addMotCle(yytext, "mcCHARACTER", 1); col = col + yyleng; return mcCHARACTER; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 27 "lexical.l"
-{ addMotCle(yytext, "mcLOGICAL", 1); col = col + yyleng; return mcLOGICAL; }
+{ yylval.string=strdup(yytext); addMotCle(yytext, "mcLOGICAL", 1); col = col + yyleng; return mcLOGICAL; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
@@ -1044,42 +1044,42 @@ case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
 #line 65 "lexical.l"
-{col =1; nbligne++;}
+{ col =1; nbligne++;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 66 "lexical.l"
-{ addConstant(yytext, "mcINTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGER; }
+{ yylval.entier=atoi(yytext); addConstant(yytext, "mcINTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGER; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 67 "lexical.l"
-{ addConstant(yytext, "mcREAL", 1, atof(yytext)); col = col + yyleng; return REAL; }
+{ yylval.real=atof(yytext);   addConstant(yytext, "mcREAL", 1, atof(yytext)); col = col + yyleng; return REAL; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 68 "lexical.l"
-{ addVariable(yytext,"TypeVariable", 1, 0.0, ""); col = col + yyleng; return identificateur; }
+{ yylval.string=strdup(yytext); addVariable(yytext,"TypeVariable", 1, 0.0, ""); col = col + yyleng; return identificateur; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 69 "lexical.l"
-{ addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGERPOSITIF; }
+{ yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGERPOSITIF; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
 #line 70 "lexical.l"
-{ addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGERNEGATIF; }
+{ yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGERNEGATIF; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 71 "lexical.l"
-{ addConstant(yytext, "CHARACTER", 1, (float)yytext[1]); col = col + yyleng; return caracter; }
+{ yylval.caracter=strdup(yytext); addConstant(yytext, "CHARACTER", 1, (float)yytext[1]); col = col + yyleng; return caracter; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 72 "lexical.l"
-{ addConstant(yytext, "STRING", 1, 0.0); col = col + yyleng; return chaine; }
+{ yylval.string=strdup(yytext); addConstant(yytext, "STRING", 1, 0.0); col = col + yyleng; return chaine; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
@@ -1089,12 +1089,12 @@ YY_RULE_SETUP
 case 53:
 YY_RULE_SETUP
 #line 74 "lexical.l"
-{ addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALNEGATIF; }
+{ yylval.real=atof(yytext); addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALNEGATIF; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 75 "lexical.l"
-{ addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALPOSITIF; }
+{ yylval.real=atof(yytext); addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALPOSITIF; }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP

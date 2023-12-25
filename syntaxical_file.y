@@ -1,11 +1,15 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 extern int yylex(void);
 extern char* yytext;
 int nbligne = 1;
 int col=1;	
 void yyerror(const char *s);
+
+char sauvType[25];
+char sauvPlace[25];
 %}
 
 %union 
@@ -13,13 +17,14 @@ void yyerror(const char *s);
    int entier;
    float real; 
    char* string;
+   char caracter;
 }
 
 %start Fonction
 
-%token mcTRUE mcFALSE <string> mcINTEGER <string> mcREAL <string> mcCHARACTER <string> mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
+%token mcTRUE mcFALSE <string>mcINTEGER <string>mcREAL <string>mcCHARACTER <string>mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
 %token OR AND GT EQ GE NE LE LT eq point_virgule point plus mpins division or aro etoile virgule
-%token paraO paraF <string> identificateur <entier> INTEGER <entier> INTEGERPOSITIF <entier> INTEGERNEGATIF <real> REAL <string> chaine commantaire <real> REALNEGATIF <real> REALPOSITIF
+%token paraO paraF <string>identificateur <entier>INTEGER <entier>INTEGERPOSITIF <entier>INTEGERNEGATIF <real>REAL <caracter>caracter <string>chaine commantaire <real>REALNEGATIF <real>REALPOSITIF
 
 %left virgule
 %left plus mpins
@@ -30,21 +35,22 @@ void yyerror(const char *s);
 %left point
 %right UNARY_OPERATOR
 %%
-Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction
+Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction { addType($3,$1); sprintf (sauvPlace,"FONCTION %s",$3); }
          | mcPROGRAM identificateur DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
-DECLARATIONS : type identificateur caractere1 DECLARATIONS1;
-
+DECLARATIONS : type identificateur caractere1 DECLARATIONS1 { strcpy(sauvType,$1); addType ($2,sauvType);addVarPlace($2,sauvPlace) }
+             ;
+                  /* exemple : int x,a; char b; */
 caractere1: etoile INTEGER
           | /*epsilon*/
           ;
 
 DECLARATIONS1 : point_virgule DECLARATIONS
 			  | point_virgule
-              | virgule identificateur caractere1 DECLARATIONS1
-              | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
-              | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
+                    | virgule identificateur caractere1 DECLARATIONS1 {addType ($2,sauvType); }
+                    | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
+                    | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
 			  | eq VALEURS DECLARATIONS1
 			  ;
 DECLARATIONS2 : point_virgule DECLARATIONS
