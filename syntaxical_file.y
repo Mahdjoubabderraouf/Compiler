@@ -133,21 +133,18 @@ Liste : identificateur
 Boucle : mcDOWHILE paraO expression paraF INSTR mcENDO;
 Condition : mcIF paraO expression paraF;
 
-expression : logical_expression
-           | paraO expression paraF
-           | expression AND expression
-           | expression OR expression
+expression : paraO expression paraF
+           | expression point AND point expression
+           | expression point OR point expression
            | comparison
+
             ;
-logical_expression : mcTRUE
-                  |mcFALSE
-                    ;
-comparison : operand EQ operand
-           | operand GT operand
-           | operand GE operand
-           | operand NE operand
-           | operand LE operand
-           | operand LT operand
+comparison : operand point EQ point operand
+           | operand point GT point operand
+           | operand point GE point operand
+           | operand point NE point operand
+           | operand point LE point operand
+           | operand point LT point operand
            | 
             ;
 operand : identificateur INTEGERPOSITIF
@@ -156,7 +153,8 @@ operand : identificateur INTEGERPOSITIF
         | identificateur etoile operand
         | paraO operand paraF
         | identificateur
-        | logical_expression operand
+        | mcTRUE
+        | mcFALSE
         ;
 
 OPER : plus
