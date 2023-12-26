@@ -2,11 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
 extern int yylex(void);
 extern char* yytext;
 int nbligne = 1;
-int col=1;	
+int col = 1;
+
 void yyerror(const char *s);
+
+void addType(char *name, char *type);
+void addVarPlace(char *name, char *varPlace);
 
 char sauvType[25];
 char sauvPlace[25];
@@ -33,28 +39,28 @@ char sauvPlace[25];
 %left AND OR
 %left paraO paraF
 %left point
-%right UNARY_OPERATOR
+%type <string>type
 %%
-Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction { addType($3,$1); sprintf (sauvPlace,"FONCTION %s",$3); }
+
+Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR {  strcpy(sauvType,$1);  addType($3,sauvType); sprintf (sauvPlace,"FONCTION %s",$3); } Fonction 
          | mcPROGRAM identificateur DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
-DECLARATIONS : type identificateur caractere1 DECLARATIONS1 { strcpy(sauvType,$1); addType ($2,sauvType);addVarPlace($2,sauvPlace) }
+DECLARATIONS : type identificateur caractere1 DECLARATIONS1 { strcpy(sauvType,$1); addType ($2,sauvType);addVarPlace($2,sauvPlace); }
+             |
              ;
-                  /* exemple : int x,a; char b; */
+                 
 caractere1: etoile INTEGER
           | /*epsilon*/
           ;
 
 DECLARATIONS1 : point_virgule DECLARATIONS
-			  | point_virgule
                     | virgule identificateur caractere1 DECLARATIONS1 {addType ($2,sauvType); }
                     | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
                     | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
 			  | eq VALEURS DECLARATIONS1
 			  ;
 DECLARATIONS2 : point_virgule DECLARATIONS
-              | point_virgule
               | virgule identificateur caractere1 DECLARATIONS1
               | mcDIMENSION paraO INTEGER paraF DECLARATIONS1
               | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS1
@@ -154,33 +160,22 @@ Condition : mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
 expression : paraO expression paraF
            | expression point AND point expression
            | expression point OR point expression
-           | comparison
-
-            ;
-comparison : operand point EQ point operand
-           | operand point GT point operand
-           | operand point GE point operand
-           | operand point NE point operand
-           | operand point LE point operand
-           | operand point LT point operand
-           | 
+           | expression OPER_COMPARISON expression
+           | operand
            ;
 
-operand : identificateur INTEGERPOSITIF
-        | identificateur INTEGERNEGATIF
-        | identificateur division operand
-        | identificateur etoile operand
-        | paraO operand paraF
-        | identificateur
-        | INTEGER
-        | INTEGERPOSITIF
-        | INTEGERNEGATIF
-        | REAL
-        | REALPOSITIF
-        | REALNEGATIF
-        | mcTRUE
-        | mcFALSE
-        ;
+operand: mcTRUE
+       | mcFALSE
+       | MATH_VAR
+       ;           
+
+OPER_COMPARISON: point EQ point
+               | point GT point
+               | point GE point
+               | point NE point
+               | point LE point
+               | point LT point 
+               ;
 
 OPER : plus
      | mpins
