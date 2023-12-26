@@ -29,7 +29,7 @@ commantaire %.*;
 "WRITE"             { addMotCle(yytext, "mcWRITE", 1); col = col + yyleng; return mcWRITE; }
 "DIMENSION"         { addMotCle(yytext, "mcDIMENSION", 1); col = col + yyleng; return mcDIMENSION; }
 "PROGRAM"           { addMotCle(yytext, "mcPROGRAM", 1); col = col + yyleng; return mcPROGRAM; }
-"END"               { addMotCle(yytext, "mcEND", 1); col = col + yyleng; afficher();  return mcEND;}
+"END"               { addMotCle(yytext, "mcEND", 1); col = col + yyleng;  return mcEND;}
 "ROUTINE"           { addMotCle(yytext, "mcROUTINE", 1); col = col + yyleng; return mcROUTINE; }
 "ENDR"              { addMotCle(yytext, "mcENDR", 1); col = col + yyleng; return mcENDR; }
 "CALL"              { addMotCle(yytext, "mcCALL", 1); col = col + yyleng; return mcCALL; }

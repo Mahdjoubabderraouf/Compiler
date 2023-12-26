@@ -13,6 +13,7 @@ void yyerror(const char *s);
 
 void addType(char *name, char *type);
 void addVarPlace(char *name, char *varPlace);
+void afficher();
 
 char sauvType[25];
 char sauvPlace[25];
@@ -43,7 +44,7 @@ char sauvPlace[25];
 %%
 
 Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR {  strcpy(sauvType,$1);  addType($3,sauvType); sprintf (sauvPlace,"FONCTION %s",$3); } Fonction 
-         | mcPROGRAM identificateur DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
+         | mcPROGRAM identificateur DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n"); afficher(); YYACCEPT; }
          ;
 
 DECLARATIONS : type identificateur caractere1 DECLARATIONS1 { strcpy(sauvType,$1); addType ($2,sauvType);addVarPlace($2,sauvPlace); }
