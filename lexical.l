@@ -11,8 +11,8 @@ NATUREL        {chiffre}+
 INTEGERPOSITIF (\+)[ ]*{NATUREL}
 INTEGERNEGATIF (\-)[ ]*{NATUREL}
 INTEGER        {NATUREL}
-REALNEGATIF    \-{INTEGER}\.{NATUREL}
-REALPOSITIF    \+{INTEGER}\.{NATUREL}
+REALNEGATIF    \-[ ]*{INTEGER}\.{NATUREL}
+REALPOSITIF    \+[ ]*{INTEGER}\.{NATUREL}
 REAL           {INTEGER}\.{NATUREL}
 identificateur {lettre}({lettre}|{chiffre}|\_){0,9}
 caracter \".\"
@@ -65,12 +65,12 @@ commantaire %.*;
 {INTEGER}           { yylval.entier=atoi(yytext); addConstant(yytext, "mcINTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGER; }
 {REAL}              { yylval.real=atof(yytext);   addConstant(yytext, "mcREAL", 1, atof(yytext)); col = col + yyleng; return REAL; }
 {identificateur}    { yylval.string=strdup(yytext); addVariable(yytext,"TypeVariable", 1, 0.0, ""); col = col + yyleng; return identificateur; }
-{INTEGERPOSITIF}    { yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGERPOSITIF; }
-{INTEGERNEGATIF}    { yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGERNEGATIF; }
+{INTEGERPOSITIF}    { yylval.entier=atoi(yytext);char str[20] ; sprintf(str,"%d",atoi(yytext)); addConstant(str, "INTEGER", 1, atoi(yytext)); col = col + yyleng; return INTEGERPOSITIF; }
+{INTEGERNEGATIF}    { yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atoi(yytext)); col = col + yyleng; return INTEGERNEGATIF; }
 {caracter}          { yylval.caracter=yytext[1]; addConstant(yytext, "CHARACTER", 1, (float)yytext[1]); col = col + yyleng; return caracter; }
 {chaine}            { yylval.string=strdup(yytext); addConstant(yytext, "STRING", 1, 0.0); col = col + yyleng; return chaine; }
 {commantaire} 
-{REALNEGATIF}       { yylval.real=atof(yytext); addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALNEGATIF; }
+{REALNEGATIF}       { yylval.real=atof(yytext); char str[20] ; sprintf(str,"%f",atof(yytext)); addConstant(str, "REAL", 1, atof(yytext)); col = col + yyleng; return REALNEGATIF; }
 {REALPOSITIF}       { yylval.real=atof(yytext); addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALPOSITIF; }
 . {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nbligne,col, yytext);}
 

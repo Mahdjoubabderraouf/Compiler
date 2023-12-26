@@ -27,6 +27,10 @@ void addConstant(char *name, char *type, int state, float val);
 void addMotCle(char *name, char *type, int state);
 void addSep(char *name, char *type, int state);
 void afficher();
+void addType(char *name, char *type);
+void addVal(char *name, float val);
+void addVarPlace(char *name, char *varPlace);
+
 
 /******************************************/
 

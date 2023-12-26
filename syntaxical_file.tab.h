@@ -93,27 +93,37 @@ extern int yydebug;
     aro = 294,                     /* aro  */
     etoile = 295,                  /* etoile  */
     virgule = 296,                 /* virgule  */
-    gui = 297,                     /* gui  */
-    paraO = 298,                   /* paraO  */
-    paraF = 299,                   /* paraF  */
-    identificateur = 300,          /* identificateur  */
-    INTEGER = 301,                 /* INTEGER  */
-    INTEGERPOSITIF = 302,          /* INTEGERPOSITIF  */
-    INTEGERNEGATIF = 303,          /* INTEGERNEGATIF  */
-    REAL = 304,                    /* REAL  */
-    caracter = 305,                /* caracter  */
-    chaine = 306,                  /* chaine  */
-    commantaire = 307,             /* commantaire  */
-    REALNEGATIF = 308,             /* REALNEGATIF  */
-    REALPOSITIF = 309,             /* REALPOSITIF  */
-    UNARY_OPERATOR = 310           /* UNARY_OPERATOR  */
+    paraO = 297,                   /* paraO  */
+    paraF = 298,                   /* paraF  */
+    identificateur = 299,          /* identificateur  */
+    INTEGER = 300,                 /* INTEGER  */
+    INTEGERPOSITIF = 301,          /* INTEGERPOSITIF  */
+    INTEGERNEGATIF = 302,          /* INTEGERNEGATIF  */
+    REAL = 303,                    /* REAL  */
+    caracter = 304,                /* caracter  */
+    chaine = 305,                  /* chaine  */
+    commantaire = 306,             /* commantaire  */
+    REALNEGATIF = 307,             /* REALNEGATIF  */
+    REALPOSITIF = 308              /* REALPOSITIF  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 22 "syntaxical_file.y"
+ 
+   int entier;
+   float real; 
+   char* string;
+   char caracter;
+
+#line 124 "syntaxical_file.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

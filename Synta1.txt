@@ -1,9 +1,8 @@
 PROGRAM HelloAcad
-INTEGER A ; 
-
-IF (FALSE . EQ . TRUE ) 
-THEN
-A = A + B; 
-ENDIF 
-
-END.
+DOWHILE (FALSE) 
+A = A + 1;
+A = A - 2;
+B = B-1;
+B= B+2; 
+ENDDO;
+END

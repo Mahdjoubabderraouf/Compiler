@@ -150,32 +150,43 @@ Liste : identificateur
       | identificateur paraO INTEGER paraF
       ;
 
-Boucle : mcDOWHILE paraO expression paraF INST_S mcENDDO ;
+Boucle : mcDOWHILE paraO expression paraF INST_S mcENDDO 
+       | mcDOWHILE paraO expression2 paraF INST_S mcENDDO 
+       ;
 
 
 Condition : mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
           | mcIF paraO expression paraF mcTHEN INST_S mcENDIF
           ;
 
+expression2 : MATH_VAR point AND point expression2
+            | MATH_VAR point OR point expression2
+            | MATH_VAR
+            | LOGICAL point AND point expression2
+            | LOGICAL point OR point expression2
+            | LOGICAL
+            ;
+
 expression : paraO expression paraF
            | expression point AND point expression
            | expression point OR point expression
-           | expression OPER_COMPARISON expression
-           | operand
+           | comparision
            ;
+           
+comparision : MATH_VAR point EQ point MATH_VAR
+            | LOGICAL point EQ point LOGICAL
+            | MATH_VAR point EQ point LOGICAL
+            | LOGICAL point EQ point MATH_VAR
+            | MATH_VAR point GT point MATH_VAR
+            | MATH_VAR point GE point MATH_VAR
+            | MATH_VAR point NE point MATH_VAR
+            | MATH_VAR point LE point MATH_VAR
+            | MATH_VAR point LT point MATH_VAR
+            ;
 
-operand: mcTRUE
+LOGICAL: mcTRUE
        | mcFALSE
-       | MATH_VAR
-       ;           
-
-OPER_COMPARISON: point EQ point
-               | point GT point
-               | point GE point
-               | point NE point
-               | point LE point
-               | point LT point 
-               ;
+       ;
 
 OPER : plus
      | mpins
