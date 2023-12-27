@@ -1,8 +1,12 @@
+INTEGER ROUTINE Ahmed ()
+Ahmed = 10 
+ENDR
+
 PROGRAM HelloAcad
-DOWHILE (FALSE) 
-A = A + 1;
-A = A - 2;
-B = B-1;
-B= B+2; 
-ENDDO;
-END
+
+INTEGER A = 12 ; 
+INTEGER A , B =15 , D ;
+REAL TAB DIMENSION (20 , 200) ;
+INTEGER var4 DIMENSION (20) ; 
+ 
+END 

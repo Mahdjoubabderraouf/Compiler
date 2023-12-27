@@ -14,9 +14,14 @@ void yyerror(const char *s);
 void addType(char *name, char *type);
 void addVarPlace(char *name, char *varPlace);
 void afficher();
+void addVariable(char *name, char *type, int state, char* val, char varPlace[]);
 
 char sauvType[25];
 char sauvPlace[25];
+char IDFValeur[25];
+char IDF[25];
+char listeSource [500];
+ char errorMsg[500];
 %}
 
 %union 
@@ -29,7 +34,7 @@ char sauvPlace[25];
 
 %start Fonction
 
-%token mcTRUE mcFALSE <string>mcINTEGER <string>mcREAL <string>mcCHARACTER <string>mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
+%token <string>mcTRUE <string>mcFALSE <string>mcINTEGER <string>mcREAL <string>mcCHARACTER <string>mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
 %token OR AND GT EQ GE NE LE LT eq point_virgule point plus mpins division or aro etoile virgule
 %token paraO paraF <string>identificateur <entier>INTEGER <entier>INTEGERPOSITIF <entier>INTEGERNEGATIF <real>REAL <caracter>caracter <string>chaine commantaire <real>REALNEGATIF <real>REALPOSITIF
 
@@ -37,17 +42,28 @@ char sauvPlace[25];
 %left plus mpins
 %left etoile division
 %nonassoc EQ NE LT LE GT GE
+%right eq
 %left AND OR
 %left paraO paraF
 %left point
 %type <string>type
+%type <entier>VALEURS_entier
+%type <real>VALEURS_real
+%type <string>LOGICAL
 %%
 
-Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR {  strcpy(sauvType,$1);  addType($3,sauvType); sprintf (sauvPlace,"FONCTION %s",$3); } Fonction 
-         | mcPROGRAM identificateur DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n"); afficher(); YYACCEPT; }
+Fonction : type mcROUTINE identificateur { addVariable($3,$1,1,"NULL","PROGRAM") ; strcpy(sauvType,$1);  addType($3,sauvType); sprintf (sauvPlace,"FONCTION %s",$3); } paraO { sprintf(listeSource ,"para de Fun %s",$3); } Liste paraF DECLARATIONS INST_S identificateur  
+         eq EXPR { 
+           if ( strcmp($3,$11) != 0 )
+           { 
+          sprintf(errorMsg, "return value must be affected in the same function name \n");
+            yyerror(errorMsg); 
+            } 
+         } mcENDR  Fonction 
+         | mcPROGRAM identificateur {sprintf (sauvPlace,"PROGRAM");} DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n");  YYACCEPT; }
          ;
 
-DECLARATIONS : type identificateur caractere1 DECLARATIONS1 { strcpy(sauvType,$1); addType ($2,sauvType);addVarPlace($2,sauvPlace); }
+DECLARATIONS : type identificateur caractere1 {  strcpy(sauvType,$1); strcpy(IDF,$2);  } DECLARATIONS1 
              |
              ;
                  
@@ -55,29 +71,42 @@ caractere1: etoile INTEGER
           | /*epsilon*/
           ;
 
-DECLARATIONS1 : point_virgule DECLARATIONS
-                    | virgule identificateur caractere1 DECLARATIONS1 {addType ($2,sauvType); }
-                    | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
-                    | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
-			  | eq VALEURS DECLARATIONS1
-			  ;
-DECLARATIONS2 : point_virgule DECLARATIONS
-              | virgule identificateur caractere1 DECLARATIONS1
+DECLARATIONS1 : point_virgule { addVariable(IDF,sauvType,1,"NULL",sauvPlace);} DECLARATIONS 
+              | virgule { addVariable(IDF,sauvType,1,"NULL",sauvPlace);} identificateur caractere1 { strcpy(IDF,$3); } DECLARATIONS1
+              | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
+              | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2   
+              | eq VALEURS_entier { sprintf(IDFValeur,"%d", $2) ; addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);} DECLARATIONS1                   
+              | eq VALEURS_real { sprintf(IDFValeur,"%f", $2) ; addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);} DECLARATIONS1 
+              | eq chaine { sprintf(IDFValeur,"%s", $2) ; addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);} DECLARATIONS1                     
+              | eq caracter {  sprintf(IDFValeur,"%c", $2); addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);}DECLARATIONS1 
+              | eq LOGICAL{ sprintf(IDFValeur,"%s", $2) ; printf("%s\n",IDFValeur); addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);} DECLARATIONS1
+              ;
+
+DECLARATIONS2 : point_virgule { addVariable(IDF,sauvType,1,"NULL",sauvPlace);} DECLARATIONS
+              | virgule identificateur { addVariable(IDF,sauvType,1,"NULL",sauvPlace);} caractere1 DECLARATIONS1
               | mcDIMENSION paraO INTEGER paraF DECLARATIONS1
               | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS1
               ;
 
-VALEURS : REAL | INTEGER | caracter | chaine;
+VALEURS_entier : INTEGER 
+               | INTEGERPOSITIF
+               | INTEGERNEGATIF
+               ;
+
+VALEURS_real : REAL
+             | REALPOSITIF
+             | REALNEGATIF
+             ;
+
 
 type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
 
-INST_S: INST_S INSTR point_virgule | INST_S Condition
+INST_S: INST_S INSTR point_virgule | INST_S if_statment
       | ;
 
 INSTR : Affectation
       | ES
       | Boucle
-      | Appel
       | Equivalence
       | /*vide*/
       ;
@@ -88,11 +117,11 @@ Affectation : identificateur eq EXPR;
 EXPR : CHAINE_STRING
      | MATH_VAR
      | APPEL_FONC
-     | mcFALSE
-     | mcTRUE
+     | LOGICAL
      ;
 
-APPEL_FONC : mcCALL identificateur paraO Liste paraF ;
+APPEL_FONC : mcCALL identificateur paraO { sprintf(listeSource ,"%s",sauvPlace); } Liste paraF ;
+
 
 MATH_VAR : identificateur MATH_VAR1
          | identificateur paraO INTEGER paraF MATH_VAR1
@@ -139,26 +168,27 @@ ES : mcREAD paraO identificateur paraF
 
 ES_WRITE_OPTIONAL :  virgule identificateur | virgule identificateur chaine ;
 
-Appel : identificateur paraO Liste paraF ;
+Equivalence : PartageMemoire paraO { sprintf(listeSource ,"%s",sauvPlace); } identificateur Liste paraF virgule paraO identificateur Liste paraF ;
 
-Equivalence : PartageMemoire paraO Liste paraF virgule paraO Liste paraF ;
-
-Liste : identificateur
-      | Liste virgule identificateur
-      | Liste virgule identificateur paraO INTEGER paraF
-      | Liste virgule identificateur paraO INTEGER virgule INTEGER paraF
-      | identificateur paraO INTEGER virgule INTEGER paraF
-      | identificateur paraO INTEGER paraF
+Liste :
+      | Liste virgule identificateur { addVariable($3,"pas de type",1,"NULL",listeSource);}
+      | Liste virgule identificateur paraO INTEGER paraF { addVariable($3,"pas de type",1,"NULL",listeSource);}
+      | Liste virgule identificateur paraO INTEGER virgule INTEGER paraF { addVariable($3,"pas de type",1,"NULL",listeSource);}
+      | identificateur paraO INTEGER virgule INTEGER paraF { addVariable($1,"pas de type",1,"NULL",listeSource);}
+      | identificateur paraO INTEGER paraF { addVariable($1,"pas de type",1,"NULL",listeSource);}
       ;
 
-Boucle : mcDOWHILE paraO expression paraF INST_S mcENDDO 
-       | mcDOWHILE paraO expression2 paraF INST_S mcENDDO 
+Boucle : mcDOWHILE paraO condition paraF INST_S mcENDDO 
        ;
 
 
-Condition : mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
-          | mcIF paraO expression paraF mcTHEN INST_S mcENDIF
+if_statment : mcIF paraO condition paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+          | mcIF paraO condition paraF mcTHEN INST_S mcENDIF
           ;
+
+condition : expression 
+          | expression2
+          ; 
 
 expression2 : MATH_VAR point AND point expression2
             | MATH_VAR point OR point expression2
@@ -171,6 +201,14 @@ expression2 : MATH_VAR point AND point expression2
 expression : paraO expression paraF
            | expression point AND point expression
            | expression point OR point expression
+           | expression point AND point MATH_VAR
+           | expression point OR point MATH_VAR
+           | expression point AND point LOGICAL
+           | expression point OR point LOGICAL
+           | MATH_VAR point AND point expression
+           | MATH_VAR point OR point expression
+           | LOGICAL point AND point expression
+           | LOGICAL point OR point expression
            | comparision
            ;
            
@@ -200,13 +238,12 @@ OPER : plus
 // Fonction main
 
 void yyerror(const char *s) {
-    fprintf(stderr, "Syntax error at line %d, column %d: %s\n", nbligne, col, s);
-    yyparse ();
+    fprintf(stderr, "\n Syntax error at line %d, column %d: %s\n", nbligne, col, s);
+      exit(EXIT_FAILURE);
 }
 
 int main() {
     yyparse();
+    afficher();
     return 0;
-
-
 }

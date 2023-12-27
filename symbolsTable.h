@@ -10,25 +10,25 @@ typedef struct variable
     char name[20];
     char code[20];
     char type[20];
-    float val;
+    char val [20];
     char varPlace[20]; /* la place de la variable  */
     struct variable *suiv;
 
 } variable;
 
 /******les siganatures des fonctions *********/
-variable* RechercherVar(char *name);
-int RechercherVarPlace (char *name,char *place);
+
+variable*  RechercherVar_et_sa_Place (char *name,char *place);
 int RechercherConst(char *name);
 int RechercherSep(char *name);
 int RechercherMotCle(char *name);
-void addVariable(char *name, char *type, int state, float val, char varPlace[]);
+void addVariable(char *name, char *type, int state, char* val, char varPlace[]);
 void addConstant(char *name, char *type, int state, float val);
 void addMotCle(char *name, char *type, int state);
 void addSep(char *name, char *type, int state);
 void afficher();
 void addType(char *name, char *type);
-void addVal(char *name, float val);
+void addVal(char *name, char * val);
 void addVarPlace(char *name, char *varPlace);
 
 
@@ -53,6 +53,28 @@ typedef struct elt
     struct elt *suiv;
 } elt; // séparateurs & des mots clés
 
+typedef struct vector {
+    int state;
+    char name[20];
+    char type[20];
+    int size; // added size field
+    char code[20];
+    char val[20];
+    char vecPlace[20];
+    struct vector *suiv;
+} vector;
+
+typedef struct matrix {
+    int state;
+    char name[20];
+    char type[20];
+    int rows, cols; // added rows and cols fields for matrix size
+    char code[20];
+    char val[20];
+    char matPlace[20];
+    struct matrix *suiv;
+} matrix;
+
 /***Step 2: Déclaration des variables globales ***/
 
 variable *listVar = NULL;
@@ -66,33 +88,16 @@ elt *dernierMotCle = NULL;
 
 /***Step 3: Définition des fonctions ***/
 
-variable* RechercherVar(char *name)
+variable* RechercherVar_et_sa_Place (char *name,char *place)
 {
     variable *tempVar = listVar;
     
     while (tempVar != NULL)
     {
-        if (strcmp(tempVar->name, name) == 0 )
-            
-            return tempVar; // Element found in listVar
-        
-        tempVar = tempVar->suiv;
-
+        if (strcmp(place,tempVar->varPlace) == 0 && strcmp(name,tempVar->name)==0 )   return tempVar;; // variable exists in the function place
+        tempVar = tempVar->suiv; // move to the next variable
     }
-    return NULL ; // Element not found
-}
-
-int RechercherVarPlace (char *name,char *place)
-{
-    variable *tempVar = RechercherVar(name);
-    
-    if (tempVar != NULL)
-        
-    {
-        if (strcmp(place,tempVar->varPlace) == 0)  return 1; // variable existe dans la fonction place
-        return 0 ; // variable n'est pas déclarée dans la fonction place tu peux le déclarée 
-    }
-
+    return NULL ; // variable is not declared in the function place, you can declare it
 }
 
 int RechercherConst(char *name)
@@ -130,38 +135,38 @@ int RechercherMotCle(char *name)
     }
     return 0; // Element not found
 }
-void addVariable(char *name, char *type, int state, float val,char varPlace[])
+void addVariable(char *name, char *type, int state, char* val,char varPlace[])
 {
-    if (RechercherVar(name) == NULL )
-    {
+   
         if (listVar == NULL)
         {
             listVar = (variable *)malloc(sizeof(variable));
             listVar->state = state;
             strcpy(listVar->name, name);
             strcpy(listVar->type, type);
-            strcpy(listVar->code, "identificateur");
-            listVar->val = val;
+            strcpy(listVar->code, "IDF");
+            strcpy(listVar->val, val);
+            strcpy(listVar->varPlace, varPlace);
             listVar->suiv = NULL;
             dernierVar = listVar;
         }
         else
-        {   if (RechercherVarPlace(name,varPlace) == 0)
+        {   if (RechercherVar_et_sa_Place(name,varPlace) == NULL)
         {
             variable *newVar = (variable *)malloc(sizeof(variable));
 
             newVar->state = state;
             strcpy(newVar->name, name);
             strcpy(newVar->type, type);
-            strcpy(newVar->code, "identificateur");
-            newVar->val = val;
+            strcpy(newVar->code, "IDF");
+            strcpy(newVar->val ,val);
+            strcpy(newVar->varPlace, varPlace);
             newVar->suiv = NULL;
             dernierVar->suiv = newVar;
             dernierVar = newVar;
         } 
         }
     }
-}
 
 void addConstant(char *name, char *type, int state, float val)
     {
@@ -257,7 +262,7 @@ void afficher()
     {
         if (tempVar->state == 1)
         {
-            printf("\t|%s |%s |%s | %f | %s\n", tempVar->name, tempVar->code, tempVar->type, tempVar->val,tempVar->varPlace);
+            printf("\t|%11s |%13s |%12s | %10s | %s \n", tempVar->name, tempVar->code, tempVar->type, tempVar->val,tempVar->varPlace);
         }
         tempVar = tempVar->suiv;
     }
@@ -270,7 +275,7 @@ void afficher()
 
     while (tempConst != NULL)
     {
-        printf("\t|%s |%s | %s | %f\n", tempConst->name, tempConst->code, tempConst->type, tempConst->val);
+        printf("\t|%11s |%13s |%12s | %10f \n", tempConst->name, tempConst->code, tempConst->type, tempConst->val);
         tempConst = tempConst->suiv;
     }
     printf("\n");
@@ -320,14 +325,14 @@ void addType(char *name, char *type)
     }
 }
 // the function addVal for the variables
-void addVal(char *name, float val)
+void addVal(char *name, char * val)
 {
     variable *tempVar = listVar;
     while (tempVar != NULL)
     {
         if (strcmp(tempVar->name, name) == 0)
         {
-            tempVar->val = val;
+            strcpy (tempVar->val ,val);
             break;
         }
         tempVar = tempVar->suiv;
