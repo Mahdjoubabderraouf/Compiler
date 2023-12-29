@@ -1,22 +1,4 @@
-/**
- * Ceci est un fichier de grammaire Bison qui définit la syntaxe d'un langage de programmation.
- * Il inclut des déclarations, des définitions de fonctions, des affectations de variables, des structures de contrôle, et plus encore.
- * La grammaire spécifie les règles pour l'analyse syntaxique du code d'entrée et la génération d'un arbre syntaxique abstrait (AST).
- * L'AST peut ensuite être utilisé pour des analyses ultérieures ou la génération de code.
- *
- * La grammaire définit divers jetons tels que des identifiants, des entiers, des nombres réels, des caractères, des chaînes de caractères et des mots-clés.
- * Elle définit également la précédence et l'associativité des opérateurs, ainsi que les règles de traitement des expressions et des instructions.
- *
- * La grammaire inclut des actions sémantiques qui sont exécutées pendant l'analyse syntaxique pour effectuer des tâches telles que l'ajout de variables aux tables des symboles,
- * la vérification des déclarations en double, la validation des affectations et la génération de code.
- *
- * Ce fichier de grammaire peut être utilisé avec le générateur de parseurs Bison pour générer un parseur pour le langage de programmation.
- * Le parseur généré peut être intégré à un compilateur ou un interpréteur pour le langage.
- *
- * @file syntaxical_file.y
- * @version 1.0
- * @author [Votre nom]
- */
+
 
 %{
 #include <stdio.h>
@@ -44,6 +26,7 @@ char IDF[25];
 char listeSource [500];
 char errorMsg[500];
 char IDFCode[25] ="Var Simple";
+int isString =0;
 
 int size,column,row;
 
@@ -75,11 +58,7 @@ int size,column,row;
 %type <real> VALEURS_real
 %type <string> LOGICAL
 %%
-/**
- * It defines the syntax for function and program declarations, as well as variable declarations.
- * The code includes semantic actions that handle variable and function declarations, as well as error checking.
- * It also handles the declaration of arrays and matrices, and assigns values to variables.
- */
+
 
 Fonction : 
     type mcROUTINE identificateur 
@@ -120,11 +99,12 @@ Fonction :
 ;
 
 DECLARATIONS : 
-    type identificateur caractere1 
+
+    type identificateur  
     { 
         strcpy(sauvType, $1); 
         strcpy(IDF, $2);
-    } DECLARATIONS1 
+    } caractere1 DECLARATIONS1 
 | 
     // Other rules
 ;
@@ -132,8 +112,14 @@ DECLARATIONS :
 caractere1: 
     etoile INTEGER 
     {
-        strcpy(IDFCode, "Tableau"); 
+        if (strcmp(sauvType,"CHARACTER") !=0) 
+        {
+            sprintf(errorMsg,"Erreur de Type de la variable : \"%s\" ",IDF);
+            yyerror(errorMsg);
+        }
+        strcpy(IDFCode,"Tableau"); 
         size = $2;
+        isString =1;
     }
 | 
     /*epsilon*/
@@ -143,18 +129,19 @@ DECLARATIONS1 :
     point_virgule 
     {  
         // Add a variable to the list of declared variables
-        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) {sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg);}
+        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) 
+        { sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg); }
         strcpy(IDFCode, "Var Simple");
     } 
     DECLARATIONS 
 | 
-    virgule identificateur caractere1 
+    virgule identificateur  
     {   
         if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) {sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg);}
         strcpy(IDF, $2);
         strcpy(IDFCode, "Var Simple");
     } 
-    DECLARATIONS1
+    caractere1 DECLARATIONS1
 | 
     mcDIMENSION paraO INTEGER paraF 
     {
@@ -170,31 +157,58 @@ DECLARATIONS1 :
     } DECLARATIONS2   
 | 
     eq VALEURS_entier 
-    { 
+    {    
+        if (strcmp(sauvType,"INTEGER") !=0 && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
         sprintf(IDFValeur, "%d", $2);
     } 
     DECLARATIONS3                   
 | 
     eq VALEURS_real 
-    { 
+    {   
+        if (strcmp(sauvType,"REAL") !=0 ) 
+        {
+             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
         sprintf(IDFValeur, "%f", $2);
     } 
     DECLARATIONS3
 | 
     eq chaine 
     { 
+        if (strcmp(sauvType,"CHARACTER") !=0 || isString == 0) 
+        {   
+             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" et n'est pas une chaine",IDF,sauvType);
+            yyerror(errorMsg);
+        }
         sprintf(IDFValeur, "%s", $2);
+        isString=0;
+
     } 
     DECLARATIONS3                   
 | 
     eq caracter 
     {  
+        if (strcmp(sauvType,"CHARACTER") !=0 || isString == 1) 
+        {
+             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
         sprintf(IDFValeur, "%c", $2);
     }
     DECLARATIONS3
 | 
     eq LOGICAL 
     { 
+        if (strcmp(sauvType,"LOGICAL") !=0) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
         sprintf(IDFValeur, "%s", $2);
     } 
     DECLARATIONS3
@@ -211,7 +225,7 @@ DECLARATIONS2 :
                 yyerror("var n'est pas declarer");
         }   
         if (strcmp(IDFCode, "Matrice") == 0) 
-        {   printf("matrice");
+        {   
             if (addRowCol(IDF, sauvPlace, row, column))  
                 yyerror("var n'est pas declarer");              
         }
@@ -323,7 +337,15 @@ INSTR :
 
 Affectation : 
 
-    identificateur eq EXPR
+    identificateur
+     eq EXPR
+      {
+        if (RechercherVar_et_sa_Place($1,sauvPlace)== NULL)
+        {
+            sprintf(errorMsg,"la variable \"%s\" n'est pas declarer", $1);
+            yyerror(errorMsg);
+        }
+    }
 ;
 
 EXPR : 

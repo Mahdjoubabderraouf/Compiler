@@ -3,10 +3,10 @@ lsd=12;
 Ahmed = 10 
 ENDR
 
-PROGRAM HelloAcad
+PROGRAM Hellocad
 
 INTEGER A = 12 ; 
-INTEGER A , B =15 , D ;
+INTEGER  B =15 , D ;
 REAL TAB DIMENSION (20 , 200) ;
 INTEGER var4 DIMENSION (20) ; 
  
