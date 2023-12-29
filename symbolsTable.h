@@ -11,7 +11,7 @@ void* RechercherVar_et_sa_Place (char *name,char *place);
 int   RechercherConst(char *name);
 int   RechercherSep(char *name);
 int   RechercherMotCle(char *name);
-void addVariable(char *name, char *type,char* code, int state, char* val, char varPlace[]);
+int addVariable(char *name, char *type,char* code, int state, char* val, char varPlace[]);
 void addConstant(char *name, char *type, int state, float val);
 void addMotCle(char *name, char *type, int state);
 void addSep(char *name, char *type, int state);
@@ -150,9 +150,12 @@ int RechercherMotCle(char *name)
     return 0; // Element not found
 }
 
-void addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]) {
+int addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]) 
+{
     if (listVar == NULL) {
-        if (strcmp(code, "Matrice") == 0) {
+        if (strcmp(code, "Matrice") == 0) 
+        {
+            
             listVar = malloc(sizeof(matrice));
             ((matrice *)listVar)->state = state;
             strcpy(((matrice *)listVar)->name, name);
@@ -161,8 +164,13 @@ void addVariable(char *name, char *type, char* code, int state, char* val, char 
             strcpy(((matrice *)listVar)->val, val);
             strcpy(((matrice *)listVar)->varPlace, varPlace);
             ((matrice *)listVar)->suiv = NULL;
-            dernierVar = listVar;
-        } else if (strcmp(code, "Tableau") == 0) {
+            dernierVar = listVar; 
+
+            return 0 ;
+        } 
+        if (strcmp(code, "Tableau") == 0) 
+        {
+
             listVar = malloc(sizeof(tableau));
             ((tableau *)listVar)->state = state;
             strcpy(((tableau *)listVar)->name, name);
@@ -172,7 +180,9 @@ void addVariable(char *name, char *type, char* code, int state, char* val, char 
             strcpy(((tableau *)listVar)->varPlace, varPlace);
             ((tableau *)listVar)->suiv = NULL;
             dernierVar = listVar;
-        } else {
+            return 0 ;
+
+        } 
             listVar = malloc(sizeof(variable));
             ((variable *)listVar)->state = state;
             strcpy(((variable *)listVar)->name, name);
@@ -182,9 +192,12 @@ void addVariable(char *name, char *type, char* code, int state, char* val, char 
             strcpy(((variable *)listVar)->varPlace, varPlace);
             ((variable *)listVar)->suiv = NULL;
             dernierVar = listVar;
-        }
-    } else {
-        if (RechercherVar_et_sa_Place(name, varPlace) == NULL) {
+            return 0 ;
+    }
+
+        if (RechercherVar_et_sa_Place(name, varPlace) == NULL)
+        
+        {
             void *newVar;
             if (strcmp(code, "Matrice") == 0) {
                 newVar = malloc(sizeof(matrice));
@@ -202,8 +215,10 @@ void addVariable(char *name, char *type, char* code, int state, char* val, char 
             ((variable *)newVar)->suiv = NULL;
             ((variable *)dernierVar)->suiv = newVar;
             dernierVar = newVar;
-        }
-    }
+            return 0 ;
+        } 
+        return 1 ;
+    
 }
 
 
@@ -413,9 +428,9 @@ int addSize(char *name,char * varPlace, int size)
         if (tempVar != NULL)
         {
             tempVar->size = size;
-           return 1;
+           return 0;
         }
-    return 0 ;
+    return 1;
     
 }
 // the function addSize for the matrix
@@ -427,8 +442,8 @@ int addRowCol(char *name,char* varPlace ,int row, int col)
         {
             tempVar->row = row;
             tempVar->col = col;
-            return 1;
+            return 0;
         }
-    return 0; 
+    return 1; 
 }
 

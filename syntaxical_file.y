@@ -1,3 +1,23 @@
+/**
+ * Ceci est un fichier de grammaire Bison qui définit la syntaxe d'un langage de programmation.
+ * Il inclut des déclarations, des définitions de fonctions, des affectations de variables, des structures de contrôle, et plus encore.
+ * La grammaire spécifie les règles pour l'analyse syntaxique du code d'entrée et la génération d'un arbre syntaxique abstrait (AST).
+ * L'AST peut ensuite être utilisé pour des analyses ultérieures ou la génération de code.
+ *
+ * La grammaire définit divers jetons tels que des identifiants, des entiers, des nombres réels, des caractères, des chaînes de caractères et des mots-clés.
+ * Elle définit également la précédence et l'associativité des opérateurs, ainsi que les règles de traitement des expressions et des instructions.
+ *
+ * La grammaire inclut des actions sémantiques qui sont exécutées pendant l'analyse syntaxique pour effectuer des tâches telles que l'ajout de variables aux tables des symboles,
+ * la vérification des déclarations en double, la validation des affectations et la génération de code.
+ *
+ * Ce fichier de grammaire peut être utilisé avec le générateur de parseurs Bison pour générer un parseur pour le langage de programmation.
+ * Le parseur généré peut être intégré à un compilateur ou un interpréteur pour le langage.
+ *
+ * @file syntaxical_file.y
+ * @version 1.0
+ * @author [Votre nom]
+ */
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +33,7 @@ void yyerror(const char *s);
 void addType(char *name, char *type);
 void addVarPlace(char *name, char *varPlace);
 void afficher();
-void addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]);int addSize(char *name,char * varPlace, int size);
+int addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]);int addSize(char *name,char * varPlace, int size);
 int addRowCol(char *name,char* varPlace ,int row, int col);
 void* RechercherVar_et_sa_Place (char *name,char *place);
 
@@ -55,12 +75,17 @@ int size,column,row;
 %type <real> VALEURS_real
 %type <string> LOGICAL
 %%
+/**
+ * It defines the syntax for function and program declarations, as well as variable declarations.
+ * The code includes semantic actions that handle variable and function declarations, as well as error checking.
+ * It also handles the declaration of arrays and matrices, and assigns values to variables.
+ */
 
 Fonction : 
     type mcROUTINE identificateur 
     { 
         // Add a variable when a function is declared
-        addVariable($3, $1, "idf fonction", 1, "NULL", "PROGRAM");
+        if (addVariable($3, $1, "idf fonction", 1, "NULL", "PROGRAM")) {sprintf(errorMsg,"double declaration de %s",$3) ; yyerror(errorMsg);}
         strcpy(sauvType, $1);
         addType($3, sauvType);
         sprintf(sauvPlace, "FONCTION %s", $3);
@@ -116,36 +141,16 @@ caractere1:
 
 DECLARATIONS1 : 
     point_virgule 
-    { 
+    {  
         // Add a variable to the list of declared variables
-        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
-        if (strcmp(IDFCode, "Tableau") == 0) 
-        { 
-            if (!addSize(IDF, sauvPlace, size))   
-                yyerror("var n'est pas declarer");
-        }   
-        if (strcmp(IDFCode, "Matrice") == 0) 
-        {
-            if (!addRowCol(IDF, sauvPlace, row, column))  
-                yyerror("var n'est pas declarer");              
-        }
+        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) {sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg);}
         strcpy(IDFCode, "Var Simple");
     } 
     DECLARATIONS 
 | 
     virgule identificateur caractere1 
-    { 
-        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
-        if (strcmp(IDFCode, "Tableau") == 0) 
-        { 
-            if (!addSize(IDF, sauvPlace, size))   
-                yyerror("var n'est pas declarer");
-        }   
-        if (strcmp(IDFCode, "Matrice") == 0) 
-        {
-            if (!addRowCol(IDF, sauvPlace, row, column))  
-                yyerror("var n'est pas declarer");              
-        }
+    {   
+        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) {sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg);}
         strcpy(IDF, $2);
         strcpy(IDFCode, "Var Simple");
     } 
@@ -173,28 +178,24 @@ DECLARATIONS1 :
     eq VALEURS_real 
     { 
         sprintf(IDFValeur, "%f", $2);
-        addVariable(IDF, sauvType, "Var Simple", 1, IDFValeur, sauvPlace);
     } 
     DECLARATIONS3
 | 
     eq chaine 
     { 
         sprintf(IDFValeur, "%s", $2);
-        addVariable(IDF, sauvType, "Chaine", 1, IDFValeur, sauvPlace);
     } 
     DECLARATIONS3                   
 | 
     eq caracter 
     {  
         sprintf(IDFValeur, "%c", $2);
-        addVariable(IDF, sauvType, "Var Simple", 1, IDFValeur, sauvPlace);
     }
     DECLARATIONS3
 | 
     eq LOGICAL 
     { 
         sprintf(IDFValeur, "%s", $2);
-        addVariable(IDF, sauvType, "Var Simple", 1, IDFValeur, sauvPlace);
     } 
     DECLARATIONS3
 ;
@@ -203,15 +204,15 @@ DECLARATIONS2 :
 
     point_virgule
     { 
-        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
+        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) {sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg);}
         if (strcmp(IDFCode, "Tableau") == 0) 
         { 
-            if (!addSize(IDF, sauvPlace, size))   
+            if (addSize(IDF, sauvPlace, size))   
                 yyerror("var n'est pas declarer");
         }   
         if (strcmp(IDFCode, "Matrice") == 0) 
-        {
-            if (!addRowCol(IDF, sauvPlace, row, column))  
+        {   printf("matrice");
+            if (addRowCol(IDF, sauvPlace, row, column))  
                 yyerror("var n'est pas declarer");              
         }
         strcpy(IDFCode, "Var Simple");
@@ -220,15 +221,15 @@ DECLARATIONS2 :
 | 
     virgule identificateur 
     { 
-        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
+        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) {sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg);}
         if (strcmp(IDFCode, "Tableau") == 0) 
         { 
-            if (!addSize(IDF, sauvPlace, size))   
+            if (addSize(IDF, sauvPlace, size))   
                 yyerror("var n'est pas declarer");
         }   
         if (strcmp(IDFCode, "Matrice") == 0) 
         {
-            if (!addRowCol(IDF, sauvPlace, row, column))  
+            if (addRowCol(IDF, sauvPlace, row, column))  
                 yyerror("var n'est pas declarer");              
         }
         strcpy(IDF, $2);
@@ -253,35 +254,15 @@ DECLARATIONS2 :
 DECLARATIONS3 : 
 
     point_virgule
-    { 
-        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
-        if (strcmp(IDFCode, "Tableau") == 0) 
-        { 
-            if (!addSize(IDF, sauvPlace, size))   
-                yyerror("var n'est pas declarer");
-        }   
-        if (strcmp(IDFCode, "Matrice") == 0) 
-        {
-            if (!addRowCol(IDF, sauvPlace, row, column))  
-                yyerror("var n'est pas declarer");              
-        }
+    {   
+        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) yyerror("double declaration ");
         strcpy(IDFCode, "Var Simple");
     } 
     DECLARATIONS
 | 
     virgule identificateur 
-    { 
-        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
-        if (strcmp(IDFCode, "Tableau") == 0) 
-        { 
-            if (!addSize(IDF, sauvPlace, size))   
-                yyerror("var n'est pas declarer");
-        }   
-        if (strcmp(IDFCode, "Matrice") == 0) 
-        {
-            if (!addRowCol(IDF, sauvPlace, row, column))  
-                yyerror("var n'est pas declarer");              
-        }
+    {   
+        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) {sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg);}
         strcpy(IDF, $2);
         strcpy(IDFCode, "Var Simple");
     } 

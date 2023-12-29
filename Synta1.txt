@@ -1,4 +1,5 @@
 INTEGER ROUTINE Ahmed ()
+lsd=12;
 Ahmed = 10 
 ENDR
 
