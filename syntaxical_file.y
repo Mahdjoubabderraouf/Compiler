@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 extern int yylex(void);
 extern char* yytext;
 int nbligne = 1;
@@ -14,14 +13,20 @@ void yyerror(const char *s);
 void addType(char *name, char *type);
 void addVarPlace(char *name, char *varPlace);
 void afficher();
-void addVariable(char *name, char *type, int state, char* val, char varPlace[]);
+void addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]);int addSize(char *name,char * varPlace, int size);
+int addRowCol(char *name,char* varPlace ,int row, int col);
+void* RechercherVar_et_sa_Place (char *name,char *place);
 
 char sauvType[25];
 char sauvPlace[25];
 char IDFValeur[25];
 char IDF[25];
 char listeSource [500];
- char errorMsg[500];
+char errorMsg[500];
+char IDFCode[25] ="Var Simple";
+
+int size,column,row;
+
 %}
 
 %union 
@@ -34,204 +39,569 @@ char listeSource [500];
 
 %start Fonction
 
-%token <string>mcTRUE <string>mcFALSE <string>mcINTEGER <string>mcREAL <string>mcCHARACTER <string>mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
+%token <string> mcTRUE mcFALSE mcINTEGER mcREAL mcCHARACTER mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
 %token OR AND GT EQ GE NE LE LT eq point_virgule point plus mpins division or aro etoile virgule
-%token paraO paraF <string>identificateur <entier>INTEGER <entier>INTEGERPOSITIF <entier>INTEGERNEGATIF <real>REAL <caracter>caracter <string>chaine commantaire <real>REALNEGATIF <real>REALPOSITIF
+%token paraO paraF <string> identificateur <entier> INTEGER <entier> INTEGERPOSITIF <entier> INTEGERNEGATIF <real> REAL <caracter> caracter <string> chaine commantaire <real> REALNEGATIF <real> REALPOSITIF
 
 %left virgule
 %left plus mpins
 %left etoile division
 %nonassoc EQ NE LT LE GT GE
-%right eq
 %left AND OR
 %left paraO paraF
 %left point
-%type <string>type
-%type <entier>VALEURS_entier
-%type <real>VALEURS_real
-%type <string>LOGICAL
+%type <string> type
+%type <entier> VALEURS_entier
+%type <real> VALEURS_real
+%type <string> LOGICAL
 %%
 
-Fonction : type mcROUTINE identificateur { addVariable($3,$1,1,"NULL","PROGRAM") ; strcpy(sauvType,$1);  addType($3,sauvType); sprintf (sauvPlace,"FONCTION %s",$3); } paraO { sprintf(listeSource ,"para de Fun %s",$3); } Liste paraF DECLARATIONS INST_S identificateur  
-         eq EXPR { 
-           if ( strcmp($3,$11) != 0 )
-           { 
-          sprintf(errorMsg, "return value must be affected in the same function name \n");
+Fonction : 
+    type mcROUTINE identificateur 
+    { 
+        // Add a variable when a function is declared
+        addVariable($3, $1, "idf fonction", 1, "NULL", "PROGRAM");
+        strcpy(sauvType, $1);
+        addType($3, sauvType);
+        sprintf(sauvPlace, "FONCTION %s", $3);
+    } 
+    paraO 
+    { 
+        // Handle function parameters
+        sprintf(listeSource, "para de Fun %s", $3);
+    } 
+    Liste paraF DECLARATIONS INST_S identificateur eq EXPR 
+    { 
+        // Check that the return value is assigned to the function name
+        if (strcmp($3, $11) != 0)
+        { 
+            sprintf(errorMsg, "return value must be affected in the same function name \n");
             yyerror(errorMsg); 
-            } 
-         } mcENDR  Fonction 
-         | mcPROGRAM identificateur {sprintf (sauvPlace,"PROGRAM");} DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n");  YYACCEPT; }
-         ;
+        } 
+    } 
+    mcENDR Fonction 
+| 
+    mcPROGRAM identificateur 
+    { 
+        // Handle program declaration
+        sprintf(sauvPlace, "PROGRAM");
+    } 
+    DECLARATIONS INST_S mcEND
+    {  
+        // Accept if the program is syntactically correct
+        printf("Programme syntaxiquement correct.\n");  
+        YYACCEPT; 
+    }
+;
 
-DECLARATIONS : type identificateur caractere1 {  strcpy(sauvType,$1); strcpy(IDF,$2);  } DECLARATIONS1 
-             |
-             ;
-                 
-caractere1: etoile INTEGER
-          | /*epsilon*/
-          ;
+DECLARATIONS : 
+    type identificateur caractere1 
+    { 
+        strcpy(sauvType, $1); 
+        strcpy(IDF, $2);
+    } DECLARATIONS1 
+| 
+    // Other rules
+;
 
-DECLARATIONS1 : point_virgule { addVariable(IDF,sauvType,1,"NULL",sauvPlace);} DECLARATIONS 
-              | virgule { addVariable(IDF,sauvType,1,"NULL",sauvPlace);} identificateur caractere1 { strcpy(IDF,$3); } DECLARATIONS1
-              | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
-              | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2   
-              | eq VALEURS_entier { sprintf(IDFValeur,"%d", $2) ; addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);} DECLARATIONS1                   
-              | eq VALEURS_real { sprintf(IDFValeur,"%f", $2) ; addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);} DECLARATIONS1 
-              | eq chaine { sprintf(IDFValeur,"%s", $2) ; addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);} DECLARATIONS1                     
-              | eq caracter {  sprintf(IDFValeur,"%c", $2); addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);}DECLARATIONS1 
-              | eq LOGICAL{ sprintf(IDFValeur,"%s", $2) ; printf("%s\n",IDFValeur); addVariable(IDF,sauvType,1,IDFValeur,sauvPlace);} DECLARATIONS1
-              ;
+caractere1: 
+    etoile INTEGER 
+    {
+        strcpy(IDFCode, "Tableau"); 
+        size = $2;
+    }
+| 
+    /*epsilon*/
+    ;
 
-DECLARATIONS2 : point_virgule { addVariable(IDF,sauvType,1,"NULL",sauvPlace);} DECLARATIONS
-              | virgule identificateur { addVariable(IDF,sauvType,1,"NULL",sauvPlace);} caractere1 DECLARATIONS1
-              | mcDIMENSION paraO INTEGER paraF DECLARATIONS1
-              | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS1
-              ;
+DECLARATIONS1 : 
+    point_virgule 
+    { 
+        // Add a variable to the list of declared variables
+        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
+        if (strcmp(IDFCode, "Tableau") == 0) 
+        { 
+            if (!addSize(IDF, sauvPlace, size))   
+                yyerror("var n'est pas declarer");
+        }   
+        if (strcmp(IDFCode, "Matrice") == 0) 
+        {
+            if (!addRowCol(IDF, sauvPlace, row, column))  
+                yyerror("var n'est pas declarer");              
+        }
+        strcpy(IDFCode, "Var Simple");
+    } 
+    DECLARATIONS 
+| 
+    virgule identificateur caractere1 
+    { 
+        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
+        if (strcmp(IDFCode, "Tableau") == 0) 
+        { 
+            if (!addSize(IDF, sauvPlace, size))   
+                yyerror("var n'est pas declarer");
+        }   
+        if (strcmp(IDFCode, "Matrice") == 0) 
+        {
+            if (!addRowCol(IDF, sauvPlace, row, column))  
+                yyerror("var n'est pas declarer");              
+        }
+        strcpy(IDF, $2);
+        strcpy(IDFCode, "Var Simple");
+    } 
+    DECLARATIONS1
+| 
+    mcDIMENSION paraO INTEGER paraF 
+    {
+        strcpy(IDFCode, "Tableau");
+        size = $3;
+    } DECLARATIONS2
+| 
+    mcDIMENSION paraO INTEGER virgule INTEGER paraF 
+    {
+        strcpy(IDFCode, "Matrice");
+        row = $3;
+        column = $5;
+    } DECLARATIONS2   
+| 
+    eq VALEURS_entier 
+    { 
+        sprintf(IDFValeur, "%d", $2);
+    } 
+    DECLARATIONS3                   
+| 
+    eq VALEURS_real 
+    { 
+        sprintf(IDFValeur, "%f", $2);
+        addVariable(IDF, sauvType, "Var Simple", 1, IDFValeur, sauvPlace);
+    } 
+    DECLARATIONS3
+| 
+    eq chaine 
+    { 
+        sprintf(IDFValeur, "%s", $2);
+        addVariable(IDF, sauvType, "Chaine", 1, IDFValeur, sauvPlace);
+    } 
+    DECLARATIONS3                   
+| 
+    eq caracter 
+    {  
+        sprintf(IDFValeur, "%c", $2);
+        addVariable(IDF, sauvType, "Var Simple", 1, IDFValeur, sauvPlace);
+    }
+    DECLARATIONS3
+| 
+    eq LOGICAL 
+    { 
+        sprintf(IDFValeur, "%s", $2);
+        addVariable(IDF, sauvType, "Var Simple", 1, IDFValeur, sauvPlace);
+    } 
+    DECLARATIONS3
+;
 
-VALEURS_entier : INTEGER 
-               | INTEGERPOSITIF
-               | INTEGERNEGATIF
-               ;
+DECLARATIONS2 : 
 
-VALEURS_real : REAL
-             | REALPOSITIF
-             | REALNEGATIF
-             ;
+    point_virgule
+    { 
+        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
+        if (strcmp(IDFCode, "Tableau") == 0) 
+        { 
+            if (!addSize(IDF, sauvPlace, size))   
+                yyerror("var n'est pas declarer");
+        }   
+        if (strcmp(IDFCode, "Matrice") == 0) 
+        {
+            if (!addRowCol(IDF, sauvPlace, row, column))  
+                yyerror("var n'est pas declarer");              
+        }
+        strcpy(IDFCode, "Var Simple");
+    } 
+    DECLARATIONS
+| 
+    virgule identificateur 
+    { 
+        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
+        if (strcmp(IDFCode, "Tableau") == 0) 
+        { 
+            if (!addSize(IDF, sauvPlace, size))   
+                yyerror("var n'est pas declarer");
+        }   
+        if (strcmp(IDFCode, "Matrice") == 0) 
+        {
+            if (!addRowCol(IDF, sauvPlace, row, column))  
+                yyerror("var n'est pas declarer");              
+        }
+        strcpy(IDF, $2);
+        strcpy(IDFCode, "Var Simple");
+    } 
+    caractere1 DECLARATIONS1
+| 
+    mcDIMENSION paraO INTEGER paraF 
+    {
+        strcpy(IDFCode, "Tableau");
+        size = $3;
+    } DECLARATIONS1
+| 
+    mcDIMENSION paraO INTEGER virgule INTEGER paraF 
+    {
+        strcpy(IDFCode, "Matrice");
+        row =$3;
+        column =$5;
+    } DECLARATIONS1
+;
 
+DECLARATIONS3 : 
 
-type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
-
-INST_S: INST_S INSTR point_virgule | INST_S if_statment
-      | ;
-
-INSTR : Affectation
-      | ES
-      | Boucle
-      | Equivalence
-      | /*vide*/
-      ;
-
-Affectation : identificateur eq EXPR;
-
-
-EXPR : CHAINE_STRING
-     | MATH_VAR
-     | APPEL_FONC
-     | LOGICAL
-     ;
-
-APPEL_FONC : mcCALL identificateur paraO { sprintf(listeSource ,"%s",sauvPlace); } Liste paraF ;
-
-
-MATH_VAR : identificateur MATH_VAR1
-         | identificateur paraO INTEGER paraF MATH_VAR1
-         | identificateur paraO INTEGER virgule INTEGER paraF MATH_VAR1
-         | INTEGER  MATH_VAR1
-         | INTEGERPOSITIF  MATH_VAR1
-         | INTEGERNEGATIF  MATH_VAR1
-
-         | REAL MATH_VAR1
-         | REALPOSITIF MATH_VAR1
-         | REALNEGATIF MATH_VAR1
-         | paraO MATH_VAR paraF MATH_VAR1
-         ;
-
-          
-
-MATH_VAR1 : OPER MATH_VAR
-          | INTEGERNEGATIF OPER MATH_VAR
-          | INTEGERPOSITIF OPER MATH_VAR
-          | REALNEGATIF OPER MATH_VAR
-          | REALPOSITIF OPER MATH_VAR
-          | INTEGERNEGATIF
-          | INTEGERPOSITIF
-          | REALNEGATIF
-          | REALPOSITIF
-          | /*vide*/
-          ;
-
-CHAINE_STRING : IDFI_CHAR CHAINE_STRING1;
-
-CHAINE_STRING1 : plus IDFI_CHAR CHAINE_STRING1
-               | mpins IDFI_CHAR CHAINE_STRING1
-               | /*vide*/
-               ;
-
-IDFI_CHAR : chaine
-          | caracter
-          ;
-
-ES : mcREAD paraO identificateur paraF 
-   | mcWRITE paraO chaine paraF 
-   | mcWRITE paraO chaine ES_WRITE_OPTIONAL paraF 
-   ;
-
-ES_WRITE_OPTIONAL :  virgule identificateur | virgule identificateur chaine ;
-
-Equivalence : PartageMemoire paraO { sprintf(listeSource ,"%s",sauvPlace); } identificateur Liste paraF virgule paraO identificateur Liste paraF ;
-
-Liste :
-      | Liste virgule identificateur { addVariable($3,"pas de type",1,"NULL",listeSource);}
-      | Liste virgule identificateur paraO INTEGER paraF { addVariable($3,"pas de type",1,"NULL",listeSource);}
-      | Liste virgule identificateur paraO INTEGER virgule INTEGER paraF { addVariable($3,"pas de type",1,"NULL",listeSource);}
-      | identificateur paraO INTEGER virgule INTEGER paraF { addVariable($1,"pas de type",1,"NULL",listeSource);}
-      | identificateur paraO INTEGER paraF { addVariable($1,"pas de type",1,"NULL",listeSource);}
-      ;
-
-Boucle : mcDOWHILE paraO condition paraF INST_S mcENDDO 
-       ;
+    point_virgule
+    { 
+        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
+        if (strcmp(IDFCode, "Tableau") == 0) 
+        { 
+            if (!addSize(IDF, sauvPlace, size))   
+                yyerror("var n'est pas declarer");
+        }   
+        if (strcmp(IDFCode, "Matrice") == 0) 
+        {
+            if (!addRowCol(IDF, sauvPlace, row, column))  
+                yyerror("var n'est pas declarer");              
+        }
+        strcpy(IDFCode, "Var Simple");
+    } 
+    DECLARATIONS
+| 
+    virgule identificateur 
+    { 
+        addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace);
+        if (strcmp(IDFCode, "Tableau") == 0) 
+        { 
+            if (!addSize(IDF, sauvPlace, size))   
+                yyerror("var n'est pas declarer");
+        }   
+        if (strcmp(IDFCode, "Matrice") == 0) 
+        {
+            if (!addRowCol(IDF, sauvPlace, row, column))  
+                yyerror("var n'est pas declarer");              
+        }
+        strcpy(IDF, $2);
+        strcpy(IDFCode, "Var Simple");
+    } 
+    caractere1 DECLARATIONS1
+    ;
 
 
-if_statment : mcIF paraO condition paraF mcTHEN INST_S mcELSE INST_S mcENDIF
-          | mcIF paraO condition paraF mcTHEN INST_S mcENDIF
-          ;
+VALEURS_entier :
 
-condition : expression 
-          | expression2
-          ; 
+    INTEGER 
+| 
+    INTEGERPOSITIF
+| 
+    INTEGERNEGATIF
+;
 
-expression2 : MATH_VAR point AND point expression2
-            | MATH_VAR point OR point expression2
-            | MATH_VAR
-            | LOGICAL point AND point expression2
-            | LOGICAL point OR point expression2
-            | LOGICAL
-            ;
+VALEURS_real : 
 
-expression : paraO expression paraF
-           | expression point AND point expression
-           | expression point OR point expression
-           | expression point AND point MATH_VAR
-           | expression point OR point MATH_VAR
-           | expression point AND point LOGICAL
-           | expression point OR point LOGICAL
-           | MATH_VAR point AND point expression
-           | MATH_VAR point OR point expression
-           | LOGICAL point AND point expression
-           | LOGICAL point OR point expression
-           | comparision
-           ;
-           
-comparision : MATH_VAR point EQ point MATH_VAR
-            | LOGICAL point EQ point LOGICAL
-            | MATH_VAR point EQ point LOGICAL
-            | LOGICAL point EQ point MATH_VAR
-            | MATH_VAR point GT point MATH_VAR
-            | MATH_VAR point GE point MATH_VAR
-            | MATH_VAR point NE point MATH_VAR
-            | MATH_VAR point LE point MATH_VAR
-            | MATH_VAR point LT point MATH_VAR
-            ;
+    REAL
+| 
+    REALPOSITIF
+| 
+    REALNEGATIF
+;
 
-LOGICAL: mcTRUE
-       | mcFALSE
-       ;
+type :
 
-OPER : plus
-     | mpins
-     | etoile
-     | division
-     ;
+    mcINTEGER 
+| 
+    mcLOGICAL 
+| 
+    mcREAL 
+| 
+    mcCHARACTER
+;
+
+INST_S: 
+
+    INST_S INSTR point_virgule 
+| 
+    INST_S if_statment
+| 
+    /*empty*/
+;
+
+INSTR : 
+
+    Affectation
+| 
+    ES
+| 
+    Boucle
+| 
+    Equivalence
+| 
+    /*empty*/
+;
+
+Affectation : 
+
+    identificateur eq EXPR
+;
+
+EXPR : 
+
+    CHAINE_STRING
+| 
+    MATH_VAR
+| 
+    APPEL_FONC
+| 
+    LOGICAL
+;
+
+APPEL_FONC :
+
+    mcCALL identificateur paraO 
+    { 
+        sprintf(listeSource, "%s", sauvPlace); 
+    } 
+    Liste paraF
+;
+
+
+MATH_VAR : 
+
+    identificateur  MATH_VAR1
+| 
+    identificateur paraO INTEGER paraF MATH_VAR1
+| 
+    identificateur paraO INTEGER virgule INTEGER paraF MATH_VAR1
+| 
+    INTEGER MATH_VAR1
+| 
+    INTEGERPOSITIF MATH_VAR1
+| 
+    INTEGERNEGATIF MATH_VAR1
+| 
+    REAL MATH_VAR1
+| 
+    REALPOSITIF MATH_VAR1
+| 
+    REALNEGATIF MATH_VAR1
+| 
+    paraO MATH_VAR paraF MATH_VAR1
+;
+
+MATH_VAR1 : 
+
+    OPER MATH_VAR
+| 
+    INTEGERNEGATIF OPER MATH_VAR
+| 
+    INTEGERPOSITIF OPER MATH_VAR
+| 
+    REALNEGATIF OPER MATH_VAR
+| 
+    REALPOSITIF OPER MATH_VAR
+| 
+    INTEGERNEGATIF
+| 
+    INTEGERPOSITIF
+| 
+    REALNEGATIF
+| 
+    REALPOSITIF
+| 
+    /*empty*/
+;
+
+CHAINE_STRING : 
+
+    IDFI_CHAR CHAINE_STRING1
+;
+
+CHAINE_STRING1 : 
+
+    plus IDFI_CHAR CHAINE_STRING1
+| 
+    mpins IDFI_CHAR CHAINE_STRING1
+| 
+    /*empty*/
+;
+
+IDFI_CHAR : 
+
+    chaine
+| 
+    caracter
+;
+
+ES : 
+
+    mcREAD paraO identificateur paraF 
+| 
+    mcWRITE paraO chaine paraF 
+| 
+    mcWRITE paraO chaine ES_WRITE_OPTIONAL paraF 
+;
+
+ES_WRITE_OPTIONAL :  
+
+    virgule identificateur 
+| 
+    virgule identificateur chaine 
+;
+
+Equivalence : 
+
+    PartageMemoire paraO 
+
+    {
+       sprintf(listeSource ,"%s",sauvPlace); 
+    } 
+
+    Liste1 paraF virgule paraO Liste paraF 
+;
+
+
+Liste : Liste1
+|
+;
+
+Liste1 :
+
+
+  Liste1 virgule identificateur  
+
+    { 
+        addVariable($3,"pas de type","Var Simple",1,"NULL",listeSource);
+    }
+| 
+    Liste1 virgule identificateur paraO INTEGER paraF
+    
+    { 
+        addVariable($3,"pas de type","Tableau",1,"NULL",listeSource);
+    }
+| 
+    Liste1 virgule identificateur paraO INTEGER virgule INTEGER paraF 
+    
+    { 
+        addVariable($3,"pas de type","Matrice",1,"NULL",listeSource);
+    }
+| 
+    identificateur paraO INTEGER virgule INTEGER paraF 
+    
+    { 
+        addVariable($1,"pas de type","Matrice",1,"NULL",listeSource);
+    }
+| 
+    identificateur paraO INTEGER paraF
+    
+    { 
+        addVariable($1,"pas de type","Tableau",1,"NULL",listeSource);
+    }
+
+|
+        identificateur 
+    { 
+        addVariable($1,"pas de type","Var Simple",1,"NULL",listeSource);
+    }
+;
+Boucle : 
+
+    mcDOWHILE paraO condition paraF INST_S mcENDDO
+;
+
+if_statment :
+
+    mcIF paraO condition paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+| 
+    mcIF paraO condition paraF mcTHEN INST_S mcENDIF
+;
+
+condition : 
+
+    expression 
+| 
+    expression2
+; 
+
+expression2 :
+
+    MATH_VAR point AND point expression2
+| 
+    MATH_VAR point OR point expression2
+| 
+    MATH_VAR
+| 
+    LOGICAL point AND point expression2
+| 
+    LOGICAL point OR point expression2
+| 
+    LOGICAL
+;
+
+expression : 
+
+    paraO expression paraF
+| 
+    expression point AND point expression
+| 
+    expression point OR point expression
+| 
+    expression point AND point MATH_VAR
+| 
+    expression point OR point MATH_VAR
+| 
+    expression point AND point LOGICAL
+| 
+    expression point OR point LOGICAL
+| 
+    MATH_VAR point AND point expression
+| 
+    MATH_VAR point OR point expression
+| 
+    LOGICAL point AND point expression
+| 
+    LOGICAL point OR point expression
+| 
+    comparision
+;
+
+comparision : 
+
+    MATH_VAR point EQ point MATH_VAR
+| 
+    LOGICAL point EQ point LOGICAL
+| 
+    MATH_VAR point EQ point LOGICAL
+| 
+    LOGICAL point EQ point MATH_VAR
+| 
+    MATH_VAR point GT point MATH_VAR
+| 
+    MATH_VAR point GE point MATH_VAR
+| 
+    MATH_VAR point NE point MATH_VAR
+| 
+    MATH_VAR point LE point MATH_VAR
+| 
+    MATH_VAR point LT point MATH_VAR
+;
+
+LOGICAL: 
+
+    mcTRUE
+| 
+    mcFALSE
+;
+
+OPER : 
+    plus
+| 
+    mpins
+| 
+    etoile
+| 
+    division
+;
 
 %%
 
@@ -239,11 +609,12 @@ OPER : plus
 
 void yyerror(const char *s) {
     fprintf(stderr, "\n Syntax error at line %d, column %d: %s\n", nbligne, col, s);
-      exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE);
 }
 
 int main() {
     yyparse();
+
     afficher();
     return 0;
 }

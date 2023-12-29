@@ -1048,7 +1048,7 @@ YY_RULE_SETUP
 case 46:
 YY_RULE_SETUP
 #line 67 "lexical.l"
-{ yylval.string=strdup(yytext);  col = col + yyleng; return identificateur; }
+{ yylval.string=strdup(yytext); col = col + yyleng; return identificateur; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP

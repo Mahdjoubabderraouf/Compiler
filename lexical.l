@@ -64,7 +64,7 @@ commantaire %.*;
 \n                  { col =1; nbligne++;}
 {INTEGER}           { yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGER; }
 {REAL}              { yylval.real=atof(yytext);   addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REAL; }
-{identificateur}    { yylval.string=strdup(yytext);  col = col + yyleng; return identificateur; }
+{identificateur}    { yylval.string=strdup(yytext); col = col + yyleng; return identificateur; }
 {INTEGERPOSITIF}    { yylval.entier=atoi(yytext);char str[20] ; sprintf(str,"%d",atoi(yytext)); addConstant(str, "INTEGER", 1, atoi(yytext)); col = col + yyleng; return INTEGERPOSITIF; }
 {INTEGERNEGATIF}    { yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atoi(yytext)); col = col + yyleng; return INTEGERNEGATIF; }
 {caracter}          { yylval.caracter=yytext[1]; addConstant(yytext, "CHARACTER", 1, (float)yytext[1]); col = col + yyleng; return caracter; }

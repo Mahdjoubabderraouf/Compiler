@@ -3,26 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-typedef struct variable
-{
 
-    int state;
-    char name[20];
-    char code[20];
-    char type[20];
-    char val [20];
-    char varPlace[20]; /* la place de la variable  */
-    struct variable *suiv;
-
-} variable;
 
 /******les siganatures des fonctions *********/
 
-variable*  RechercherVar_et_sa_Place (char *name,char *place);
-int RechercherConst(char *name);
-int RechercherSep(char *name);
-int RechercherMotCle(char *name);
-void addVariable(char *name, char *type, int state, char* val, char varPlace[]);
+void* RechercherVar_et_sa_Place (char *name,char *place);
+int   RechercherConst(char *name);
+int   RechercherSep(char *name);
+int   RechercherMotCle(char *name);
+void addVariable(char *name, char *type,char* code, int state, char* val, char varPlace[]);
 void addConstant(char *name, char *type, int state, float val);
 void addMotCle(char *name, char *type, int state);
 void addSep(char *name, char *type, int state);
@@ -43,6 +32,7 @@ typedef struct constant
     char type[20];
     float val;
     struct constant *suiv;
+
 } constant;
 
 typedef struct elt
@@ -51,34 +41,53 @@ typedef struct elt
     char name[20];
     char type[20];
     struct elt *suiv;
+
 } elt; // séparateurs & des mots clés
 
-typedef struct vector {
+typedef struct variable
+{
     int state;
     char name[20];
-    char type[20];
-    int size; // added size field
     char code[20];
-    char val[20];
-    char vecPlace[20];
-    struct vector *suiv;
-} vector;
+    char type[20];
+    char val [20];
+    char varPlace[20]; /* la place de la variable  */
+    void *suiv;
 
-typedef struct matrix {
+} variable;
+
+typedef struct tableau {
+
     int state;
     char name[20];
-    char type[20];
-    int rows, cols; // added rows and cols fields for matrix size
     char code[20];
-    char val[20];
-    char matPlace[20];
-    struct matrix *suiv;
-} matrix;
+    char type[20];
+    char val [20];
+    char varPlace[20]; /* la place de la variable  */
+    void *suiv;
+
+    int size; 
+
+} tableau;
+
+typedef struct matrice {
+    
+    int state;
+    char name[20];
+    char code[20];
+    char type[20];
+    char val [20];
+    char varPlace[20]; /* la place de la variable  */
+    void *suiv;
+    
+    int col,row; 
+
+} matrice;
 
 /***Step 2: Déclaration des variables globales ***/
 
-variable *listVar = NULL;
-variable *dernierVar = NULL;
+void *listVar = NULL;
+void *dernierVar = NULL;
 constant *listConst = NULL;
 constant *dernierConst = NULL;
 elt *listSep = NULL;
@@ -88,14 +97,19 @@ elt *dernierMotCle = NULL;
 
 /***Step 3: Définition des fonctions ***/
 
-variable* RechercherVar_et_sa_Place (char *name,char *place)
+void* RechercherVar_et_sa_Place (char *name,char *place)
 {
-    variable *tempVar = listVar;
+    void *tempVar = listVar;
     
     while (tempVar != NULL)
     {
-        if (strcmp(place,tempVar->varPlace) == 0 && strcmp(name,tempVar->name)==0 )   return tempVar;; // variable exists in the function place
-        tempVar = tempVar->suiv; // move to the next variable
+        if (strcmp(place,((variable *)tempVar)->varPlace) == 0 && strcmp(name,((variable *)tempVar)->name)==0 )
+            return tempVar;
+        else if (strcmp(place,((tableau *)tempVar)->varPlace) == 0 && strcmp(name,((tableau *)tempVar)->name)==0 )
+            return tempVar;
+        else if (strcmp(place,((matrice *)tempVar)->varPlace) == 0 && strcmp(name,((matrice *)tempVar)->name)==0 )
+            return tempVar;
+        tempVar = ((variable *)tempVar)->suiv; // move to the next variable
     }
     return NULL ; // variable is not declared in the function place, you can declare it
 }
@@ -135,38 +149,63 @@ int RechercherMotCle(char *name)
     }
     return 0; // Element not found
 }
-void addVariable(char *name, char *type, int state, char* val,char varPlace[])
-{
-   
-        if (listVar == NULL)
-        {
-            listVar = (variable *)malloc(sizeof(variable));
-            listVar->state = state;
-            strcpy(listVar->name, name);
-            strcpy(listVar->type, type);
-            strcpy(listVar->code, "IDF");
-            strcpy(listVar->val, val);
-            strcpy(listVar->varPlace, varPlace);
-            listVar->suiv = NULL;
+
+void addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]) {
+    if (listVar == NULL) {
+        if (strcmp(code, "Matrice") == 0) {
+            listVar = malloc(sizeof(matrice));
+            ((matrice *)listVar)->state = state;
+            strcpy(((matrice *)listVar)->name, name);
+            strcpy(((matrice *)listVar)->type, type);
+            strcpy(((matrice *)listVar)->code, code);
+            strcpy(((matrice *)listVar)->val, val);
+            strcpy(((matrice *)listVar)->varPlace, varPlace);
+            ((matrice *)listVar)->suiv = NULL;
+            dernierVar = listVar;
+        } else if (strcmp(code, "Tableau") == 0) {
+            listVar = malloc(sizeof(tableau));
+            ((tableau *)listVar)->state = state;
+            strcpy(((tableau *)listVar)->name, name);
+            strcpy(((tableau *)listVar)->type, type);
+            strcpy(((tableau *)listVar)->code, code);
+            strcpy(((tableau *)listVar)->val, val);
+            strcpy(((tableau *)listVar)->varPlace, varPlace);
+            ((tableau *)listVar)->suiv = NULL;
+            dernierVar = listVar;
+        } else {
+            listVar = malloc(sizeof(variable));
+            ((variable *)listVar)->state = state;
+            strcpy(((variable *)listVar)->name, name);
+            strcpy(((variable *)listVar)->type, type);
+            strcpy(((variable *)listVar)->code, code);
+            strcpy(((variable *)listVar)->val, val);
+            strcpy(((variable *)listVar)->varPlace, varPlace);
+            ((variable *)listVar)->suiv = NULL;
             dernierVar = listVar;
         }
-        else
-        {   if (RechercherVar_et_sa_Place(name,varPlace) == NULL)
-        {
-            variable *newVar = (variable *)malloc(sizeof(variable));
-
-            newVar->state = state;
-            strcpy(newVar->name, name);
-            strcpy(newVar->type, type);
-            strcpy(newVar->code, "IDF");
-            strcpy(newVar->val ,val);
-            strcpy(newVar->varPlace, varPlace);
-            newVar->suiv = NULL;
-            dernierVar->suiv = newVar;
+    } else {
+        if (RechercherVar_et_sa_Place(name, varPlace) == NULL) {
+            void *newVar;
+            if (strcmp(code, "Matrice") == 0) {
+                newVar = malloc(sizeof(matrice));
+            } else if (strcmp(code, "Tableau") == 0) {
+                newVar = malloc(sizeof(tableau));
+            } else {
+                newVar = malloc(sizeof(variable));
+            }
+            ((variable *)newVar)->state = state;
+            strcpy(((variable *)newVar)->name, name);
+            strcpy(((variable *)newVar)->type, type);
+            strcpy(((variable *)newVar)->code, code);
+            strcpy(((variable *)newVar)->val, val);
+            strcpy(((variable *)newVar)->varPlace, varPlace);
+            ((variable *)newVar)->suiv = NULL;
+            ((variable *)dernierVar)->suiv = newVar;
             dernierVar = newVar;
-        } 
         }
     }
+}
+
 
 void addConstant(char *name, char *type, int state, float val)
     {
@@ -253,16 +292,19 @@ void addSep(char *name, char *type, int state)
 void afficher()
 {
     printf("/***************Table des symboles IDF*************/\n");
-    printf("____________________________________________________________________________________\n");
-    printf("\t| Nom_Entite |  Code_Entite | Type_Entite | Val_Entite | Var_Place\n");
-    printf("____________________________________________________________________________________\n");
+    printf("_________________________________________________________________________________________________\n");
+    printf("\t| Nom_Entite |  Code_Entite | Type_Entite | Val_Entite | Var_Place | Demension 1 | Demension 2| \n");
+    printf("_________________________________________________________________________________________________\n");
 
     variable *tempVar = listVar;
     while (tempVar != NULL)
     {
         if (tempVar->state == 1)
         {
-            printf("\t|%11s |%13s |%12s | %10s | %s \n", tempVar->name, tempVar->code, tempVar->type, tempVar->val,tempVar->varPlace);
+            printf("\t|%11s |%13s |%12s | %10s | %s | ", tempVar->name, tempVar->code, tempVar->type, tempVar->val,tempVar->varPlace);
+            if (strcmp (tempVar->code,"Tableau" ) == 0) { printf ("%10d |",((tableau*) tempVar)->size);}
+            else if (strcmp (tempVar->code,"Matrice" ) == 0) { printf ("%10d |%10d |",((matrice*) tempVar)->row,((matrice*) tempVar)->col);}
+            printf("\n");
         }
         tempVar = tempVar->suiv;
     }
@@ -270,7 +312,7 @@ void afficher()
     constant *tempConst = listConst;
     printf("\n/***************Table des symboles constants*************/\n");
     printf("____________________________________________________________________\n");
-    printf("\t| Nom_Entite |  Code_Entite | Type_Entite | Val_Entite\n");
+    printf("\t| Nom_Entite |  Code_Entite | Type_Entite | Val_Entite |\n");
     printf("____________________________________________________________________\n");
 
     while (tempConst != NULL)
@@ -338,18 +380,55 @@ void addVal(char *name, char * val)
         tempVar = tempVar->suiv;
     }
 }
-// the function addVarplace for the constants
+// the function addVarplace for the variable.
 void addVarPlace(char *name, char *varPlace)
 {
-    variable *tempVar = listVar;
+    void *tempVar = listVar;
     while (tempVar != NULL)
     {
-        if (strcmp(tempVar->name, name) == 0)
+        if (strcmp(((variable *)tempVar)->name, name) == 0)
         {
-            strcpy(tempVar->varPlace, varPlace);
+            strcpy(((variable *)tempVar)->varPlace, varPlace);
             break;
         }
-        tempVar = tempVar->suiv;
+        else if (strcmp(((tableau *)tempVar)->name, name) == 0)
+        {
+            strcpy(((tableau *)tempVar)->varPlace, varPlace);
+            break;
+        }
+        else if (strcmp(((matrice *)tempVar)->name, name) == 0)
+        {
+            strcpy(((matrice *)tempVar)->varPlace, varPlace);
+            break;
+        }
+        tempVar = ((variable *)tempVar)->suiv;
     }
+}
+// the function addSize for the table
+int addSize(char *name,char * varPlace, int size)
+{
+
+    tableau *tempVar =(tableau*) RechercherVar_et_sa_Place (name,varPlace);
+    
+        if (tempVar != NULL)
+        {
+            tempVar->size = size;
+           return 1;
+        }
+    return 0 ;
+    
+}
+// the function addSize for the matrix
+int addRowCol(char *name,char* varPlace ,int row, int col)
+{
+    matrice *tempVar =(matrice*) RechercherVar_et_sa_Place (name,varPlace);
+
+        if (tempVar != NULL)
+        {
+            tempVar->row = row;
+            tempVar->col = col;
+            return 1;
+        }
+    return 0; 
 }
 
