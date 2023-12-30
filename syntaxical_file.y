@@ -18,6 +18,17 @@ void afficher();
 int addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]);int addSize(char *name,char * varPlace, int size);
 int addRowCol(char *name,char* varPlace ,int row, int col);
 void* RechercherVar_et_sa_Place (char *name,char *place);
+// Vérifie si une variable est déclarée
+int variableisDeclared(char *name, char *place);
+
+// Vérifie si un tableau est déclaré
+int tableisDeclared(char *name, char *place);
+
+// Vérifie si une matrice est déclarée
+int matrixisDeclared(char *name, char *place);
+
+// Retourne le type d'une variable, tableau ou matrice
+char* getVariableType(char *name, char *place);
 
 char sauvType[25];
 char sauvPlace[25];
@@ -212,6 +223,23 @@ DECLARATIONS1 :
         sprintf(IDFValeur, "%s", $2);
     } 
     DECLARATIONS3
+|
+    eq identificateur
+    { 
+       if(variableisDeclared($2, sauvPlace))//return 1 si le idf n'est pas déclaré 
+        {
+            sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme variable simple", $2);
+            yyerror(errorMsg);
+        }
+        if (strcmp(sauvType,getVariableType($2, sauvPlace)) !=0 )
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+
+        sprintf(IDFValeur, "%s", $2);
+    } 
+    DECLARATIONS3
 ;
 
 DECLARATIONS2 : 
@@ -269,7 +297,7 @@ DECLARATIONS3 :
 
     point_virgule
     {   
-        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)) yyerror("double declaration ");
+        if(addVariable(IDF, sauvType, IDFCode, 1, "NULL", sauvPlace)){sprintf(errorMsg,"double declaration de %s",IDF) ; yyerror(errorMsg);}
         strcpy(IDFCode, "Var Simple");
     } 
     DECLARATIONS
@@ -339,8 +367,8 @@ Affectation :
 
     identificateur
      eq EXPR
-      {
-        if (RechercherVar_et_sa_Place($1,sauvPlace)== NULL)
+    {
+        if (RechercherVar_et_sa_Place($1,sauvPlace)== NULL )
         {
             sprintf(errorMsg,"la variable \"%s\" n'est pas declarer", $1);
             yyerror(errorMsg);
@@ -349,14 +377,25 @@ Affectation :
 ;
 
 EXPR : 
-
     CHAINE_STRING
+    {
+        // Semantic code for CHAINE_STRING
+    }
 | 
     MATH_VAR
+    {
+        // Semantic code for MATH_VAR
+    }
 | 
     APPEL_FONC
+    {
+        // Semantic code for APPEL_FONC
+    }
 | 
-    LOGICAL
+    LOGICAL 
+    {
+        // Semantic code for LOGICAL
+    }
 ;
 
 APPEL_FONC :
@@ -371,11 +410,34 @@ APPEL_FONC :
 
 MATH_VAR : 
 
-    identificateur  MATH_VAR1
+    identificateur
+    {
+        if(variableisDeclared($1, sauvPlace))//return 1 si le idf n'est pas déclaré 
+        {
+            sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme variable simple", $1);
+            yyerror(errorMsg);
+        }
+    }
+    MATH_VAR1
 | 
-    identificateur paraO INTEGER paraF MATH_VAR1
+    identificateur paraO INTEGER paraF 
+    {
+        if(tableisDeclared($1, sauvPlace))//return 1 si le tableau n'est pas déclaré 
+        {
+            sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme tableau ", $1);
+            yyerror(errorMsg);
+        }
+    }
+    MATH_VAR1
 | 
-    identificateur paraO INTEGER virgule INTEGER paraF MATH_VAR1
+    identificateur paraO INTEGER virgule INTEGER paraF 
+    {
+        if(matrixisDeclared($1, sauvPlace))//return 1 si le tableau n'est pas déclaré 
+        {
+            sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme matrice", $1);
+            yyerror(errorMsg);
+        }
+    } MATH_VAR1
 | 
     INTEGER MATH_VAR1
 | 

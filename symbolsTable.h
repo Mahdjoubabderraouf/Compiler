@@ -42,6 +42,27 @@ void addVal(char *name, char *val);
 // Ajoute la place d'une variable dans la table des symboles
 void addVarPlace(char *name, char *varPlace);
 
+// Ajoute la taille d'un tableau
+int addSize(char *name, char *varPlace, int size);
+
+// Ajoute le nombre de lignes et de colonnes d'une matrice
+int addRowCol(char *name, char* varPlace, int row, int col);
+
+// Vérifie si une variable est déclarée
+int variableisDeclared(char *name, char *place);
+
+// Vérifie si un tableau est déclaré
+int tableisDeclared(char *name, char *place);
+
+// Vérifie si une matrice est déclarée
+int matrixisDeclared(char *name, char *place);
+
+// Retourne le type d'une variable, tableau ou matrice
+char* getVariableType(char *name, char *place);
+
+
+
+
 /******************************************/
 
 // Définition des structures de données
@@ -484,3 +505,60 @@ int addRowCol(char *name, char* varPlace, int row, int col)
     }
     return 1; 
 }
+
+// Fonction pour viréfier si un identificateur simple est déclaré
+int variableisDeclared(char *name, char *place)
+{
+ 
+   void* cond = RechercherVar_et_sa_Place(name, place);
+        if ( cond == NULL || strcmp(((variable*)cond)->code,"Var Simple")!=0 )
+        {
+            return 1; 
+        }
+    return 0;
+}
+
+// Fonction pour viréfier si un tableau est déclaré
+int tableisDeclared(char *name, char *place)
+{
+   void* cond = RechercherVar_et_sa_Place(name, place);
+        if ( cond == NULL || strcmp(((variable*)cond)->code,"Tableau")!=0 )
+        {
+            return 1; 
+        }
+    return 0;
+}
+
+// Fonction pour viréfier si une matrice est déclaré
+int matrixisDeclared(char *name, char *place)
+{
+   void* cond = RechercherVar_et_sa_Place(name, place);
+        if ( cond == NULL || strcmp(((variable*)cond)->code,"Matrice")!=0 )
+        {
+            return 1; 
+        }
+    return 0;
+}
+
+// Function to return the type of a variable, table, or matrix
+char* getVariableType(char *name, char *place)
+{
+    void *cond = RechercherVar_et_sa_Place(name, place);
+    if (cond != NULL)
+    {
+        if (strcmp(((variable *)cond)->type, "Var Simple") == 0)
+        {
+            return ((variable *)cond)->type;
+        }
+        else if (strcmp(((tableau *)cond)->type, "Tableau") == 0)
+        {
+            return ((tableau *)cond)->type;
+        }
+        else if (strcmp(((matrice *)cond)->type, "Matrice") == 0)
+        {
+            return ((matrice *)cond)->type;
+        }
+    }
+    return "Unknown";
+}
+
