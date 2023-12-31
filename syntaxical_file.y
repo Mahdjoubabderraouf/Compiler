@@ -38,7 +38,9 @@ char listeSource [500];
 char errorMsg[500];
 char IDFCode[25] ="Var Simple";
 int isString =0;
-
+int val_entier;
+float val_real;
+char oper;
 int size,column,row;
 
 %}
@@ -65,9 +67,11 @@ int size,column,row;
 %left paraO paraF
 %left point
 %type <string> type
-%type <entier> VALEURS_entier
-%type <real> VALEURS_real
+// %type <entier> VALEURS_entier
+// %type <real> VALEURS_real
 %type <string> LOGICAL
+%type <real>MATH_VAR
+%type <real>MATH_VAR1
 %%
 
 
@@ -117,7 +121,6 @@ DECLARATIONS :
         strcpy(IDF, $2);
     } caractere1 DECLARATIONS1 
 | 
-    // Other rules
 ;
 
 caractere1: 
@@ -166,80 +169,92 @@ DECLARATIONS1 :
         row = $3;
         column = $5;
     } DECLARATIONS2   
-| 
-    eq VALEURS_entier 
-    {    
-        if (strcmp(sauvType,"INTEGER") !=0 && strcmp(sauvType,"REAL") ) 
-        {
-            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-        sprintf(IDFValeur, "%d", $2);
-    } 
-    DECLARATIONS3                   
-| 
-    eq VALEURS_real 
-    {   
-        if (strcmp(sauvType,"REAL") !=0 ) 
-        {
-             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-        sprintf(IDFValeur, "%f", $2);
-    } 
-    DECLARATIONS3
-| 
-    eq chaine 
-    { 
-        if (strcmp(sauvType,"CHARACTER") !=0 || isString == 0) 
-        {   
-             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" et n'est pas une chaine",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-        sprintf(IDFValeur, "%s", $2);
-        isString=0;
+// | 
+//     eq VALEURS_entier 
+//     {    
+//         if (strcmp(sauvType,"INTEGER") !=0 && strcmp(sauvType,"REAL") ) 
+//         {
+//             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+//             yyerror(errorMsg);
+//         }
+//         sprintf(IDFValeur, "%d", $2);
+//     } 
+//     DECLARATIONS3                   
+// | 
+//     eq VALEURS_real 
+//     {   
+//         if (strcmp(sauvType,"REAL") !=0 ) 
+//         {
+//              sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+//             yyerror(errorMsg);
+//         }
+//         sprintf(IDFValeur, "%f", $2);
+//     } 
+//     DECLARATIONS3
+// | 
+//     eq chaine 
+//     { 
+//         if (strcmp(sauvType,"CHARACTER") !=0 ) 
+//         {   
+//             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type chaine de \"%s\"",IDF,sauvType);
+//             yyerror(errorMsg);
+//         }else if ( isString == 0)
+//         {
+//             sprintf(errorMsg," \"%s\" est de Type \"%s\" et n' est pas une chaine ",IDF,sauvType);
+//             yyerror(errorMsg);
+//         }
+//         sprintf(IDFValeur, "%s", $2);
+//         isString=0;
 
-    } 
-    DECLARATIONS3                   
-| 
-    eq caracter 
-    {  
-        if (strcmp(sauvType,"CHARACTER") !=0 || isString == 1) 
-        {
-             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-        sprintf(IDFValeur, "%c", $2);
-    }
-    DECLARATIONS3
-| 
-    eq LOGICAL 
-    { 
-        if (strcmp(sauvType,"LOGICAL") !=0) 
-        {
-            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-        sprintf(IDFValeur, "%s", $2);
-    } 
-    DECLARATIONS3
+//     } 
+//     DECLARATIONS3                   
+// | 
+//     eq caracter 
+//     {  
+//         if (strcmp(sauvType,"CHARACTER") !=0 ) 
+//         {
+//              sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+//             yyerror(errorMsg);
+
+//         }else if ( isString == 1)
+//         {
+//             sprintf(errorMsg," \"%s\" est une chaine de \" %s\"",IDF,sauvType);
+//             yyerror(errorMsg);
+//         }
+        
+//         sprintf(IDFValeur, "%c", $2);
+//     }
+//     DECLARATIONS3
+// | 
+//     eq LOGICAL 
+//     { 
+//         if (strcmp(sauvType,"LOGICAL") !=0) 
+//         {
+//             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+//             yyerror(errorMsg);
+//         }
+//         sprintf(IDFValeur, "%s", $2);
+//     } 
+//     DECLARATIONS3
+// |
+//     eq identificateur
+//     { 
+//        if(variableisDeclared($2, sauvPlace))//return 1 si le idf n'est pas déclaré 
+//         {
+//             sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme variable simple", $2);
+//             yyerror(errorMsg);
+//         }
+//         if (strcmp(sauvType,getVariableType($2, sauvPlace)) !=0 )
+//         {
+//             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+//             yyerror(errorMsg);
+//         }
+
+//         sprintf(IDFValeur, "%s", $2);
+//     } 
+//     DECLARATIONS3
 |
-    eq identificateur
-    { 
-       if(variableisDeclared($2, sauvPlace))//return 1 si le idf n'est pas déclaré 
-        {
-            sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme variable simple", $2);
-            yyerror(errorMsg);
-        }
-        if (strcmp(sauvType,getVariableType($2, sauvPlace)) !=0 )
-        {
-            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-
-        sprintf(IDFValeur, "%s", $2);
-    } 
-    DECLARATIONS3
+    eq EXPR DECLARATIONS3
 ;
 
 DECLARATIONS2 : 
@@ -312,23 +327,23 @@ DECLARATIONS3 :
     ;
 
 
-VALEURS_entier :
+// VALEURS_entier :
 
-    INTEGER 
-| 
-    INTEGERPOSITIF
-| 
-    INTEGERNEGATIF
-;
+//     INTEGER 
+// | 
+//     INTEGERPOSITIF
+// | 
+//     INTEGERNEGATIF
+// ;
 
-VALEURS_real : 
+// VALEURS_real : 
 
-    REAL
-| 
-    REALPOSITIF
-| 
-    REALNEGATIF
-;
+//     REAL
+// | 
+//     REALPOSITIF
+// | 
+//     REALNEGATIF
+// ;
 
 type :
 
@@ -396,6 +411,11 @@ EXPR :
     {
         // Semantic code for LOGICAL
     }
+|   
+    caracter
+    {
+        // Semantic code for caracter
+    }
 ;
 
 APPEL_FONC :
@@ -439,63 +459,191 @@ MATH_VAR :
         }
     } MATH_VAR1
 | 
-    INTEGER MATH_VAR1
+    INTEGER 
+    {
+        if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_entier = $1 ; 
+        sprintf(IDFValeur, "%d", val_entier);
+    }
+    MATH_VAR1
 | 
-    INTEGERPOSITIF MATH_VAR1
+    INTEGERPOSITIF 
+    {
+        if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_entier = $1 ; 
+        sprintf(IDFValeur, "%d", val_entier);
+    }
+    MATH_VAR1
 | 
-    INTEGERNEGATIF MATH_VAR1
+    INTEGERNEGATIF 
+    {
+        if (strcmp(sauvType,"INTEGER") !=0 && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_entier = $1 ; 
+        sprintf(IDFValeur, "%d", val_entier);
+    }
+    MATH_VAR1
 | 
-    REAL MATH_VAR1
+    REAL 
+    {
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = $1 ;
+        sprintf(IDFValeur, "%d", val_real);
+    }
+    MATH_VAR1
 | 
-    REALPOSITIF MATH_VAR1
+    REALPOSITIF 
+    {
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = $1 ;
+        sprintf(IDFValeur, "%d", val_real);
+    }
+    MATH_VAR1
 | 
-    REALNEGATIF MATH_VAR1
+    REALNEGATIF 
+    {
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = $1 ;
+        sprintf(IDFValeur, "%d", val_real);
+    }
+    MATH_VAR1
 | 
     paraO MATH_VAR paraF MATH_VAR1
 ;
 
 MATH_VAR1 : 
 
+    OPER 
+    {
+        if(oper == '+') 
+    }
+    MATH_VAR
+| 
+    INTEGERNEGATIF 
+    {
+        if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        $$ = $1 ; 
+        sprintf(IDFValeur, "%d", val_entier);
+    }
     OPER MATH_VAR
 | 
-    INTEGERNEGATIF OPER MATH_VAR
+    INTEGERPOSITIF
+    {
+        if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_entier = $1 ; 
+        sprintf(IDFValeur, "%d", val_entier);
+    }
+    OPER MATH_VAR
 | 
-    INTEGERPOSITIF OPER MATH_VAR
+    REALNEGATIF 
+    {
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = $1 ;
+        sprintf(IDFValeur, "%d", val_real);
+    }
+    OPER 
+    
+    MATH_VAR
 | 
-    REALNEGATIF OPER MATH_VAR
-| 
-    REALPOSITIF OPER MATH_VAR
+    REALPOSITIF 
+    {
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = $1 ;
+        sprintf(IDFValeur, "%d", val_real);
+    }
+    OPER MATH_VAR
 | 
     INTEGERNEGATIF
+    {
+        if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_entier = $1 ; 
+        sprintf(IDFValeur, "%d", val_entier);
+    }
 | 
     INTEGERPOSITIF
+    {
+        if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_entier = $1 ; 
+        sprintf(IDFValeur, "%d", val_entier);
+    }
 | 
     REALNEGATIF
+    {
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = $1 ;
+        sprintf(IDFValeur, "%d", val_real);
+    }
 | 
     REALPOSITIF
+    {
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = $1 ;
+        sprintf(IDFValeur, "%d", val_real);
+    }
 | 
     /*empty*/
 ;
 
 CHAINE_STRING : 
 
-    IDFI_CHAR CHAINE_STRING1
-;
-
-CHAINE_STRING1 : 
-
-    plus IDFI_CHAR CHAINE_STRING1
+    chaine CHAINE_STRING
 | 
-    mpins IDFI_CHAR CHAINE_STRING1
-| 
-    /*empty*/
-;
-
-IDFI_CHAR : 
-
     chaine
-| 
-    caracter
 ;
 
 ES : 
@@ -660,12 +808,16 @@ LOGICAL:
 
 OPER : 
     plus
+    {oper='+'}
 | 
     mpins
+    {oper='-'}
 | 
-    etoile
+    etoile 
+    {oper='*'}
 | 
     division
+    {oper='/'}
 ;
 
 %%

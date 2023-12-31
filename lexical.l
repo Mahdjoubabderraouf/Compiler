@@ -15,7 +15,7 @@ REALNEGATIF    \-{INTEGER}\.{NATUREL}
 REALPOSITIF    \+{INTEGER}\.{NATUREL}
 REAL           {INTEGER}\.{NATUREL}
 identificateur {lettre}({lettre}|{chiffre}|\_){0,9}
-caracter \".\"
+caracter \'.\'
 chaine 	\".+\"
 commantaire %.*;
 %%
