@@ -354,7 +354,7 @@ Affectation :
         int tempRow ,tempCol;
         if(getRowCol(IDF,sauvPlace,&tempRow,&tempCol)==0)
         {
-            if (tempRow < $3 || tempCol != $5){
+            if (tempRow < $3 || tempCol < $5){
                 sprintf(errorMsg, "la variable \"%s\" a une erreur dans la taille  ", $1);
                 yyerror(errorMsg);
             }
@@ -492,7 +492,7 @@ MATH_VAR :
         int tempRow ,tempCol;
         if(getRowCol(IDF,sauvPlace,&tempRow,&tempCol)==0)
         {
-            if (tempRow < $3 || tempCol != $5){
+            if (tempRow < $3 || tempCol < $5){
                 sprintf(errorMsg, "lla variable \"%s\" a une erreur dans la taille  ", $1);
                 yyerror(errorMsg);
             }

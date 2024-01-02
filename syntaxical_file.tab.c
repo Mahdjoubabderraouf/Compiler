@@ -1690,7 +1690,7 @@ yyreduce:
         int tempRow ,tempCol;
         if(getRowCol(IDF,sauvPlace,&tempRow,&tempCol)==0)
         {
-            if (tempRow < (yyvsp[-3].entier) || tempCol != (yyvsp[-1].entier)){
+            if (tempRow < (yyvsp[-3].entier) || tempCol < (yyvsp[-1].entier)){
                 sprintf(errorMsg, "la variable \"%s\" a une erreur dans la taille  ", (yyvsp[-5].string));
                 yyerror(errorMsg);
             }
@@ -1830,7 +1830,7 @@ yyreduce:
         int tempRow ,tempCol;
         if(getRowCol(IDF,sauvPlace,&tempRow,&tempCol)==0)
         {
-            if (tempRow < (yyvsp[-3].entier) || tempCol != (yyvsp[-1].entier)){
+            if (tempRow < (yyvsp[-3].entier) || tempCol < (yyvsp[-1].entier)){
                 sprintf(errorMsg, "lla variable \"%s\" a une erreur dans la taille  ", (yyvsp[-5].string));
                 yyerror(errorMsg);
             }

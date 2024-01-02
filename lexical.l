@@ -8,12 +8,12 @@ extern YYSTYPE yylval;
 lettre         [a-zA-Z]
 chiffre        [0-9]
 NATUREL        {chiffre}+
-INTEGERPOSITIF (\+){NATUREL}
-INTEGERNEGATIF (\-){NATUREL}
-INTEGER        {NATUREL}
-REALNEGATIF    \-{INTEGER}\.{NATUREL}
-REALPOSITIF    \+{INTEGER}\.{NATUREL}
-REAL           {INTEGER}\.{NATUREL}
+INTEGERPOSITIF 0|[0-3]?[0-2]?[0-7]?[0-6]?[0-7]
+INTEGERNEGATIF \-[0-3]?[0-2]?[0-7]?[0-6]?[0-7]|0
+INTEGER        [0-32767]
+REALNEGATIF    \-{NATUREL}\.{NATUREL}
+REALPOSITIF    \+{NATUREL}\.{NATUREL}
+REAL           {NATUREL}\.{NATUREL}
 identificateur {lettre}({lettre}|{chiffre}|\_){0,9}
 caracter \'.\'
 chaine 	\".+\"
@@ -60,7 +60,6 @@ commantaire %.*;
 "("                 { addSep(yytext, "paraO", 1); col = col + yyleng; return paraO; }
 ")"                 { addSep(yytext, "paraF", 1); col = col + yyleng; return paraF; }
 "."                 { addSep(yytext, "point", 1); col = col + yyleng; return point; }
-"affiche" {afficher();}
 [ \t]               { col = col + strlen(yytext); }
 \n                  { col =1; nbligne++;}
 {INTEGER}           { yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGER; }
