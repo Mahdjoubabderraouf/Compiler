@@ -233,7 +233,7 @@ int addVariable(char *name, char *type, char* code, int state, char* val, char v
 
             return 0;
         } 
-        if (strcmp(code, "Tableau") == 0) 
+        if (strcmp(code, "Tableau") == 0 || strcmp(code, "idf fonction") == 0 ) 
         {
             // Si le code indique un tableau
             listVar = malloc(sizeof(tableau));
@@ -396,7 +396,7 @@ void afficher()
         if (tempVar->state == 1)
         {
             printf("\t|%11s |%13s |%12s | %10s | %s | ", tempVar->name, tempVar->code, tempVar->type, tempVar->val,tempVar->varPlace);
-            if (strcmp(tempVar->code,"Tableau") == 0) { printf ("%10d |",((tableau*) tempVar)->size);}
+            if (strcmp(tempVar->code,"Tableau") == 0 || strcmp(tempVar->code, "idf fonction") == 0) { printf ("%10d |",((tableau*) tempVar)->size);}
             else if (strcmp(tempVar->code,"Matrice") == 0) { printf ("%10d |%10d |",((matrice*) tempVar)->row,((matrice*) tempVar)->col);}
             printf("\n");
         }
@@ -573,10 +573,10 @@ char* getVariableType(char *name, char *place,char code[100])
         {
             return ((variable *)cond)->type;
         }
-        else  if (strcmp(((variable *)cond)->code, "idf fonction") == 0) 
+        else  if (strcmp(((tableau *)cond)->code, "idf fonction") == 0) 
         {   
-            strcpy((code),((variable *)cond)->code);
-            return ((variable *)cond)->type;
+            strcpy((code),((tableau *)cond)->code);
+            return ((tableau *)cond)->type;
         }
         else if (strcmp(((tableau *)cond)->code, "Tableau") == 0)
         {
@@ -596,7 +596,7 @@ int getSize(char *name, char *place)
     void *cond = RechercherVar_et_sa_Place(name, place);
     if (cond != NULL)
     {
-        if (strcmp(((tableau *)cond)->code, "Tableau") == 0)
+        if (strcmp(((tableau *)cond)->code, "Tableau" )|| strcmp(((tableau *)cond)->code, "idf fonction" ) == 0)
         {
             return ((tableau *)cond)->size;
         }

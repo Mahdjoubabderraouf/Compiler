@@ -15,9 +15,11 @@ void yyerror(const char *s);
 void addType(char *name, char *type);
 void addVarPlace(char *name, char *varPlace);
 void afficher();
-int addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]);int addSize(char *name,char * varPlace, int size);
+int addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]);
+int addSize(char *name,char * varPlace, int size);
 int addRowCol(char *name,char* varPlace ,int row, int col);
 void* RechercherVar_et_sa_Place (char *name,char *place);
+
 // Vérifie si une variable est déclarée
 int variableisDeclared(char *name, char *place);
 
@@ -47,6 +49,7 @@ char* string;
 int size,column,row;
 char function_return[100] = ""; 
 int condition = 0;
+int Nombre_de_paramètres=0;
 
 
 %}
@@ -84,17 +87,25 @@ Fonction :
     type mcROUTINE identificateur 
     { 
         // Add a variable when a function is declared
+        // Nous avons suposer la fonction comme un tableau et son taille est le nombre de paramètres 
+        // parce que quand on apelle une fonction on doit viréfier son nbr de paramètres    
         if (addVariable($3, $1, "idf fonction", 1, "NULL", "PROGRAM")) {sprintf(errorMsg,"double declaration de %s",$3) ; yyerror(errorMsg);}
         strcpy(sauvType, $1);
         addType($3, sauvType);
         sprintf(sauvPlace, "FONCTION %s", $3);
+    
     } 
     paraO 
     { 
         // Handle function parameters
         sprintf(listeSource, "para de Fun %s", $3);
     } 
-    Liste paraF DECLARATIONS INST_S Affectation { 
+    Liste paraF 
+    {
+        addSize($3,"PROGRAM", Nombre_de_paramètres);
+        Nombre_de_paramètres=0;
+    }    
+    DECLARATIONS INST_S Affectation { 
         // Check that the return value is assigned to the function name
         if (strcmp($3, function_return) != 0)
         { 
@@ -312,8 +323,11 @@ Affectation :
         }
         else
         { 
-            if (strcmp(function_return,"idf fonction")== 0) 
-            {
+            if (strcmp(function_return,"idf fonction")== 0)
+             // ici la fonction getVariableType modifie le function_return si la variable est une fonction 
+             // donc en mete le nom de cette variable dans function_return pour virifier si le nome de la fonction et 
+             // la nome que nous avons affecter le retour sont equvalant  
+            {                                              
                 strcpy(function_return,$1);
             }
             strcpy(IDF,$1);
@@ -324,8 +338,10 @@ Affectation :
 |
     identificateur paraO INTEGER paraF 
     {
-        if(tableisDeclared($1, sauvPlace))//return 1 si le tableau n'est pas déclaré 
-        {
+
+        char* temp = getVariableType($1,sauvPlace,function_return);
+        if (strcmp(temp,"Unknown")== 0)
+        {   
             sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme tableau ", $1);
             yyerror(errorMsg);
         }
@@ -339,6 +355,8 @@ Affectation :
                 sprintf(errorMsg, "la variable \"%s\" a une erreur dans la taille ", $1);
                 yyerror(errorMsg);
             }
+            strcpy(IDF,$1);
+            strcpy(sauvType,temp);
         }
         }
     }
@@ -346,8 +364,10 @@ Affectation :
 |
     identificateur paraO INTEGER virgule INTEGER paraF 
     {
-        if(matrixisDeclared($1, sauvPlace))//return 1 si le tableau n'est pas déclaré 
-        {
+        
+        char* temp = getVariableType($1,sauvPlace,function_return);
+        if (strcmp(temp,"Unknown")== 0)
+        {   
             sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme matrice", $1);
             yyerror(errorMsg);
         }
@@ -360,6 +380,8 @@ Affectation :
                 sprintf(errorMsg, "la variable \"%s\" a une erreur dans la taille  ", $1);
                 yyerror(errorMsg);
             }
+            strcpy(IDF,$1);
+            strcpy(sauvType,temp);
         }
         }
     }
@@ -367,6 +389,7 @@ Affectation :
 ;
 
 EXPR : 
+
     CHAINE_STRING
 
 | 
@@ -374,6 +397,7 @@ EXPR :
 
 | 
     APPEL_FONC
+    
 | 
     LOGICAL
 
@@ -393,9 +417,30 @@ APPEL_FONC :
             sprintf(errorMsg, "la fonction \"%s\" n'est pas declarer ", $2);
             yyerror(errorMsg);
         }
+
+        char* temp = getVariableType($2,"PROGRAM",function_return);
+
+        strcpy(function_return ,"");
+        if (strcmp(temp,"INTEGER") == 0 && strcmp("REAL",sauvType)!= 0 )
+        {
+            if (strcmp(temp,sauvType)!= 0)
+            {   
+                sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\"", IDF,sauvType);
+                yyerror(errorMsg);
+            }
+        }
         sprintf(listeSource, "%s", sauvPlace); 
     } 
-    Liste paraF
+    Liste
+    {   int tempSize = getSize($2,"PROGRAM");
+        if(tempSize!= Nombre_de_paramètres)
+        {
+            sprintf(errorMsg, "le nombre de paramètres de la fonction \"%s\" est incorrect le nombre correcte est %d", $2,tempSize);
+            yyerror(errorMsg);   
+        }
+        Nombre_de_paramètres=0;
+    }
+    paraF
 ;
 
 
@@ -793,37 +838,38 @@ Liste1 :
 
   Liste1 virgule identificateur  
 
-    { 
+    {    Nombre_de_paramètres++;
         addVariable($3,"pas de type","Var Simple",1,"NULL",listeSource);
     }
 | 
     Liste1 virgule identificateur paraO INTEGER paraF
     
-    { 
+    {    Nombre_de_paramètres++;
         addVariable($3,"pas de type","Tableau",1,"NULL",listeSource);
     }
 | 
     Liste1 virgule identificateur paraO INTEGER virgule INTEGER paraF 
     
-    { 
+    {    Nombre_de_paramètres++;
         addVariable($3,"pas de type","Matrice",1,"NULL",listeSource);
     }
 | 
     identificateur paraO INTEGER virgule INTEGER paraF 
     
-    { 
+    {    Nombre_de_paramètres++;
         addVariable($1,"pas de type","Matrice",1,"NULL",listeSource);
     }
 | 
     identificateur paraO INTEGER paraF
     
-    { 
+    {    Nombre_de_paramètres++;
         addVariable($1,"pas de type","Tableau",1,"NULL",listeSource);
     }
 
 |
         identificateur 
-    { 
+    {   
+        Nombre_de_paramètres++;
         addVariable($1,"pas de type","Var Simple",1,"NULL",listeSource);
     }
 ;
