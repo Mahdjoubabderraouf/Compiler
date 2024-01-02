@@ -58,7 +58,13 @@ int tableisDeclared(char *name, char *place);
 int matrixisDeclared(char *name, char *place);
 
 // Retourne le type d'une variable, tableau ou matrice
-char* getVariableType(char *name, char *place);
+char* getVariableType(char *name, char *place,char code[100]);
+
+// Retourne la taille d'un tableau
+int getSize(char *name, char *place);
+
+// Retourne le nombre de lignes d'une matrice
+int getRowCol(char *name, char *place, int *row, int *col);
 
 
 
@@ -149,6 +155,20 @@ void* RechercherVar_et_sa_Place(char *name, char *place)
         
         tempVar = ((variable *)tempVar)->suiv; // passer à la variable suivante
     }
+    tempVar = listVar;
+    while (tempVar != NULL)
+    {
+
+        if (strcmp("PROGRAM", ((variable *)tempVar)->varPlace) == 0 && strcmp(name, ((variable *)tempVar)->name) == 0)
+        {
+            if (strcmp("idf fonction", ((variable *)tempVar)->code)==0)
+            {
+                return tempVar;
+            }
+        }
+        tempVar = ((variable *)tempVar)->suiv; // passer à la variable suivante
+    }
+    
     return NULL; // la variable n'est pas déclarée à l'endroit spécifié, vous pouvez la déclarer
 }
 
@@ -541,24 +561,59 @@ int matrixisDeclared(char *name, char *place)
 }
 
 // Function to return the type of a variable, table, or matrix
-char* getVariableType(char *name, char *place)
+char* getVariableType(char *name, char *place,char code[100])
 {
     void *cond = RechercherVar_et_sa_Place(name, place);
     if (cond != NULL)
     {
-        if (strcmp(((variable *)cond)->type, "Var Simple") == 0)
+        if (strcmp(((variable *)cond)->code, "Var Simple") == 0 )
         {
             return ((variable *)cond)->type;
         }
-        else if (strcmp(((tableau *)cond)->type, "Tableau") == 0)
+        else  if (strcmp(((variable *)cond)->code, "idf fonction") == 0) 
+        {   
+            strcpy((code),((variable *)cond)->code);
+            return ((variable *)cond)->type;
+        }
+        else if (strcmp(((tableau *)cond)->code, "Tableau") == 0)
         {
             return ((tableau *)cond)->type;
         }
-        else if (strcmp(((matrice *)cond)->type, "Matrice") == 0)
+        else if (strcmp(((matrice *)cond)->code, "Matrice") == 0)
         {
             return ((matrice *)cond)->type;
         }
     }
     return "Unknown";
 }
+
+// Fonction retourne la taille d'un tableau
+int getSize(char *name, char *place)
+{
+    void *cond = RechercherVar_et_sa_Place(name, place);
+    if (cond != NULL)
+    {
+        if (strcmp(((tableau *)cond)->code, "Tableau") == 0)
+        {
+            return ((tableau *)cond)->size;
+        }
+    }
+    return 0;
+}
+// Fonction retourner Row & Colmun
+int getRowCol(char *name, char *place, int *row, int *col)
+{
+    void *cond = RechercherVar_et_sa_Place(name, place);
+    if (cond != NULL)
+    {
+        if (strcmp(((matrice *)cond)->code, "Matrice") == 0)
+        {
+            *row = ((matrice *)cond)->row;
+            *col = ((matrice *)cond)->col;
+            return 0;
+        }
+    }
+    return 1;
+}
+
 

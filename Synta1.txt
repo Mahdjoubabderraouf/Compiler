@@ -1,13 +1,10 @@
-INTEGER ROUTINE Ahmed ()
-lsd=12;
-Ahmed = 10 
-ENDR
 
 PROGRAM Hellocad
-
 INTEGER A = 12 ; 
 INTEGER  B =15 , D ;
 REAL TAB DIMENSION (20 , 200) ;
 INTEGER var4 DIMENSION (20) ; 
+
+ TAB (5,20) = A ;
  
 END 

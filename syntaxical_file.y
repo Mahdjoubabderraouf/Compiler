@@ -28,7 +28,9 @@ int tableisDeclared(char *name, char *place);
 int matrixisDeclared(char *name, char *place);
 
 // Retourne le type d'une variable, tableau ou matrice
-char* getVariableType(char *name, char *place);
+char* getVariableType(char *name, char *place,char code[100]);
+int getSize(char *name, char *place);
+int getRowCol(char *name, char *place, int *row, int *col);
 
 char sauvType[25];
 char sauvPlace[25];
@@ -40,8 +42,10 @@ char IDFCode[25] ="Var Simple";
 int isString =0;
 int val_entier;
 float val_real;
-char oper;
+char* string;
 int size,column,row;
+char function_return[100] = ""; 
+
 
 %}
 
@@ -63,6 +67,7 @@ int size,column,row;
 %left plus mpins
 %left etoile division
 %nonassoc EQ NE LT LE GT GE
+%left eq
 %left AND OR
 %left paraO paraF
 %left point
@@ -70,8 +75,6 @@ int size,column,row;
 // %type <entier> VALEURS_entier
 // %type <real> VALEURS_real
 %type <string> LOGICAL
-%type <real>MATH_VAR
-%type <real>MATH_VAR1
 %%
 
 
@@ -89,16 +92,15 @@ Fonction :
         // Handle function parameters
         sprintf(listeSource, "para de Fun %s", $3);
     } 
-    Liste paraF DECLARATIONS INST_S identificateur eq EXPR 
-    { 
+    Liste paraF DECLARATIONS INST_S Affectation { 
         // Check that the return value is assigned to the function name
-        if (strcmp($3, $11) != 0)
+        if (strcmp($3, function_return) != 0)
         { 
             sprintf(errorMsg, "return value must be affected in the same function name \n");
             yyerror(errorMsg); 
         } 
-    } 
-    mcENDR Fonction 
+    } mcENDR 
+    Fonction 
 | 
     mcPROGRAM identificateur 
     { 
@@ -112,6 +114,7 @@ Fonction :
         YYACCEPT; 
     }
 ;
+
 
 DECLARATIONS : 
 
@@ -158,101 +161,27 @@ DECLARATIONS1 :
     caractere1 DECLARATIONS1
 | 
     mcDIMENSION paraO INTEGER paraF 
-    {
+    {    
+        if($3==0)
+        {
+            sprintf(errorMsg, "la taille doit être suprieur à 0 ");
+            yyerror(errorMsg);
+        }
         strcpy(IDFCode, "Tableau");
         size = $3;
     } DECLARATIONS2
 | 
     mcDIMENSION paraO INTEGER virgule INTEGER paraF 
-    {
+    {   
+        if($3==0 || $5==0)
+        {
+            sprintf(errorMsg, "la taille doit être suprieur à 0 ");
+            yyerror(errorMsg);
+        }
         strcpy(IDFCode, "Matrice");
         row = $3;
         column = $5;
     } DECLARATIONS2   
-// | 
-//     eq VALEURS_entier 
-//     {    
-//         if (strcmp(sauvType,"INTEGER") !=0 && strcmp(sauvType,"REAL") ) 
-//         {
-//             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-//             yyerror(errorMsg);
-//         }
-//         sprintf(IDFValeur, "%d", $2);
-//     } 
-//     DECLARATIONS3                   
-// | 
-//     eq VALEURS_real 
-//     {   
-//         if (strcmp(sauvType,"REAL") !=0 ) 
-//         {
-//              sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-//             yyerror(errorMsg);
-//         }
-//         sprintf(IDFValeur, "%f", $2);
-//     } 
-//     DECLARATIONS3
-// | 
-//     eq chaine 
-//     { 
-//         if (strcmp(sauvType,"CHARACTER") !=0 ) 
-//         {   
-//             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type chaine de \"%s\"",IDF,sauvType);
-//             yyerror(errorMsg);
-//         }else if ( isString == 0)
-//         {
-//             sprintf(errorMsg," \"%s\" est de Type \"%s\" et n' est pas une chaine ",IDF,sauvType);
-//             yyerror(errorMsg);
-//         }
-//         sprintf(IDFValeur, "%s", $2);
-//         isString=0;
-
-//     } 
-//     DECLARATIONS3                   
-// | 
-//     eq caracter 
-//     {  
-//         if (strcmp(sauvType,"CHARACTER") !=0 ) 
-//         {
-//              sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-//             yyerror(errorMsg);
-
-//         }else if ( isString == 1)
-//         {
-//             sprintf(errorMsg," \"%s\" est une chaine de \" %s\"",IDF,sauvType);
-//             yyerror(errorMsg);
-//         }
-        
-//         sprintf(IDFValeur, "%c", $2);
-//     }
-//     DECLARATIONS3
-// | 
-//     eq LOGICAL 
-//     { 
-//         if (strcmp(sauvType,"LOGICAL") !=0) 
-//         {
-//             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-//             yyerror(errorMsg);
-//         }
-//         sprintf(IDFValeur, "%s", $2);
-//     } 
-//     DECLARATIONS3
-// |
-//     eq identificateur
-//     { 
-//        if(variableisDeclared($2, sauvPlace))//return 1 si le idf n'est pas déclaré 
-//         {
-//             sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme variable simple", $2);
-//             yyerror(errorMsg);
-//         }
-//         if (strcmp(sauvType,getVariableType($2, sauvPlace)) !=0 )
-//         {
-//             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-//             yyerror(errorMsg);
-//         }
-
-//         sprintf(IDFValeur, "%s", $2);
-//     } 
-//     DECLARATIONS3
 |
     eq EXPR DECLARATIONS3
 ;
@@ -295,13 +224,23 @@ DECLARATIONS2 :
     caractere1 DECLARATIONS1
 | 
     mcDIMENSION paraO INTEGER paraF 
-    {
+    {   
+        if($3==0)
+        {
+            sprintf(errorMsg, "la taille doit être suprieur à 0 ");
+            yyerror(errorMsg);
+        }
         strcpy(IDFCode, "Tableau");
         size = $3;
     } DECLARATIONS1
 | 
     mcDIMENSION paraO INTEGER virgule INTEGER paraF 
     {
+        if($3==0 || $5==0)
+        {
+            sprintf(errorMsg, "la taille doit être suprieur à 0 ");
+            yyerror(errorMsg);
+        }
         strcpy(IDFCode, "Matrice");
         row =$3;
         column =$5;
@@ -324,26 +263,7 @@ DECLARATIONS3 :
         strcpy(IDFCode, "Var Simple");
     } 
     caractere1 DECLARATIONS1
-    ;
-
-
-// VALEURS_entier :
-
-//     INTEGER 
-// | 
-//     INTEGERPOSITIF
-// | 
-//     INTEGERNEGATIF
-// ;
-
-// VALEURS_real : 
-
-//     REAL
-// | 
-//     REALPOSITIF
-// | 
-//     REALNEGATIF
-// ;
+;
 
 type :
 
@@ -381,33 +301,82 @@ INSTR :
 Affectation : 
 
     identificateur
-     eq EXPR
     {
-        if (RechercherVar_et_sa_Place($1,sauvPlace)== NULL )
-        {
-            sprintf(errorMsg,"la variable \"%s\" n'est pas declarer", $1);
+        char* temp = getVariableType($1,sauvPlace,function_return);
+        if (strcmp(temp,"Unknown")== 0)
+        {   
+            sprintf(errorMsg,"la variable  \"%s\" n'est pas declarer", $1);
             yyerror(errorMsg);
         }
+        else
+        { 
+            if (strcmp(function_return,"idf fonction")== 0) 
+            {
+                strcpy(function_return,$1);
+            }
+            strcpy(IDF,$1);
+            strcpy(sauvType,temp);
+        }
     }
+    eq EXPR 
+|
+    identificateur paraO INTEGER paraF 
+    {
+        if(tableisDeclared($1, sauvPlace))//return 1 si le tableau n'est pas déclaré 
+        {
+            sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme tableau ", $1);
+            yyerror(errorMsg);
+        }
+        else
+        {
+        int tempSize = getSize(IDF,sauvPlace);
+
+        if (tempSize)
+        {
+            if (tempSize < $3){
+                sprintf(errorMsg, "la variable \"%s\" a une erreur dans la taille ", $1);
+                yyerror(errorMsg);
+            }
+        }
+        }
+    }
+    eq EXPR
+|
+    identificateur paraO INTEGER virgule INTEGER paraF 
+    {
+        if(matrixisDeclared($1, sauvPlace))//return 1 si le tableau n'est pas déclaré 
+        {
+            sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme matrice", $1);
+            yyerror(errorMsg);
+        }
+        else
+        {
+        int tempRow ,tempCol;
+        if(getRowCol(IDF,sauvPlace,&tempRow,&tempCol)==0)
+        {
+            if (tempRow < $3 || tempCol != $5){
+                sprintf(errorMsg, "la variable \"%s\" a une erreur dans la taille  ", $1);
+                yyerror(errorMsg);
+            }
+        }
+        }
+    }
+    eq EXPR
 ;
 
 EXPR : 
     CHAINE_STRING
-    {
-        // Semantic code for CHAINE_STRING
-    }
+
 | 
     MATH_VAR
-    {
-        // Semantic code for MATH_VAR
-    }
+
 | 
     APPEL_FONC
     {
         // Semantic code for APPEL_FONC
     }
 | 
-    LOGICAL 
+    LOGICAL
     {
         // Semantic code for LOGICAL
     }
@@ -432,10 +401,28 @@ MATH_VAR :
 
     identificateur
     {
-        if(variableisDeclared($1, sauvPlace))//return 1 si le idf n'est pas déclaré 
+        if(variableisDeclared($1, sauvPlace) && tableisDeclared($1, sauvPlace) && matrixisDeclared ($1, sauvPlace))//return 1 si le idf n'est pas déclaré 
         {
             sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme variable simple", $1);
             yyerror(errorMsg);
+        }
+        else
+        { 
+            char* temp = getVariableType($1,sauvPlace,function_return);
+            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") )
+
+            {   
+                sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\"", IDF,sauvType);
+                yyerror(errorMsg);
+            }
+            else
+            { 
+                if (strcmp(function_return,"idf fonction")== 0) 
+                {
+                sprintf(errorMsg,"la variable  \"%s\" est declarer comme fonction", $1);
+                yyerror(errorMsg);
+                }
+            }
         }
     }
     MATH_VAR1
@@ -447,6 +434,34 @@ MATH_VAR :
             sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme tableau ", $1);
             yyerror(errorMsg);
         }
+        else
+        {
+            // check the type 
+            char* temp = getVariableType($1,sauvPlace,function_return);
+            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") )
+            {  
+                sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\"", IDF,sauvType);
+                yyerror(errorMsg);
+            }
+            else
+            { 
+                if (strcmp(function_return,"idf fonction")== 0) 
+                {
+                sprintf(errorMsg,"la variable  \"%s\" est declarer comme fonction", $1);
+                yyerror(errorMsg);
+                }
+            }
+        }
+        int tempSize = getSize(IDF,sauvPlace);
+
+        if (tempSize)
+        {
+            if (tempSize < $3){
+                sprintf(errorMsg, "la variable \"%s\" a une erreur dans la taille  ", $1);
+                yyerror(errorMsg);
+            }
+        }
+        
     }
     MATH_VAR1
 | 
@@ -457,12 +472,38 @@ MATH_VAR :
             sprintf(errorMsg, "la variable \"%s\" n'est pas declarer comme matrice", $1);
             yyerror(errorMsg);
         }
+        else
+        {
+            char* temp = getVariableType($1,sauvPlace,function_return);
+            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") )
+            {   
+                sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\"", IDF,sauvType);
+                yyerror(errorMsg);
+            }
+            else
+            { 
+                if (strcmp(function_return,"idf fonction")== 0) 
+                {
+                sprintf(errorMsg,"la variable  \"%s\" est declarer comme fonction", $1);
+                yyerror(errorMsg);
+                }
+            }
+        } 
+        int tempRow ,tempCol;
+        if(getRowCol(IDF,sauvPlace,&tempRow,&tempCol)==0)
+        {
+            if (tempRow < $3 || tempCol != $5){
+                sprintf(errorMsg, "lla variable \"%s\" a une erreur dans la taille  ", $1);
+                yyerror(errorMsg);
+            }
+        }
+
     } MATH_VAR1
 | 
     INTEGER 
     {
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
-        {
+        {  
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
@@ -503,7 +544,7 @@ MATH_VAR :
             yyerror(errorMsg);
         }
         val_real = $1 ;
-        sprintf(IDFValeur, "%d", val_real);
+        sprintf(IDFValeur, "%f", val_real);
     }
     MATH_VAR1
 | 
@@ -515,7 +556,7 @@ MATH_VAR :
             yyerror(errorMsg);
         }
         val_real = $1 ;
-        sprintf(IDFValeur, "%d", val_real);
+        sprintf(IDFValeur, "%f", val_real);
     }
     MATH_VAR1
 | 
@@ -527,7 +568,7 @@ MATH_VAR :
             yyerror(errorMsg);
         }
         val_real = $1 ;
-        sprintf(IDFValeur, "%d", val_real);
+        sprintf(IDFValeur, "%f", val_real);
     }
     MATH_VAR1
 | 
@@ -537,9 +578,6 @@ MATH_VAR :
 MATH_VAR1 : 
 
     OPER 
-    {
-        if(oper == '+') 
-    }
     MATH_VAR
 | 
     INTEGERNEGATIF 
@@ -549,7 +587,7 @@ MATH_VAR1 :
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
-        $$ = $1 ; 
+        val_entier += $1 ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
     OPER MATH_VAR
@@ -561,7 +599,7 @@ MATH_VAR1 :
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
-        val_entier = $1 ; 
+       val_entier += $1 ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
     OPER MATH_VAR
@@ -574,7 +612,7 @@ MATH_VAR1 :
             yyerror(errorMsg);
         }
         val_real = $1 ;
-        sprintf(IDFValeur, "%d", val_real);
+        sprintf(IDFValeur, "%f", val_real);
     }
     OPER 
     
@@ -588,7 +626,7 @@ MATH_VAR1 :
             yyerror(errorMsg);
         }
         val_real = $1 ;
-        sprintf(IDFValeur, "%d", val_real);
+        sprintf(IDFValeur, "%f", val_real);
     }
     OPER MATH_VAR
 | 
@@ -622,7 +660,7 @@ MATH_VAR1 :
             yyerror(errorMsg);
         }
         val_real = $1 ;
-        sprintf(IDFValeur, "%d", val_real);
+        sprintf(IDFValeur, "%f", val_real);
     }
 | 
     REALPOSITIF
@@ -633,7 +671,7 @@ MATH_VAR1 :
             yyerror(errorMsg);
         }
         val_real = $1 ;
-        sprintf(IDFValeur, "%d", val_real);
+        sprintf(IDFValeur, "%f", val_real);
     }
 | 
     /*empty*/
@@ -642,8 +680,14 @@ MATH_VAR1 :
 CHAINE_STRING : 
 
     chaine CHAINE_STRING
+    {
+        sprintf(string,"%s%s",string,$1);
+    }
 | 
     chaine
+    {
+        string = $1; 
+    }
 ;
 
 ES : 
@@ -738,17 +782,11 @@ condition :
 
 expression2 :
 
-    MATH_VAR point AND point expression2
+    EXPR point AND point expression2
 | 
-    MATH_VAR point OR point expression2
+    EXPR point OR point expression2
 | 
-    MATH_VAR
-| 
-    LOGICAL point AND point expression2
-| 
-    LOGICAL point OR point expression2
-| 
-    LOGICAL
+    EXPR
 ;
 
 expression : 
@@ -759,45 +797,32 @@ expression :
 | 
     expression point OR point expression
 | 
-    expression point AND point MATH_VAR
+    expression point AND point EXPR
 | 
-    expression point OR point MATH_VAR
+    expression point OR point EXPR
 | 
-    expression point AND point LOGICAL
+    EXPR point AND point expression
 | 
-    expression point OR point LOGICAL
-| 
-    MATH_VAR point AND point expression
-| 
-    MATH_VAR point OR point expression
-| 
-    LOGICAL point AND point expression
-| 
-    LOGICAL point OR point expression
+    EXPR point OR point expression
 | 
     comparision
 ;
 
-comparision : 
-
-    MATH_VAR point EQ point MATH_VAR
+comparision :  
+    
+    EXPR point EQ point EXPR
 | 
-    LOGICAL point EQ point LOGICAL
+    EXPR point GT point EXPR
 | 
-    MATH_VAR point EQ point LOGICAL
+    EXPR point GE point EXPR
 | 
-    LOGICAL point EQ point MATH_VAR
+    EXPR point NE point EXPR
 | 
-    MATH_VAR point GT point MATH_VAR
+    EXPR point LE point EXPR
 | 
-    MATH_VAR point GE point MATH_VAR
-| 
-    MATH_VAR point NE point MATH_VAR
-| 
-    MATH_VAR point LE point MATH_VAR
-| 
-    MATH_VAR point LT point MATH_VAR
+    EXPR point LT point EXPR
 ;
+
 
 LOGICAL: 
 
@@ -808,16 +833,12 @@ LOGICAL:
 
 OPER : 
     plus
-    {oper='+'}
 | 
     mpins
-    {oper='-'}
 | 
     etoile 
-    {oper='*'}
 | 
     division
-    {oper='/'}
 ;
 
 %%

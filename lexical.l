@@ -60,6 +60,7 @@ commantaire %.*;
 "("                 { addSep(yytext, "paraO", 1); col = col + yyleng; return paraO; }
 ")"                 { addSep(yytext, "paraF", 1); col = col + yyleng; return paraF; }
 "."                 { addSep(yytext, "point", 1); col = col + yyleng; return point; }
+"affiche" {afficher();}
 [ \t]               { col = col + strlen(yytext); }
 \n                  { col =1; nbligne++;}
 {INTEGER}           { yylval.entier=atoi(yytext); addConstant(yytext, "INTEGER", 1, atof(yytext)); col = col + yyleng; return INTEGER; }
