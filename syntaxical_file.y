@@ -501,7 +501,12 @@ MATH_VAR :
     } MATH_VAR1
 | 
     INTEGER 
-    {
+    {   
+        // check if depasse intervale 0 32767
+        if ($1 > 32767 || $1 < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {  
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -513,7 +518,11 @@ MATH_VAR :
     MATH_VAR1
 | 
     INTEGERPOSITIF 
-    {
+    {   // check if depasse intervale 0 32767
+        if ($1 > 32767 || $1 < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -525,7 +534,11 @@ MATH_VAR :
     MATH_VAR1
 | 
     INTEGERNEGATIF 
-    {
+    {   // check if depasse intervale -32768 0
+        if ($1 > 0 || $1 < -32768 ){
+           sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") !=0 && strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -538,6 +551,11 @@ MATH_VAR :
 | 
     REAL 
     {
+        // check if depasse intervale 0 32767.32767 
+        if ($1 > 32767.32767 || $1 < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -549,7 +567,12 @@ MATH_VAR :
     MATH_VAR1
 | 
     REALPOSITIF 
-    {
+    {   
+        // check if depasse intervale  -32768.32768 0
+        if ($1 > 32767.32767 || $1 < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -561,7 +584,12 @@ MATH_VAR :
     MATH_VAR1
 | 
     REALNEGATIF 
-    {
+    {   
+        if ($1 > 0|| $1 < -32768.32768 )
+        {
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -581,10 +609,15 @@ MATH_VAR1 :
     MATH_VAR
 | 
     INTEGERNEGATIF 
-    {
+    {   
+        if ($1 > 0 || $1 < -32768 )
+        {
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
-            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            sprintf(errorMsg, "erreur dans l'intervale ");
             yyerror(errorMsg);
         }
         val_entier += $1 ; 
@@ -594,6 +627,11 @@ MATH_VAR1 :
 | 
     INTEGERPOSITIF
     {
+        if ($1 > 32767 || $1 < 0 )
+        {
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -605,7 +643,12 @@ MATH_VAR1 :
     OPER MATH_VAR
 | 
     REALNEGATIF 
-    {
+    {   
+        if ($1 > 0|| $1 < -32768.32768 )
+        {
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -619,7 +662,10 @@ MATH_VAR1 :
     MATH_VAR
 | 
     REALPOSITIF 
-    {
+    {   if ($1 > 32767.32767 || $1 < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -631,7 +677,11 @@ MATH_VAR1 :
     OPER MATH_VAR
 | 
     INTEGERNEGATIF
-    {
+    {   if ($1 > 0 || $1 < -32768 )
+        {
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -645,15 +695,24 @@ MATH_VAR1 :
     {
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
+         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
+        val_entier = $1 ; 
         val_entier = $1 ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
 | 
     REALNEGATIF
-    {
+    {   if ($1 > 32767.32767 || $1 < 0 ){
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -665,6 +724,10 @@ MATH_VAR1 :
 | 
     REALPOSITIF
     {
+        if ($1 > 32767.32767 || $1 < 0 ){
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);

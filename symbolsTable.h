@@ -560,7 +560,7 @@ int matrixisDeclared(char *name, char *place)
     return 0;
 }
 
-// Function to return the type of a variable, table, or matrix
+// Fonction reteurne le type de la variable, table, or matrix
 char* getVariableType(char *name, char *place,char code[100])
 {
     void *cond = RechercherVar_et_sa_Place(name, place);

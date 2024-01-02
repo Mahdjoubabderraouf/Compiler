@@ -656,14 +656,14 @@ static const yytype_int16 yyrline[] =
      253,   252,   260,   259,   270,   272,   274,   276,   281,   283,
      284,   290,   292,   294,   296,   297,   304,   303,   324,   323,
      346,   345,   368,   371,   374,   379,   384,   393,   392,   403,
-     402,   431,   430,   469,   468,   504,   503,   516,   515,   528,
-     527,   540,   539,   552,   551,   564,   563,   575,   580,   584,
-     583,   596,   595,   608,   607,   622,   621,   633,   644,   655,
-     666,   676,   682,   687,   695,   697,   699,   704,   706,   713,
-     711,   721,   722,   728,   734,   740,   746,   752,   759,   766,
-     771,   773,   778,   780,   785,   787,   789,   794,   796,   798,
-     800,   802,   804,   806,   808,   813,   815,   817,   819,   821,
-     823,   829,   831,   835,   837,   839,   841
+     402,   431,   430,   469,   468,   504,   503,   521,   520,   537,
+     536,   553,   552,   570,   569,   587,   586,   603,   608,   612,
+     611,   629,   628,   646,   645,   665,   664,   679,   694,   711,
+     725,   739,   745,   750,   758,   760,   762,   767,   769,   776,
+     774,   784,   785,   791,   797,   803,   809,   815,   822,   829,
+     834,   836,   841,   843,   848,   850,   852,   857,   859,   861,
+     863,   865,   867,   869,   871,   876,   878,   880,   882,   884,
+     886,   892,   894,   898,   900,   902,   904
 };
 #endif
 
@@ -1842,7 +1842,12 @@ yyreduce:
 
   case 65: /* $@23: %empty  */
 #line 504 "syntaxical_file.y"
-    {
+    {   
+        // check if depasse intervale 0 32767
+        if ((yyvsp[0].entier) > 32767 || (yyvsp[0].entier) < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {  
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1851,12 +1856,16 @@ yyreduce:
         val_entier = (yyvsp[0].entier) ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
-#line 1855 "syntaxical_file.tab.c"
+#line 1860 "syntaxical_file.tab.c"
     break;
 
   case 67: /* $@24: %empty  */
-#line 516 "syntaxical_file.y"
-    {
+#line 521 "syntaxical_file.y"
+    {   // check if depasse intervale 0 32767
+        if ((yyvsp[0].entier) > 32767 || (yyvsp[0].entier) < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1865,12 +1874,16 @@ yyreduce:
         val_entier = (yyvsp[0].entier) ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
-#line 1869 "syntaxical_file.tab.c"
+#line 1878 "syntaxical_file.tab.c"
     break;
 
   case 69: /* $@25: %empty  */
-#line 528 "syntaxical_file.y"
-    {
+#line 537 "syntaxical_file.y"
+    {   // check if depasse intervale -32768 0
+        if ((yyvsp[0].entier) > 0 || (yyvsp[0].entier) < -32768 ){
+           sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") !=0 && strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1879,12 +1892,17 @@ yyreduce:
         val_entier = (yyvsp[0].entier) ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
-#line 1883 "syntaxical_file.tab.c"
+#line 1896 "syntaxical_file.tab.c"
     break;
 
   case 71: /* $@26: %empty  */
-#line 540 "syntaxical_file.y"
+#line 553 "syntaxical_file.y"
     {
+        // check if depasse intervale 0 32767.32767 
+        if ((yyvsp[0].real) > 32767.32767 || (yyvsp[0].real) < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1893,12 +1911,17 @@ yyreduce:
         val_real = (yyvsp[0].real) ;
         sprintf(IDFValeur, "%f", val_real);
     }
-#line 1897 "syntaxical_file.tab.c"
+#line 1915 "syntaxical_file.tab.c"
     break;
 
   case 73: /* $@27: %empty  */
-#line 552 "syntaxical_file.y"
-    {
+#line 570 "syntaxical_file.y"
+    {   
+        // check if depasse intervale  -32768.32768 0
+        if ((yyvsp[0].real) > 32767.32767 || (yyvsp[0].real) < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1907,12 +1930,17 @@ yyreduce:
         val_real = (yyvsp[0].real) ;
         sprintf(IDFValeur, "%f", val_real);
     }
-#line 1911 "syntaxical_file.tab.c"
+#line 1934 "syntaxical_file.tab.c"
     break;
 
   case 75: /* $@28: %empty  */
-#line 564 "syntaxical_file.y"
-    {
+#line 587 "syntaxical_file.y"
+    {   
+        if ((yyvsp[0].real) > 0|| (yyvsp[0].real) < -32768.32768 )
+        {
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1921,26 +1949,36 @@ yyreduce:
         val_real = (yyvsp[0].real) ;
         sprintf(IDFValeur, "%f", val_real);
     }
-#line 1925 "syntaxical_file.tab.c"
+#line 1953 "syntaxical_file.tab.c"
     break;
 
   case 79: /* $@29: %empty  */
-#line 584 "syntaxical_file.y"
-    {
+#line 612 "syntaxical_file.y"
+    {   
+        if ((yyvsp[0].entier) > 0 || (yyvsp[0].entier) < -32768 )
+        {
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
-            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            sprintf(errorMsg, "erreur dans l'intervale ");
             yyerror(errorMsg);
         }
         val_entier += (yyvsp[0].entier) ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
-#line 1939 "syntaxical_file.tab.c"
+#line 1972 "syntaxical_file.tab.c"
     break;
 
   case 81: /* $@30: %empty  */
-#line 596 "syntaxical_file.y"
+#line 629 "syntaxical_file.y"
     {
+        if ((yyvsp[0].entier) > 32767 || (yyvsp[0].entier) < 0 )
+        {
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1949,12 +1987,17 @@ yyreduce:
        val_entier += (yyvsp[0].entier) ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
-#line 1953 "syntaxical_file.tab.c"
+#line 1991 "syntaxical_file.tab.c"
     break;
 
   case 83: /* $@31: %empty  */
-#line 608 "syntaxical_file.y"
-    {
+#line 646 "syntaxical_file.y"
+    {   
+        if ((yyvsp[0].real) > 0|| (yyvsp[0].real) < -32768.32768 )
+        {
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1963,12 +2006,15 @@ yyreduce:
         val_real = (yyvsp[0].real) ;
         sprintf(IDFValeur, "%f", val_real);
     }
-#line 1967 "syntaxical_file.tab.c"
+#line 2010 "syntaxical_file.tab.c"
     break;
 
   case 85: /* $@32: %empty  */
-#line 622 "syntaxical_file.y"
-    {
+#line 665 "syntaxical_file.y"
+    {   if ((yyvsp[0].real) > 32767.32767 || (yyvsp[0].real) < 0 ){
+            sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1977,12 +2023,16 @@ yyreduce:
         val_real = (yyvsp[0].real) ;
         sprintf(IDFValeur, "%f", val_real);
     }
-#line 1981 "syntaxical_file.tab.c"
+#line 2027 "syntaxical_file.tab.c"
     break;
 
   case 87: /* MATH_VAR1: INTEGERNEGATIF  */
-#line 634 "syntaxical_file.y"
-    {
+#line 680 "syntaxical_file.y"
+    {   if ((yyvsp[0].entier) > 0 || (yyvsp[0].entier) < -32768 )
+        {
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
         {
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
@@ -1990,126 +2040,139 @@ yyreduce:
         }
         val_entier = (yyvsp[0].entier) ; 
         sprintf(IDFValeur, "%d", val_entier);
-    }
-#line 1995 "syntaxical_file.tab.c"
-    break;
-
-  case 88: /* MATH_VAR1: INTEGERPOSITIF  */
-#line 645 "syntaxical_file.y"
-    {
-        if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
-        {
-            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-        val_entier = (yyvsp[0].entier) ; 
-        sprintf(IDFValeur, "%d", val_entier);
-    }
-#line 2009 "syntaxical_file.tab.c"
-    break;
-
-  case 89: /* MATH_VAR1: REALNEGATIF  */
-#line 656 "syntaxical_file.y"
-    {
-        if (strcmp(sauvType,"REAL") ) 
-        {
-            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-        val_real = (yyvsp[0].real) ;
-        sprintf(IDFValeur, "%f", val_real);
-    }
-#line 2023 "syntaxical_file.tab.c"
-    break;
-
-  case 90: /* MATH_VAR1: REALPOSITIF  */
-#line 667 "syntaxical_file.y"
-    {
-        if (strcmp(sauvType,"REAL") ) 
-        {
-            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
-            yyerror(errorMsg);
-        }
-        val_real = (yyvsp[0].real) ;
-        sprintf(IDFValeur, "%f", val_real);
-    }
-#line 2037 "syntaxical_file.tab.c"
-    break;
-
-  case 92: /* CHAINE_STRING: chaine CHAINE_STRING  */
-#line 683 "syntaxical_file.y"
-    {
-        sprintf(string,"%s%s",string,(yyvsp[-1].string));
     }
 #line 2045 "syntaxical_file.tab.c"
     break;
 
+  case 88: /* MATH_VAR1: INTEGERPOSITIF  */
+#line 695 "syntaxical_file.y"
+    {
+        if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
+         if (strcmp(sauvType,"INTEGER") && strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_entier = (yyvsp[0].entier) ; 
+        val_entier = (yyvsp[0].entier) ; 
+        sprintf(IDFValeur, "%d", val_entier);
+    }
+#line 2065 "syntaxical_file.tab.c"
+    break;
+
+  case 89: /* MATH_VAR1: REALNEGATIF  */
+#line 712 "syntaxical_file.y"
+    {   if ((yyvsp[0].real) > 32767.32767 || (yyvsp[0].real) < 0 ){
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = (yyvsp[0].real) ;
+        sprintf(IDFValeur, "%f", val_real);
+    }
+#line 2082 "syntaxical_file.tab.c"
+    break;
+
+  case 90: /* MATH_VAR1: REALPOSITIF  */
+#line 726 "syntaxical_file.y"
+    {
+        if ((yyvsp[0].real) > 32767.32767 || (yyvsp[0].real) < 0 ){
+             sprintf(errorMsg, "erreur dans l'intervale ");
+            yyerror(errorMsg);
+        }
+        if (strcmp(sauvType,"REAL") ) 
+        {
+            sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
+            yyerror(errorMsg);
+        }
+        val_real = (yyvsp[0].real) ;
+        sprintf(IDFValeur, "%f", val_real);
+    }
+#line 2100 "syntaxical_file.tab.c"
+    break;
+
+  case 92: /* CHAINE_STRING: chaine CHAINE_STRING  */
+#line 746 "syntaxical_file.y"
+    {
+        sprintf(string,"%s%s",string,(yyvsp[-1].string));
+    }
+#line 2108 "syntaxical_file.tab.c"
+    break;
+
   case 93: /* CHAINE_STRING: chaine  */
-#line 688 "syntaxical_file.y"
+#line 751 "syntaxical_file.y"
     {
         string = (yyvsp[0].string); 
     }
-#line 2053 "syntaxical_file.tab.c"
+#line 2116 "syntaxical_file.tab.c"
     break;
 
   case 99: /* $@33: %empty  */
-#line 713 "syntaxical_file.y"
+#line 776 "syntaxical_file.y"
     {
        sprintf(listeSource ,"%s",sauvPlace); 
     }
-#line 2061 "syntaxical_file.tab.c"
+#line 2124 "syntaxical_file.tab.c"
     break;
 
   case 103: /* Liste1: Liste1 virgule identificateur  */
-#line 730 "syntaxical_file.y"
+#line 793 "syntaxical_file.y"
     { 
         addVariable((yyvsp[0].string),"pas de type","Var Simple",1,"NULL",listeSource);
     }
-#line 2069 "syntaxical_file.tab.c"
+#line 2132 "syntaxical_file.tab.c"
     break;
 
   case 104: /* Liste1: Liste1 virgule identificateur paraO INTEGER paraF  */
-#line 736 "syntaxical_file.y"
+#line 799 "syntaxical_file.y"
     { 
         addVariable((yyvsp[-3].string),"pas de type","Tableau",1,"NULL",listeSource);
     }
-#line 2077 "syntaxical_file.tab.c"
+#line 2140 "syntaxical_file.tab.c"
     break;
 
   case 105: /* Liste1: Liste1 virgule identificateur paraO INTEGER virgule INTEGER paraF  */
-#line 742 "syntaxical_file.y"
+#line 805 "syntaxical_file.y"
     { 
         addVariable((yyvsp[-5].string),"pas de type","Matrice",1,"NULL",listeSource);
     }
-#line 2085 "syntaxical_file.tab.c"
+#line 2148 "syntaxical_file.tab.c"
     break;
 
   case 106: /* Liste1: identificateur paraO INTEGER virgule INTEGER paraF  */
-#line 748 "syntaxical_file.y"
+#line 811 "syntaxical_file.y"
     { 
         addVariable((yyvsp[-5].string),"pas de type","Matrice",1,"NULL",listeSource);
     }
-#line 2093 "syntaxical_file.tab.c"
+#line 2156 "syntaxical_file.tab.c"
     break;
 
   case 107: /* Liste1: identificateur paraO INTEGER paraF  */
-#line 754 "syntaxical_file.y"
+#line 817 "syntaxical_file.y"
     { 
         addVariable((yyvsp[-3].string),"pas de type","Tableau",1,"NULL",listeSource);
     }
-#line 2101 "syntaxical_file.tab.c"
+#line 2164 "syntaxical_file.tab.c"
     break;
 
   case 108: /* Liste1: identificateur  */
-#line 760 "syntaxical_file.y"
+#line 823 "syntaxical_file.y"
     { 
         addVariable((yyvsp[0].string),"pas de type","Var Simple",1,"NULL",listeSource);
     }
-#line 2109 "syntaxical_file.tab.c"
+#line 2172 "syntaxical_file.tab.c"
     break;
 
 
-#line 2113 "syntaxical_file.tab.c"
+#line 2176 "syntaxical_file.tab.c"
 
       default: break;
     }
@@ -2302,7 +2365,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 844 "syntaxical_file.y"
+#line 907 "syntaxical_file.y"
 
 
 // Fonction main
