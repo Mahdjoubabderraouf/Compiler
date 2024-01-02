@@ -31,6 +31,7 @@ int matrixisDeclared(char *name, char *place);
 char* getVariableType(char *name, char *place,char code[100]);
 int getSize(char *name, char *place);
 int getRowCol(char *name, char *place, int *row, int *col);
+int functionisDeclared(char *name);
 
 char sauvType[25];
 char sauvPlace[25];
@@ -45,6 +46,7 @@ float val_real;
 char* string;
 int size,column,row;
 char function_return[100] = ""; 
+int condition = 0;
 
 
 %}
@@ -372,14 +374,9 @@ EXPR :
 
 | 
     APPEL_FONC
-    {
-        // Semantic code for APPEL_FONC
-    }
 | 
     LOGICAL
-    {
-        // Semantic code for LOGICAL
-    }
+
 |   
     caracter
     {
@@ -391,6 +388,11 @@ APPEL_FONC :
 
     mcCALL identificateur paraO 
     { 
+        if(functionisDeclared($2))
+        {
+            sprintf(errorMsg, "la fonction \"%s\" n'est pas declarer ", $2);
+            yyerror(errorMsg);
+        }
         sprintf(listeSource, "%s", sauvPlace); 
     } 
     Liste paraF
@@ -409,8 +411,8 @@ MATH_VAR :
         else
         { 
             char* temp = getVariableType($1,sauvPlace,function_return);
-            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") )
 
+            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") && condition == 0 )
             {   
                 sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\"", IDF,sauvType);
                 yyerror(errorMsg);
@@ -423,6 +425,7 @@ MATH_VAR :
                 yyerror(errorMsg);
                 }
             }
+
         }
     }
     MATH_VAR1
@@ -438,7 +441,7 @@ MATH_VAR :
         {
             // check the type 
             char* temp = getVariableType($1,sauvPlace,function_return);
-            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") )
+            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") && condition == 0 )
             {  
                 sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\"", IDF,sauvType);
                 yyerror(errorMsg);
@@ -475,7 +478,7 @@ MATH_VAR :
         else
         {
             char* temp = getVariableType($1,sauvPlace,function_return);
-            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") )
+            if (strcmp(temp,sauvType)!= 0 && strcmp(sauvType,"REAL") && condition == 0)
             {   
                 sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\"", IDF,sauvType);
                 yyerror(errorMsg);
@@ -831,13 +834,16 @@ Boucle :
 
 if_statment :
 
-    mcIF paraO condition paraF mcTHEN INST_S mcELSE INST_S mcENDIF
-| 
-    mcIF paraO condition paraF mcTHEN INST_S mcENDIF
+    mcIF {condition = 1;} paraO  condition paraF mcTHEN INST_S if_reste {condition = 0;}
 ;
 
-condition : 
+if_reste : 
+    mcELSE INST_S mcENDIF
+| 
+    mcENDIF
 
+condition : 
+    
     expression 
 | 
     expression2

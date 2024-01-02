@@ -66,6 +66,9 @@ int getSize(char *name, char *place);
 // Retourne le nombre de lignes d'une matrice
 int getRowCol(char *name, char *place, int *row, int *col);
 
+// Vérifie si une fonction est déclarée
+int functionisDeclared(char *name);
+
 
 
 
@@ -615,5 +618,20 @@ int getRowCol(char *name, char *place, int *row, int *col)
     }
     return 1;
 }
-
-
+// check if function declared 
+int functionisDeclared(char *name)
+{
+    void *tempVar = listVar;
+    while (tempVar != NULL)
+    {
+        if (strcmp(((variable *)tempVar)->name, name) == 0)
+        {
+            if (strcmp(((variable *)tempVar)->code, "idf fonction") == 0)
+            {
+                return 0;
+            }
+        }
+        tempVar = ((variable *)tempVar)->suiv;
+    }
+    return 1;
+}
