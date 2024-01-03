@@ -69,6 +69,9 @@ int getRowCol(char *name, char *place, int *row, int *col);
 // Vérifie si une fonction est déclarée
 int functionisDeclared(char *name);
 
+// Retourne la valeur d'une variable, tableau ou matrice
+char* getVal(char *name, char *place);
+
 
 
 
@@ -603,7 +606,7 @@ int getSize(char *name, char *place)
     }
     return 0;
 }
-
+ 
 // Fonction retourner Row & Colmun
 int getRowCol(char *name, char *place, int *row, int *col)
 {
@@ -636,4 +639,25 @@ int functionisDeclared(char *name)
         tempVar = ((variable *)tempVar)->suiv;
     }
     return 1;
+}
+//Fonction retourner la valeur 
+char* getVal(char *name, char *place)
+{
+    void *cond = RechercherVar_et_sa_Place(name, place);
+    if (cond != NULL)
+    {
+        if (strcmp(((variable *)cond)->code, "Var Simple") == 0)
+        {
+            return ((variable *)cond)->val;
+        }
+        else if (strcmp(((tableau *)cond)->code, "Tableau")==0||strcmp(((tableau *)cond)->code, "idf fonction" )==0)
+        {
+            return ((tableau *)cond)->val;
+        }
+        else if (strcmp(((matrice *)cond)->code, "Matrice") == 0)
+        {
+            return ((matrice *)cond)->val;
+        }
+    }
+    return "Unknown";
 }

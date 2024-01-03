@@ -10,8 +10,12 @@ int col = 1;
 
 void yyerror(const char *s);
 
+// Structure de la table des symboles
 void addType(char *name, char *type);
+
 void addVarPlace(char *name, char *varPlace);
+
+
 void afficher();
 int addVariable(char *name, char *type, char* code, int state, char* val, char varPlace[]);
 int addSize(char *name,char * varPlace, int size);
@@ -32,6 +36,8 @@ char* getVariableType(char *name, char *place,char code[100]);
 int getSize(char *name, char *place);
 int getRowCol(char *name, char *place, int *row, int *col);
 int functionisDeclared(char *name);
+char* getVal(char *name, char *place);
+
 
 char sauvType[25];
 char sauvPlace[25];
@@ -47,7 +53,8 @@ char* string;
 int size,column,row;
 char function_return[100] = ""; 
 int condition = 0;
-int Nombre_de_paramètres=0;
+int Nombre_de_paramètres = 0 ;
+char oper=' ';
 %}
 %union 
 { 
@@ -120,7 +127,6 @@ Fonction :
     }
 ;
 
-
 DECLARATIONS : 
 
     type identificateur  
@@ -132,6 +138,7 @@ DECLARATIONS :
 ;
 
 caractere1: 
+
     etoile INTEGER 
     {
         if (strcmp(sauvType,"CHARACTER") !=0) 
@@ -145,7 +152,7 @@ caractere1:
     }
 | 
     /*epsilon*/
-    ;
+;
 
 DECLARATIONS1 : 
     point_virgule 
@@ -461,6 +468,7 @@ MATH_VAR :
                 sprintf(errorMsg,"la variable  \"%s\" est declarer comme fonction", $1);
                 yyerror(errorMsg);
                 }
+
             }
 
         }
@@ -552,6 +560,13 @@ MATH_VAR :
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
+        if (oper == '/' && $1==0 )
+        {
+            sprintf(errorMsg, "division par 0 ");
+            yyerror(errorMsg);
+            oper= ' ';
+        }
+        oper=' ';
         val_entier = $1 ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
@@ -568,6 +583,13 @@ MATH_VAR :
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
+        if (oper == '/' && $1==0 )
+        {
+            sprintf(errorMsg, "division par 0 ");
+            yyerror(errorMsg);
+            oper= ' ';
+        }
+        oper=' ';
         val_entier = $1 ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
@@ -584,6 +606,13 @@ MATH_VAR :
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
+        if (oper == '/' && $1==0 )
+        {
+            sprintf(errorMsg, "division par 0 ");
+            yyerror(errorMsg);
+            oper= ' ';
+        }
+        oper=' ';
         val_entier = $1 ; 
         sprintf(IDFValeur, "%d", val_entier);
     }
@@ -601,6 +630,13 @@ MATH_VAR :
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
+        if (oper == '/' && $1==0 )
+        {
+            sprintf(errorMsg, "division par 0 ");
+            yyerror(errorMsg);
+            oper= ' ';
+        }
+        oper=' ';
         val_real = $1 ;
         sprintf(IDFValeur, "%f", val_real);
     }
@@ -618,6 +654,13 @@ MATH_VAR :
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
+        if (oper == '/' && $1==0 )
+        {
+            sprintf(errorMsg, "division par 0 ");
+            yyerror(errorMsg);
+            oper= ' ';
+        }
+        oper=' ';
         val_real = $1 ;
         sprintf(IDFValeur, "%f", val_real);
     }
@@ -635,6 +678,13 @@ MATH_VAR :
             sprintf(errorMsg,"incompatibilité de type  : \"%s\" est de Type \"%s\" ",IDF,sauvType);
             yyerror(errorMsg);
         }
+        if (oper == '/' && $1==0 )
+        {
+            sprintf(errorMsg, "division par 0 ");
+            yyerror(errorMsg);
+            oper= ' ';
+        }
+        oper=' ';
         val_real = $1 ;
         sprintf(IDFValeur, "%f", val_real);
     }
@@ -785,18 +835,7 @@ CHAINE_STRING :
     chaine CHAINE_STRING
     {
         sprintf(string,"%s%s",string,$1);
-    }#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include "symbolsTable.h"
-int test (){ return 5; }
-
-int main() {
-    char * code ; 
-    addVariable("Comp", "INTEGER", "idf fonction", 1, "NULL", "PROGRAM");
-    printf("%s\n", getVariableType("Comp", "PROGRAM", &code));
-    printf("%s\n",code);
-}
+    }
 | 
     chaine
     {
@@ -941,7 +980,6 @@ comparision :
     EXPR point LT point EXPR
 ;
 
-
 LOGICAL: 
 
     mcTRUE
@@ -957,6 +995,8 @@ OPER :
     etoile 
 | 
     division
+    {oper = '/';}
+
 ;
 
 %%
@@ -970,7 +1010,6 @@ void yyerror(const char *s) {
 
 int main() {
     yyparse();
-
     afficher();
     return 0;
 }
