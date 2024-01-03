@@ -1,5 +1,3 @@
-
-
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,10 +48,7 @@ int size,column,row;
 char function_return[100] = ""; 
 int condition = 0;
 int Nombre_de_paramètres=0;
-
-
 %}
-
 %union 
 { 
    int entier;
@@ -61,7 +56,6 @@ int Nombre_de_paramètres=0;
    char* string;
    char caracter;
 }
-
 %start Fonction
 
 %token <string> mcTRUE mcFALSE mcINTEGER mcREAL mcCHARACTER mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
@@ -81,8 +75,6 @@ int Nombre_de_paramètres=0;
 // %type <real> VALEURS_real
 %type <string> LOGICAL
 %%
-
-
 Fonction : 
     type mcROUTINE identificateur 
     { 
@@ -793,7 +785,18 @@ CHAINE_STRING :
     chaine CHAINE_STRING
     {
         sprintf(string,"%s%s",string,$1);
-    }
+    }#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include "symbolsTable.h"
+int test (){ return 5; }
+
+int main() {
+    char * code ; 
+    addVariable("Comp", "INTEGER", "idf fonction", 1, "NULL", "PROGRAM");
+    printf("%s\n", getVariableType("Comp", "PROGRAM", &code));
+    printf("%s\n",code);
+}
 | 
     chaine
     {
