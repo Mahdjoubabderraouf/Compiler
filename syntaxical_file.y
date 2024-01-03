@@ -1045,6 +1045,8 @@ void yyerror(const char *s) {
 }
 int main() {
     yyparse();
+    afficher(); // pour la ts 
+    
     afficher_qdr();
     return 0;
 }
