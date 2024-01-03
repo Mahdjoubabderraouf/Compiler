@@ -2,7 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "quad.h"
 
+int Fin_if=0,  deb_else=0;
+int qc=0;
+char tmp [20]; 
 extern int yylex(void);
 extern char* yytext;
 int nbligne = 1;
@@ -48,7 +52,10 @@ int size,column,row;
 char function_return[100] = ""; 
 int condition = 0;
 int Nombre_de_paramètres=0;
+
+
 %}
+
 %union 
 { 
    int entier;
@@ -56,6 +63,7 @@ int Nombre_de_paramètres=0;
    char* string;
    char caracter;
 }
+
 %start Fonction
 
 %token <string> mcTRUE mcFALSE mcINTEGER mcREAL mcCHARACTER mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
@@ -75,6 +83,8 @@ int Nombre_de_paramètres=0;
 // %type <real> VALEURS_real
 %type <string> LOGICAL
 %%
+
+
 Fonction : 
     type mcROUTINE identificateur 
     { 
@@ -785,18 +795,7 @@ CHAINE_STRING :
     chaine CHAINE_STRING
     {
         sprintf(string,"%s%s",string,$1);
-    }#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include "symbolsTable.h"
-int test (){ return 5; }
-
-int main() {
-    char * code ; 
-    addVariable("Comp", "INTEGER", "idf fonction", 1, "NULL", "PROGRAM");
-    printf("%s\n", getVariableType("Comp", "PROGRAM", &code));
-    printf("%s\n",code);
-}
+    }
 | 
     chaine
     {
@@ -882,23 +881,54 @@ Boucle :
 ;
 
 if_statment :
-
-    mcIF {condition = 1;} paraO  condition paraF mcTHEN INST_S if_reste {condition = 0;}
+   if_A mcENDIF 
+   {
+   condition = 0; 
+   sprintf(tmp,"%d",qc);
+   ajour_quad(Fin_if,1,tmp);
+   }
+   | if_A mcELSE INST_S mcENDIF 
+   {condition = 0; 
+   sprintf(tmp,"%d",qc);
+   ajour_quad(Fin_if,1,tmp);
+   }
 ;
 
-if_reste : 
-    mcELSE INST_S mcENDIF
-| 
-    mcENDIF
 
-condition : 
-    
+
+
+if_A: if_B mcTHEN INST_S 
+    {
+    Fin_if=qc; 
+    quadr("BR","","vide","vide");
+    sprintf(tmp,"%d",qc);    
+    ajour_quad(deb_else,1,tmp); 
+    };
+
+if_B : mcIF {condition = 1;} paraO condition paraF     
+    {  
+       deb_else=qc;
+       quadr("BZ","","temp_cond", "vide");                                                            		
+	};
+
+
+/*
+				{Quad Condi}
+				(BG,ELSE,a,)
+				{Quad INSTR}
+				(BR, Fin, vide , vide )
+		ELSE--> {Quad INSTR_S}
+		Fin -->
+*/
+
+
+condition: 
     expression 
 | 
     expression2
 ; 
 
-expression2 :
+expression2:
 
     EXPR point AND point expression2
 | 
@@ -907,7 +937,7 @@ expression2 :
     EXPR
 ;
 
-expression : 
+expression: 
 
     paraO expression paraF
 | 
@@ -925,30 +955,26 @@ expression :
 | 
     comparision
 ;
-
 comparision :  
     
-    EXPR point EQ point EXPR
+    EXPR point EQ point EXPR /*(BE,fin,Temp_cond, )*/
 | 
-    EXPR point GT point EXPR
+    EXPR point GT point EXPR /*(BGE,fin,Temp_cond, )*/
 | 
-    EXPR point GE point EXPR
+    EXPR point GE point EXPR /*(GE,fin,Temp_cond, )*/
+|
+    EXPR point NE point EXPR /*(BNE,fin,Temp_cond, )*/
 | 
-    EXPR point NE point EXPR
-| 
-    EXPR point LE point EXPR
-| 
-    EXPR point LT point EXPR
+    EXPR point LE point EXPR /*(BLE,fin,Temp_cond, )*/
+|
+    EXPR point LT point EXPR /*(BL,fin,Temp_cond, )*/
 ;
-
-
 LOGICAL: 
 
-    mcTRUE
+    mcTRUE 
 | 
     mcFALSE
 ;
-
 OPER : 
     plus
 | 
@@ -958,19 +984,14 @@ OPER :
 | 
     division
 ;
-
 %%
-
 // Fonction main
-
 void yyerror(const char *s) {
     fprintf(stderr, "\n Syntax error at line %d, column %d: %s\n", nbligne, col, s);
     exit(EXIT_FAILURE);
 }
-
 int main() {
     yyparse();
-
-    afficher();
+    afficher_qdr();
     return 0;
 }
