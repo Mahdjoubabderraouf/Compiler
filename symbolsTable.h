@@ -603,6 +603,7 @@ int getSize(char *name, char *place)
     }
     return 0;
 }
+
 // Fonction retourner Row & Colmun
 int getRowCol(char *name, char *place, int *row, int *col)
 {
@@ -618,6 +619,7 @@ int getRowCol(char *name, char *place, int *row, int *col)
     }
     return 1;
 }
+
 // check if function declared 
 int functionisDeclared(char *name)
 {
