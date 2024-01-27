@@ -71,7 +71,4 @@ commantaire %.*;
 {chaine}            { yylval.string=strdup(yytext); addConstant(yytext, "STRING", 1, 0.0); col = col + yyleng; return chaine; }
 {commantaire} 
 {REALNEGATIF}       { yylval.real=atof(yytext); addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALNEGATIF; }
-{REALPOSITIF}       { yylval.real=atof(yytext); addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALPOSITIF; }
-. {printf("erreur lexical a la ligne %d  la col %d entite %s \n",nbligne,col, yytext);}
-
-%%
+GATIF; }
