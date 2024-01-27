@@ -17,7 +17,7 @@ REAL           {INTEGER}\.{NATUREL}
 identificateur {lettre}({lettre}|{chiffre}|\_){0,9}
 caracter \".\"
 chaine 	\".+\"
-commantaire %.*;
+commantaire %[.*"\n"];
 %%
 "TRUE"              { addMotCle(yytext, "mcTRUE" ,1); col = col + yyleng; return mcTRUE; }
 "FALSE"             { addMotCle(yytext, "mcFALSE" ,1); col = col + yyleng; return mcFALSE; }
@@ -71,4 +71,5 @@ commantaire %.*;
 {chaine}            { yylval.string=strdup(yytext); addConstant(yytext, "STRING", 1, 0.0); col = col + yyleng; return chaine; }
 {commantaire} 
 {REALNEGATIF}       { yylval.real=atof(yytext); addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALNEGATIF; }
-GATIF; }
+{REALPOSITIF}       { yylval.real=atof(yytext); addConstant(yytext, "REAL", 1, atof(yytext)); col = col + yyleng; return REALPOSITIF; }
+%%
