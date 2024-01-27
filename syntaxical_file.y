@@ -1,17 +1,30 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 extern int yylex(void);
 extern char* yytext;
 int nbligne = 1;
 int col=1;	
 void yyerror(const char *s);
+
+char sauvType[25];
+char sauvPlace[25];
 %}
+
+%union 
+{ 
+   int entier;
+   float real; 
+   char* string;
+   char caracter;
+}
+
 %start Fonction
 
-%token mcTRUE mcFALSE mcINTEGER mcREAL mcCHARACTER mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDO PartageMemoire
-%token OR AND GT EQ GE NE LE LT eq point_virgule point plus mpins division or aro etoile virgule gui
-%token paraO paraF identificateur INTEGER INTEGERPOSITIF INTEGERNEGATIF REAL caracter chaine commantaire REALNEGATIF REALPOSITIF
+%token mcTRUE mcFALSE <string>mcINTEGER <string>mcREAL <string>mcCHARACTER <string>mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
+%token OR AND GT EQ GE NE LE LT eq point_virgule point plus mpins division or aro etoile virgule
+%token paraO paraF <string>identificateur <entier>INTEGER <entier>INTEGERPOSITIF <entier>INTEGERNEGATIF <real>REAL <caracter>caracter <string>chaine commantaire <real>REALNEGATIF <real>REALPOSITIF
 
 %left virgule
 %left plus mpins
@@ -19,26 +32,27 @@ void yyerror(const char *s);
 %nonassoc EQ NE LT LE GT GE
 %left AND OR
 %left paraO paraF
+%left point
 %right UNARY_OPERATOR
 %%
-Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INSTR1 identificateur eq EXPR mcENDR Fonction
-         | mcPROGRAM identificateur DECLARATIONS INSTR1 mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
+Fonction : type mcROUTINE identificateur paraO Liste paraF DECLARATIONS INST_S identificateur eq EXPR mcENDR Fonction { addType($3,$1); sprintf (sauvPlace,"FONCTION %s",$3); }
+         | mcPROGRAM identificateur DECLARATIONS INST_S mcEND {  printf("Programme syntaxiquement correct.\n"); YYACCEPT; }
          ;
 
-DECLARATIONS : type identificateur caractere1 DECLARATIONS1;
-
+DECLARATIONS : type identificateur caractere1 DECLARATIONS1 { strcpy(sauvType,$1); addType ($2,sauvType);addVarPlace($2,sauvPlace) }
+             ;
+                  /* exemple : int x,a; char b; */
 caractere1: etoile INTEGER
           | /*epsilon*/
           ;
 
 DECLARATIONS1 : point_virgule DECLARATIONS
 			  | point_virgule
-              | virgule identificateur caractere1 DECLARATIONS1
-              | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
-              | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
+                    | virgule identificateur caractere1 DECLARATIONS1 {addType ($2,sauvType); }
+                    | mcDIMENSION paraO INTEGER paraF DECLARATIONS2
+                    | mcDIMENSION paraO INTEGER virgule INTEGER paraF DECLARATIONS2
 			  | eq VALEURS DECLARATIONS1
-			  ;/* TABLEAU tab (50),X = 847,ahmed (64); */
-
+			  ;
 DECLARATIONS2 : point_virgule DECLARATIONS
               | point_virgule
               | virgule identificateur caractere1 DECLARATIONS1
@@ -50,12 +64,11 @@ VALEURS : REAL | INTEGER | caracter | chaine;
 
 type : mcINTEGER | mcLOGICAL | mcREAL | mcCHARACTER;
 
-INSTR1: INSTR1 INSTR point_virgule
+INST_S: INST_S INSTR point_virgule | INST_S Condition
       | ;
 
 INSTR : Affectation
       | ES
-      | Condition
       | Boucle
       | Appel
       | Equivalence
@@ -87,7 +100,7 @@ MATH_VAR : identificateur MATH_VAR1
          | paraO MATH_VAR paraF MATH_VAR1
          ;
 
-          /* paraO int OPER int paraF */
+          
 
 MATH_VAR1 : OPER MATH_VAR
           | INTEGERNEGATIF OPER MATH_VAR
@@ -131,37 +144,43 @@ Liste : identificateur
       | identificateur paraO INTEGER paraF
       ;
 
-
-Condition : mcIF paraO EXPR_CONDI paraF mcTHEN INSTR mcENDIF;
-
-Boucle : mcDOWHILE paraO EXPR_CONDI paraF INSTR mcENDO;
+Boucle : mcDOWHILE paraO expression paraF INST_S mcENDDO ;
 
 
-EXPR_CONDI : EXPR_CONDI_TYPE EXPR_CONDI_SUITE;
+Condition : mcIF paraO expression paraF mcTHEN INST_S mcELSE INST_S mcENDIF
+          | mcIF paraO expression paraF mcTHEN INST_S mcENDIF
+          ;
 
-EXPR_CONDI_TYPE : identificateur
-               | mcTRUE
-               | mcFALSE
-               | INTEGER
-               | REAL
-               | paraO EXPR_CONDI paraF
-               ;
+expression : paraO expression paraF
+           | expression point AND point expression
+           | expression point OR point expression
+           | comparison
 
-EXPR_CONDI_SUITE : EXPR_CONDI_OP EXPR_CONDI_TYPE EXPR_CONDI_SUITE
-                | point_virgule
-                | ;
+            ;
+comparison : operand point EQ point operand
+           | operand point GT point operand
+           | operand point GE point operand
+           | operand point NE point operand
+           | operand point LE point operand
+           | operand point LT point operand
+           | 
+           ;
 
-EXPR_CONDI_OP : OR
-              | AND
-              | GT
-              | GE
-              | EQ
-              | NE
-              | LE
-              | LT
-              | paraO EXPR_CONDI paraF
-              | OPER
-              ;
+operand : identificateur INTEGERPOSITIF
+        | identificateur INTEGERNEGATIF
+        | identificateur division operand
+        | identificateur etoile operand
+        | paraO operand paraF
+        | identificateur
+        | INTEGER
+        | INTEGERPOSITIF
+        | INTEGERNEGATIF
+        | REAL
+        | REALPOSITIF
+        | REALNEGATIF
+        | mcTRUE
+        | mcFALSE
+        ;
 
 OPER : plus
      | mpins
