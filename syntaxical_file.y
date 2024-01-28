@@ -2,7 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "quad.h"
 
+int Fin_if=0,  deb_else=0;
+int qc=0;
+char tmp [20]; 
 extern int yylex(void);
 extern char* yytext;
 int nbligne = 1;
@@ -55,7 +59,11 @@ char function_return[100] = "";
 int condition = 0;
 int nbr_par = 0 ;
 char oper=' ';
+char valeur [100];
+
+
 %}
+
 %union 
 { 
    int entier;
@@ -63,6 +71,7 @@ char oper=' ';
    char* string;
    char caracter;
 }
+
 %start Fonction
 
 %token <string> mcTRUE mcFALSE mcINTEGER mcREAL mcCHARACTER mcLOGICAL mcREAD mcWRITE mcDIMENSION mcPROGRAM mcEND mcROUTINE mcENDR mcCALL mcIF mcTHEN mcELSE mcENDIF mcDOWHILE mcENDDO PartageMemoire
@@ -73,7 +82,7 @@ char oper=' ';
 %left plus mpins
 %left etoile division
 %nonassoc EQ NE LT LE GT GE
-%left eq
+%left eq 
 %left AND OR
 %left paraO paraF
 %left point
@@ -82,6 +91,8 @@ char oper=' ';
 // %type <real> VALEURS_real
 %type <string> LOGICAL
 %%
+
+
 Fonction : 
     type mcROUTINE identificateur 
     { 
@@ -97,7 +108,7 @@ Fonction :
     paraO 
     { 
         // Handle function parameters
-        sprintf(listeSource, "para de Fun %s", $3);
+        sprintf(listeSource, "FONCTION %s", $3);
     } 
     Liste paraF 
     {
@@ -172,18 +183,32 @@ DECLARATIONS1 :
     } 
     caractere1 DECLARATIONS1
 | 
-    mcDIMENSION paraO INTEGER paraF 
-    {    
+    mcDIMENSION paraO INTEGER paraF // (BOUNDS,$3, , )
+                                    // (ADEC,IDF, , )
+    {
         if($3==0)
         {
             sprintf(errorMsg, "la taille doit être suprieur à 0 ");
             yyerror(errorMsg);
         }
         strcpy(IDFCode, "Tableau");
+
         size = $3;
+        sprintf(valeur,"%d",$3);
+
+        // quad BOUNDS
+        quadr("BOUNDS","1",valeur,"vide");
+
+        // ADEC
+        quadr("ADEC",IDF,"1","vide");
+
     } DECLARATIONS2
 | 
     mcDIMENSION paraO INTEGER virgule INTEGER paraF 
+    // (BOUNDS,$3,  , )
+    // (ADEC,IDF ,  , )
+    // (BOUNDS,$5,  , )
+    // (ADEC,IDF ,  , )
     {   
         if($3==0 || $5==0)
         {
@@ -193,6 +218,18 @@ DECLARATIONS1 :
         strcpy(IDFCode, "Matrice");
         row = $3;
         column = $5;
+
+        // quad BOUNDS
+        sprintf(valeur,"%d",$3);
+        quadr("BOUNDS","1",valeur,"vide");
+
+        // quad BOUNDS
+        sprintf(valeur,"%d",$5);
+        quadr("BOUNDS","2",valeur,"vide");
+
+        // ADEC
+        quadr("ADEC",IDF,"vide","vide");
+
     } DECLARATIONS2   
 |
     eq EXPR DECLARATIONS3
@@ -244,6 +281,14 @@ DECLARATIONS2 :
         }
         strcpy(IDFCode, "Tableau");
         size = $3;
+
+        sprintf(valeur,"%d",$3);
+        // quad BOUNDS
+        quadr("BOUNDS","1",valeur,"vide");
+
+        // ADEC
+        quadr("ADEC",IDF,"1","vide");
+
     } DECLARATIONS1
 | 
     mcDIMENSION paraO INTEGER virgule INTEGER paraF 
@@ -256,6 +301,18 @@ DECLARATIONS2 :
         strcpy(IDFCode, "Matrice");
         row =$3;
         column =$5;
+
+        // quad BOUNDS
+        sprintf(valeur,"%d",$3);
+        quadr("BOUNDS","1",valeur,"vide");
+
+        // quad BOUNDS
+        sprintf(valeur,"%d",$5);
+        quadr("BOUNDS","2",valeur,"vide");
+
+        // ADEC
+        quadr("ADEC",IDF,"vide","vide");
+
     } DECLARATIONS1
 ;
 
@@ -696,6 +753,9 @@ MATH_VAR :
 MATH_VAR1 : 
 
     OPER 
+    {
+    
+    }
     MATH_VAR
 | 
     INTEGERNEGATIF 
@@ -752,7 +812,8 @@ MATH_VAR1 :
     MATH_VAR
 | 
     REALPOSITIF 
-    {   if ($1 > 32767.32767 || $1 < 0 ){
+    {   
+        if ($1 > 32767.32767 || $1 < 0 ){
             sprintf(errorMsg, "erreur dans l'intervale ");
             yyerror(errorMsg);
         }
@@ -799,7 +860,8 @@ MATH_VAR1 :
     }
 | 
     REALNEGATIF
-    {   if ($1 > 32767.32767 || $1 < 0 ){
+    {   
+        if ($1 > 32767.32767 || $1 < 0 ){
              sprintf(errorMsg, "erreur dans l'intervale ");
             yyerror(errorMsg);
         }
@@ -921,23 +983,53 @@ Boucle :
 ;
 
 if_statment :
-
-    mcIF {condition = 1;} paraO  condition paraF mcTHEN INST_S if_reste {condition = 0;}
+   if_A mcENDIF 
+   {
+   condition = 0; 
+   sprintf(tmp,"%d",qc);
+   ajour_quad(Fin_if,1,tmp);
+   }
+   | if_A mcELSE INST_S mcENDIF 
+   {condition = 0; 
+   sprintf(tmp,"%d",qc);
+   ajour_quad(Fin_if,1,tmp);
+   }
 ;
 
-if_reste : 
-    mcELSE INST_S mcENDIF
-| 
-    mcENDIF
 
-condition : 
-    
+
+
+if_A: if_B mcTHEN INST_S 
+    {
+    Fin_if=qc; 
+    quadr("BR","","vide","vide");
+    sprintf(tmp,"%d",qc);    
+    ajour_quad(deb_else,1,tmp); 
+    };
+
+if_B : mcIF {condition = 1;} paraO condition paraF     
+    {  
+       deb_else=qc;
+       quadr("BZ","","temp_cond", "vide");                                                            		
+	};
+
+/*
+				{Quad Condi}
+				(BG,ELSE,a,)
+				{Quad INSTR}
+				(BR, Fin, vide , vide )
+		ELSE--> {Quad INSTR_S}
+		Fin -->
+*/
+
+
+condition: 
     expression 
 | 
     expression2
 ; 
 
-expression2 :
+expression2:
 
     EXPR point AND point expression2
 | 
@@ -946,7 +1038,7 @@ expression2 :
     EXPR
 ;
 
-expression : 
+expression: 
 
     paraO expression paraF
 | 
@@ -964,27 +1056,29 @@ expression :
 | 
     comparision
 ;
-
 comparision :  
     
-    EXPR point EQ point EXPR
+    EXPR point EQ point EXPR /*(BE,fin,Temp_cond, )*/
 | 
-    EXPR point GT point EXPR
+    EXPR point GT point EXPR /*(BGE,fin,Temp_cond, )*/
 | 
-    EXPR point GE point EXPR
+    EXPR point GE point EXPR /*(GE,fin,Temp_cond, )*/
+|
+    EXPR point NE point EXPR /*(BNE,fin,Temp_cond, )*/
 | 
-    EXPR point NE point EXPR
-| 
-    EXPR point LE point EXPR
-| 
-    EXPR point LT point EXPR
+    EXPR point LE point EXPR /*(BLE,fin,Temp_cond, )*/
+|
+    EXPR point LT point EXPR /*(BL,fin,Temp_cond, )*/
 ;
+
 
 LOGICAL: 
 
-    mcTRUE
+    mcTRUE 
+    {addConstant("TRUE", "LOGICAL", 1,0);}
 | 
     mcFALSE
+    {addConstant("FALSE", "LOGICAL", 1,0);}
 ;
 
 OPER : 
@@ -995,21 +1089,19 @@ OPER :
     etoile 
 | 
     division
-    {oper = '/';}
-
+    {oper ='/';}
 ;
 
 %%
-
 // Fonction main
-
 void yyerror(const char *s) {
     fprintf(stderr, "\n Syntax error at line %d, column %d: %s\n", nbligne, col, s);
     exit(EXIT_FAILURE);
 }
-
 int main() {
     yyparse();
-    afficher();
+    afficher(); // pour la ts 
+    
+    afficher_qdr();
     return 0;
 }
