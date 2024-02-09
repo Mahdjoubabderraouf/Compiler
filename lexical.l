@@ -17,7 +17,7 @@ REAL           {INTEGER}\.{NATUREL}
 identificateur {lettre}({lettre}|{chiffre}|\_){0,9}
 caracter \'.\'
 chaine 	\".+\"
-commantaire %.*;
+commantaire %[^;]*[;]
 %%
 "TRUE"              { yylval.string=strdup(yytext); addMotCle(yytext, "mcTRUE" ,1); col = col + yyleng; return mcTRUE; }
 "FALSE"             { yylval.string=strdup(yytext); addMotCle(yytext, "mcFALSE" ,1); col = col + yyleng; return mcFALSE; }
