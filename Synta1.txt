@@ -1,0 +1,76 @@
+
+INTEGER ROUTINE Comp (X,Y,Z)
+
+INTEGER A,B; 
+
+
+REAL T= 555.87; 
+CHARACTER C*20; 
+REAL L ; 
+INTEGER var4 DIMENSION (20);
+INTEGER MAT DIMENSION (20, 200);
+LOGICAL D = TRUE;
+L=X;
+% Instructions;
+
+B = 30;
+C = "L3";
+D = TRUE;
+A = MAT(5,4) + (B * (-5));
+
+WRITE ("Donner la valeur de A :"); 
+
+WRITE ("La Valeur de A est ", A, ".");
+
+READ (A);
+
+WRITE ("Donner la valeur de T:"); 
+READ (T);
+WRITE ("La Valeur de T est ", T, ".");
+
+
+IF ((A.GT.(D)).OR.(C.EQ.TRUE))
+
+THEN A = A - B ;
+ELSE A = A + B;
+ENDIF
+
+A = 0;
+
+DOWHILE (A.LT.10)
+A = MAT(55,3) + 1;
+IF
+((A.GT.(B+1)).OR.(C.EQ.TRUE))
+
+THEN A = A - B ;
+ELSE A = A + B;
+ENDIF
+
+ENDDO;
+
+Comp = A
+
+ENDR
+
+PROGRAM HelloAcad
+
+% Déclarations;
+
+INTEGER A,B,C ; 
+REAL Y ; 
+INTEGER TAB DIMENSION (20) ; 
+
+% Instructions;
+A = TAB(11) + (B * 7);
+B = 30;
+C = 22+10*B;
+
+
+
+EQUIVALENCE (A, B, C), (Y, TAB(3));
+
+IF(A .EQ. B  ) THEN A = A - B ;
+ELSE A = A + B;
+ENDIF
+
+END
